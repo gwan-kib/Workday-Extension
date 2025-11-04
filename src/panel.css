@@ -6,10 +6,13 @@
 
 /* Floating toggle button that stays visible */
 .wd-floating-btn {
+    display: flex;
   position: fixed;
+  width: 70px;
+  height: 70px;
   right: 16px;
   bottom: 16px;
-  z-index: 2147483647;
+  z-index: 999999;
   padding: 10px 14px;
   border-radius: 12px;
   border: 1px solid #d1d5db;
@@ -17,7 +20,18 @@
   box-shadow: 0 6px 20px rgba(0,0,0,.10);
   cursor: pointer;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  font-size: 14px;
+  font-size: 10px;
+  display: flex;
+  flex-direction: column;    /* stack lines vertically */
+  align-items: center;       /* center horizontally */
+  justify-content: center;   /* center vertically */
+
+  text-align: center;
+  line-height: 1.2;
+}
+
+.wd-floating-btn:hover {
+  background: #f9fafb;
 }
 
 :host {
