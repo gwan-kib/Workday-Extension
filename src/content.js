@@ -462,9 +462,8 @@ function runExtraction(delay = START_DELAY) {
   initCoursePanel();
 })();
 
-
 async function initCoursePanel() {
-  // 1️⃣ Create container for the panel
+  // Container for the floating panel (outside shadow so we can show/hide it)
   const host = document.createElement('div');
   Object.assign(host.style, {
     position: 'fixed',
@@ -475,51 +474,70 @@ async function initCoursePanel() {
     maxHeight: '60vh',
     fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Arial',
     color: '#111',
-    display: 'none'
+    display: 'none' // start hidden; toggle button will show/hide
   });
   document.body.appendChild(host);
 
-  // 2️⃣ Create shadow DOM
+  // Shadow DOM isolates the panel’s CSS/HTML from Workday styles
   const shadow = host.attachShadow({ mode: 'open' });
 
-  // 3️⃣ Load external CSS and HTML files
-  const cssURL = chrome.runtime.getURL('src/panel.css');
+  // Load panel assets
+  const cssURL  = chrome.runtime.getURL('src/panel.css');
   const htmlURL = chrome.runtime.getURL('src/panel.html');
 
-  const [css, html] = await Promise.all([
-    fetch(cssURL).then(r => r.text()),
-    fetch(htmlURL).then(r => r.text())
-  ]);
+  let css = '', html = '';
+  try {
+    const [cssRes, htmlRes] = await Promise.all([fetch(cssURL), fetch(htmlURL)]);
+    css  = await cssRes.text();
+    html = await htmlRes.text();
+  } catch (e) {
+    console.error('[Workday Course Extractor] Failed to load panel assets:', e);
+    return;
+  }
 
-  // 4️⃣ Inject them into the shadow root
-  const style = document.createElement('style');
-  style.textContent = css;
-  shadow.appendChild(style);
+  // Inject CSS + HTML into the shadow root
+  const styleEl = document.createElement('style');
+  styleEl.textContent = css;
+  shadow.appendChild(styleEl);
 
   const wrapper = document.createElement('div');
   wrapper.innerHTML = html;
   shadow.appendChild(wrapper);
 
-    // ===== Panel controller: wire up storage → table =====
+  // --- Toggle button lives INSIDE panel.html as #wd-toggle ---
+  const toggleBtn = shadow.getElementById('wd-toggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      host.style.display = host.style.display === 'none' ? 'block' : 'none';
+    });
+  } else {
+    console.warn('[Workday Course Extractor] #wd-toggle not found in panel.html');
+  }
+
+  // ===== Panel controller: storage → table =====
   const $ = (id) => shadow.getElementById(id);
-  const tbody = $('wd-tbody');
-  const searchInput = $('wd-search');
-  const countEl = $('wd-count');
+
+  const tbody      = $('wd-tbody');
+  const searchEl   = $('wd-search');
+  const countEl    = $('wd-count');
   const btnRefresh = $('wd-refresh');
-  const btnExport = $('wd-export');
+  const btnExport  = $('wd-export');
 
   let allRows = [];
   let viewRows = [];
   let sortKey = 'code';
-  let sortDir = 1; // 1 = asc, -1 = desc
+  let sortDir = 1; // 1 asc, -1 desc
 
   const norm = (s) => String(s ?? '').toLowerCase();
-  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const esc  = (s) => String(s ?? '').replace(/[&<>"']/g, m => (
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])
+  ));
 
   function resolveKey(r, key) {
     if (key === 'meeting') {
       const m = r.meetings?.[0] || {};
-      return (Array.isArray(m.days) ? m.days.join('') : (m.days || '')) + (m.start||'');
+      const days = Array.isArray(m.days) ? m.days.join('') : (m.days || '');
+      return days + (m.start || '');
     }
     if (key === 'status') return r.registrationStatus || '';
     return r[key] ?? '';
@@ -529,13 +547,12 @@ async function initCoursePanel() {
     const m = r.meetings?.[0] || {};
     const days = Array.isArray(m.days) ? m.days.join('') : (m.days || '');
     const time = [m.start, m.end].filter(Boolean).join('–');
-    const loc = m.location || '';
+    const loc  = m.location || '';
     return `<span class="pill">${esc(days || '-')}</span> <span class="muted">${esc(time)}</span><br><span class="muted">${esc(loc)}</span>`;
   }
 
   function render() {
-    // sort
-    const sorted = [...viewRows].sort((a, b) => {
+    const sorted = [...viewRows].sort((a,b) => {
       const av = norm(resolveKey(a, sortKey));
       const bv = norm(resolveKey(b, sortKey));
       if (av < bv) return -sortDir;
@@ -543,7 +560,6 @@ async function initCoursePanel() {
       return 0;
     });
 
-    // rows
     const html = sorted.map(r => `
       <tr>
         <td>${esc(r.code)}</td>
@@ -575,10 +591,14 @@ async function initCoursePanel() {
   }
 
   async function loadFromStorage() {
-    const { courses = [] } = await chrome.storage.local.get('courses');
-    allRows = Array.isArray(courses) ? courses : [];
-    viewRows = [...allRows];
-    applyFilter(searchInput.value);
+    try {
+      const { courses = [] } = await chrome.storage.local.get('courses');
+      allRows = Array.isArray(courses) ? courses : [];
+      viewRows = [...allRows];
+      applyFilter(searchEl?.value || '');
+    } catch (e) {
+      console.error('[Workday Course Extractor] read storage failed:', e);
+    }
   }
 
   function toCSV(rows) {
@@ -588,30 +608,23 @@ async function initCoursePanel() {
       'instructionalFormat','deliveryMode','instructor','startDate','endDate',
       'meeting_days','meeting_start','meeting_end','meeting_location'
     ];
-    const escCSV = (v) => `"${String(v ?? '').replace(/"/g,'""')}"`;
-    const lines = [headers.map(escCSV).join(',')];
+    const q = (v) => `"${String(v ?? '').replace(/"/g,'""')}"`;
+    const lines = [headers.map(q).join(',')];
     for (const r of rows) {
       const m = r.meetings?.[0] || {};
       lines.push([
         r.code, r.title, r.section, r.credits, r.gradingBasis, r.registrationStatus,
         r.instructionalFormat, r.deliveryMode, r.instructor, r.startDate, r.endDate,
         (m.days || []).join(' '), m.start || '', m.end || '', m.location || ''
-      ].map(escCSV).join(','));
+      ].map(q).join(','));
     }
     return lines.join('\r\n');
   }
 
-  // wire up UI
-  searchInput.addEventListener('input', (e) => applyFilter(e.target.value));
-  btnRefresh.addEventListener('click', loadFromStorage);
-  shadow.querySelectorAll('th[data-k]').forEach(th => {
-    th.addEventListener('click', () => {
-      const k = th.getAttribute('data-k');
-      if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = 1; }
-      render();
-    });
-  });
-  btnExport.addEventListener('click', () => {
+  // UI events
+  if (searchEl)   searchEl.addEventListener('input', (e) => applyFilter(e.target.value));
+  if (btnRefresh) btnRefresh.addEventListener('click', loadFromStorage);
+  if (btnExport)  btnExport.addEventListener('click', () => {
     const csv = toCSV(viewRows);
     if (!csv) return alert('No rows to export.');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -622,36 +635,23 @@ async function initCoursePanel() {
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
   });
 
-  // react to extractor updates
+  // Sort on header click
+  shadow.querySelectorAll('th[data-k]').forEach(th => {
+    th.addEventListener('click', () => {
+      const k = th.getAttribute('data-k');
+      if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = 1; }
+      render();
+    });
+  });
+
+  // React to extractor updates
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local' && changes.courses) {
       allRows = Array.isArray(changes.courses.newValue) ? changes.courses.newValue : [];
-      applyFilter(searchInput.value);
+      applyFilter(searchEl?.value || '');
     }
   });
 
-  // initial paint
+  // Initial paint
   loadFromStorage();
-
-
-  // 5️⃣ Floating toggle button
-  const btn = document.createElement('button');
-  btn.textContent = 'Courses';
-  Object.assign(btn.style, {
-    position: 'fixed',
-    right: '16px',
-    bottom: '16px',
-    zIndex: 2147483647,
-    padding: '10px 14px',
-    borderRadius: '12px',
-    border: '1px solid #d1d5db',
-    background: '#fff',
-    boxShadow: '0 6px 20px rgba(0,0,0,.10)',
-    cursor: 'pointer',
-    fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Arial'
-  });
-  btn.addEventListener('click', () => {
-    host.style.display = host.style.display === 'none' ? 'block' : 'none';
-  });
-  document.body.appendChild(btn);
 }
