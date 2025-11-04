@@ -1,25 +1,14 @@
-<!-- panel.html — HTML structure for the floating Workday Course Extractor panel -->
+<!-- src/panel.html -->
+<button id="wd-toggle" class="wd-floating-btn" type="button">Courses</button>
+
 <div class="card">
-  <!-- Header -->
   <div class="hdr">
     <span class="title">Captured Courses</span>
-
-    <!-- Search box -->
-    <input
-      id="wd-search"
-      class="search"
-      type="text"
-      placeholder="Search title/code/instructor…"
-    />
-
+    <input id="wd-search" class="search" placeholder="Search title/code/instructor…" />
     <span class="spacer"></span>
-
-    <!-- Control buttons -->
-    <button id="wd-refresh" class="btn">Refresh</button>
-    <button id="wd-export" class="btn">Export CSV</button>
+    <button id="wd-refresh" class="btn" type="button">Refresh</button>
+    <button id="wd-export" class="btn" type="button">Export CSV</button>
   </div>
-
-  <!-- Body: course table -->
   <div class="body">
     <table>
       <thead>
@@ -32,18 +21,12 @@
           <th data-k="status">Status</th>
         </tr>
       </thead>
-      <tbody id="wd-tbody">
-        <!-- Rows dynamically injected by content.js -->
-      </tbody>
+      <tbody id="wd-tbody"></tbody>
     </table>
   </div>
-
-  <!-- Footer -->
   <div class="foot">
-    <span id="wd-count" class="count">No data yet</span>
+    <span id="wd-count" class="count"></span>
     <span class="spacer"></span>
     <span class="muted">Tip: Click headers to sort</span>
   </div>
 </div>
-
-<button id="wd-toggle" class="floating-btn">Courses</button>

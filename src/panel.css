@@ -1,7 +1,11 @@
 /* panel.css — controls the UI of the floating Course Panel */
 
 /* Floating toggle button (bottom-right corner) */
-.floating-btn {
+/* Hide just the panel, not the toggle button */
+.card.is-hidden { display: none; }
+
+/* Floating toggle button that stays visible */
+.wd-floating-btn {
   position: fixed;
   right: 16px;
   bottom: 16px;
@@ -13,8 +17,8 @@
   box-shadow: 0 6px 20px rgba(0,0,0,.10);
   cursor: pointer;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-size: 14px;
 }
-
 
 :host {
   all: initial;

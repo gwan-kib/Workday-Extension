@@ -431,19 +431,6 @@ function runExtraction(delay = START_DELAY) {
   }, delay);
 }
 
-/** Init: run on load, re-arm on DOM mutations, expose manual trigger. */
-(function init() {
-  console.log('Workday Course Extractor — minimal build');
-
-  window.addEventListener('load', () => runExtraction(START_DELAY));
-
-  const mo = new MutationObserver(() => runExtraction(REARM_DELAY));
-
-  mo.observe(document.documentElement, { childList: true, subtree: true });
-
-  window.__wdDump = () => runExtraction(0);
-})();
-
 /************ Panel ************/
 
 // 1) Call the panel initializer
@@ -474,7 +461,7 @@ async function initCoursePanel() {
     maxHeight: '60vh',
     fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Arial',
     color: '#111',
-    display: 'none' // start hidden; toggle button will show/hide
+    display: 'block' // start hidden; toggle button will show/hide
   });
   document.body.appendChild(host);
 
@@ -506,13 +493,19 @@ async function initCoursePanel() {
 
   // --- Toggle button lives INSIDE panel.html as #wd-toggle ---
   const toggleBtn = shadow.getElementById('wd-toggle');
-  if (toggleBtn) {
+  const panelCard = shadow.querySelector('.card');
+
+  // Start with the panel hidden; button remains visible
+  panelCard.classList.add('is-hidden');
+
+  if (toggleBtn && panelCard) {
     toggleBtn.addEventListener('click', () => {
-      host.style.display = host.style.display === 'none' ? 'block' : 'none';
+      panelCard.classList.toggle('is-hidden');
     });
   } else {
-    console.warn('[Workday Course Extractor] #wd-toggle not found in panel.html');
+    console.warn('[Workday Course Extractor] toggle or card not found in panel.html');
   }
+
 
   // ===== Panel controller: storage → table =====
   const $ = (id) => shadow.getElementById(id);
