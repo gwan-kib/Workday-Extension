@@ -1,0 +1,113 @@
+/* panel.css — controls the UI of the floating Course Panel */
+
+:host {
+  all: initial;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.hdr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.btn {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn:hover {
+  background: #f9fafb;
+}
+
+.search {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  width: 180px;
+}
+
+.body {
+  overflow: auto;
+  max-height: 45vh;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+}
+
+th, td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: top;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background: #f9fafb;
+  text-align: left;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+tr:hover td {
+  background: #fbfbfb;
+}
+
+.muted {
+  color: #6b7280;
+}
+
+.pill {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #eef2ff;
+  border: 1px solid #e0e7ff;
+  font-size: 11px;
+}
+
+.foot {
+  padding: 8px 12px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.count {
+  font-size: 12px;
+  color: #4b5563;
+}
+
+.days {
+  white-space: nowrap;
+}

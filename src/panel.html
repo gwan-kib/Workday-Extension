@@ -1,0 +1,47 @@
+<!-- panel.html — HTML structure for the floating Workday Course Extractor panel -->
+<div class="card">
+  <!-- Header -->
+  <div class="hdr">
+    <span class="title">Captured Courses</span>
+
+    <!-- Search box -->
+    <input
+      id="wd-search"
+      class="search"
+      type="text"
+      placeholder="Search title/code/instructor…"
+    />
+
+    <span class="spacer"></span>
+
+    <!-- Control buttons -->
+    <button id="wd-refresh" class="btn">Refresh</button>
+    <button id="wd-export" class="btn">Export CSV</button>
+  </div>
+
+  <!-- Body: course table -->
+  <div class="body">
+    <table>
+      <thead>
+        <tr>
+          <th data-k="code">Code</th>
+          <th data-k="title">Title</th>
+          <th data-k="section">Sect</th>
+          <th data-k="instructor">Instructor</th>
+          <th data-k="meeting">Meeting</th>
+          <th data-k="status">Status</th>
+        </tr>
+      </thead>
+      <tbody id="wd-tbody">
+        <!-- Rows dynamically injected by content.js -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div class="foot">
+    <span id="wd-count" class="count">No data yet</span>
+    <span class="spacer"></span>
+    <span class="muted">Tip: Click headers to sort</span>
+  </div>
+</div>
