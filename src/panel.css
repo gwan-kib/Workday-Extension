@@ -28,10 +28,20 @@
 
   text-align: center;
   line-height: 1.2;
+  background: linear-gradient(180deg, #afebff, #002046);
 }
 
-.wd-floating-btn:hover {
-  background: #f9fafb;
+#wd-logo {
+  width: 45px;      /* adjust size as needed */
+  height: auto;     /* keeps proportions */
+  vertical-align: middle;  /* centers it nicely with text */
+  color: #ffffff;
+  transition: transform 0.2s ease;
+}
+
+.wd-floating-btn:hover #wd-logo{
+  color: #b7e2ff;
+  transform: scale(1.08); 
 }
 
 :host {
@@ -46,6 +56,10 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  position: fixed;
+  right: 16px;
+   bottom: 90px; 
+   z-index: 999999;
 }
 
 .hdr {

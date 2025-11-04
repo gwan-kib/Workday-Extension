@@ -495,6 +495,11 @@ async function initCoursePanel() {
   const toggleBtn = shadow.getElementById('wd-toggle');
   const panelCard = shadow.querySelector('.card');
 
+  const logoEl = shadow.querySelector('#wd-logo');
+  if (logoEl) {
+    logoEl.src = chrome.runtime.getURL('src/W.svg');
+  }
+
   // Start with the panel hidden; button remains visible
   panelCard.classList.add('is-hidden');
 
