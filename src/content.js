@@ -62,7 +62,7 @@ function deepQuerySearchAll(root, selector) {
   while (walker.nextNode()) {
     const currElement = walker.currentNode;
 
-    if (currElement.shadowRoot) {
+    if (currElement.shadowRoot && !currElement.hasAttribute?.('data-wd-ext-host')) {
       allElements.push(...currElement.shadowRoot.querySelectorAll(selector));
     }
   }
@@ -83,9 +83,8 @@ function deepQuerySearchFirst(root, selector) {
   while (walker.nextNode()) {
     const currElement = walker.currentNode;
 
-    if (currElement.shadowRoot) {
+    if (currElement.shadowRoot && !currElement.hasAttribute?.('data-wd-ext-host')) {
       const hit = currElement.shadowRoot.querySelector(selector);
-
       if (hit) {
         return hit;
       }
@@ -201,6 +200,10 @@ function findCourseTable(rootElement) {
 
 /** Parse rows from a table/grid with headers. */
 function extractFromTable(table) {
+  if (!table) {
+    return { rows: [], diagnostics: { reason: 'no table/grid found' } };
+  }
+
   const headers = headersFrom(table);
 
   if (!headers.length) {
@@ -452,6 +455,7 @@ function runExtraction(delay = START_DELAY) {
 async function initCoursePanel() {
   // Container for the floating panel (outside shadow so we can show/hide it)
   const host = document.createElement('div');
+  host.setAttribute('data-wd-ext-host','1');
   Object.assign(host.style, {
     position: 'fixed',
     right: '16px',
@@ -492,12 +496,12 @@ async function initCoursePanel() {
   shadow.appendChild(wrapper);
 
   // --- Toggle button lives INSIDE panel.html as #wd-toggle ---
-  const toggleBtn = shadow.getElementById('wd-toggle');
-  const panelCard = shadow.querySelector('.card');
+  const toggleBtn = shadow.getElementById('floating-button');
+  const panelCard = shadow.querySelector('.widget');
 
-  const logoEl = shadow.querySelector('#wd-logo');
-  if (logoEl) {
-    logoEl.src = chrome.runtime.getURL('src/W.svg');
+  const logoElement = shadow.querySelector('#wd-logo');
+  if (logoElement) {
+    logoElement.src = chrome.runtime.getURL('src/W.svg');
   }
 
   // Start with the panel hidden; button remains visible
@@ -515,11 +519,11 @@ async function initCoursePanel() {
   // ===== Panel controller: storage → table =====
   const $ = (id) => shadow.getElementById(id);
 
-  const tbody      = $('wd-tbody');
-  const searchEl   = $('wd-search');
-  const countEl    = $('wd-count');
-  const btnRefresh = $('wd-refresh');
-  const btnExport  = $('wd-export');
+  const tbody      = $('widget-tbody');
+  const searchEl   = $('widget-search');
+  const countEl    = $('widget-course-count');
+  const btnRefresh = $('widget-refresh');
+  const btnExport  = $('widget-export');
 
   let allRows = [];
   let viewRows = [];

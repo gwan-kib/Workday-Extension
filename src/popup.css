@@ -1,47 +1,62 @@
 body {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  margin: 10px;
   width: 680px;
+ 
+  margin: 10px;
+
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
 }
 
 .top {
   display: flex;
-  gap: 8px;
   align-items: center;
+
+  gap: 8px;
+ 
   margin-bottom: 10px;
 }
 
 input {
   flex: 1;
+
   padding: 6px 10px;
+
   border: 1px solid #e5e7eb;
   border-radius: 8px;
 }
 
 button {
+  background: #fff;
+
   padding: 6px 10px;
+
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  background: #fff;
+
   cursor: pointer;
 }
 
 table {
   width: 100%;
+
   border-collapse: collapse;
+
   font-size: 12px;
 }
 
 th,
 td {
-  padding: 6px 8px;
-  border-bottom: 1px solid #f3f4f6;
-  text-align: left;
   vertical-align: top;
+
+  padding: 6px 8px;
+
+  border-bottom: 1px solid #f3f4f6;
+
+  text-align: left;
 }
 
 th {
   background: #f9fafb;
+
   position: sticky;
   top: 0;
 }
@@ -53,5 +68,6 @@ th {
 /* extra: style the scrollable container */
 .table-container {
   max-height: 60vh;
+  
   overflow: auto;
 }

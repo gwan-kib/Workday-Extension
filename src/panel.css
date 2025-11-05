@@ -1,76 +1,99 @@
-/* panel.css — controls the UI of the floating Course Panel */
-
-/* Floating toggle button (bottom-right corner) */
-/* Hide just the panel, not the toggle button */
-.card.is-hidden { display: none; }
-
 /* Floating toggle button that stays visible */
-.wd-floating-btn {
-    display: flex;
+#floating-button {
+  background: linear-gradient(180deg, #afebff, #002046);
+
+  display: flex;
+  flex-direction: column;  
+  align-items: center;      
+  justify-content: center;
+
   position: fixed;
-  width: 70px;
-  height: 70px;
   right: 16px;
   bottom: 16px;
   z-index: 999999;
+
+  width: 70px;
+  height: 70px;
+
   padding: 10px 14px;
+
   border-radius: 12px;
   border: 1px solid #d1d5db;
-  background: #fff;
+
   box-shadow: 0 6px 20px rgba(0,0,0,.10);
+
   cursor: pointer;
+
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
   font-size: 10px;
-  display: flex;
-  flex-direction: column;    /* stack lines vertically */
-  align-items: center;       /* center horizontally */
-  justify-content: center;   /* center vertically */
 
   text-align: center;
   line-height: 1.2;
-  background: linear-gradient(180deg, #afebff, #002046);
+
+  transition: all 0.2s ease;
 }
 
 #wd-logo {
-  width: 45px;      /* adjust size as needed */
-  height: auto;     /* keeps proportions */
-  vertical-align: middle;  /* centers it nicely with text */
   color: #ffffff;
-  transition: transform 0.2s ease;
+
+  width: 50px;     
+  height: auto;   
+
+  vertical-align: middle; 
+
+  transition: all 0.2s ease;
 }
 
-.wd-floating-btn:hover #wd-logo{
+
+#floating-button:hover #wd-logo{
   color: #b7e2ff;
+
   transform: scale(1.08); 
+}
+
+#floating-button:hover {
+  background: linear-gradient(180deg, #bbeeff, #002046);
 }
 
 :host {
   all: initial;
 }
 
-.card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
+.widget {
+  background: #ffffff;
+
   display: flex;
   flex-direction: column;
+  
   position: fixed;
   right: 16px;
-   bottom: 90px; 
-   z-index: 999999;
+  bottom: 90px; 
+  z-index: 999999;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+
+  overflow: hidden;
 }
 
-.hdr {
+.widget.is-hidden { 
+  display: none; 
+}
+
+.widget-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+
   padding: 10px 12px;
+
+  gap: 10px;
+
   border-bottom: 1px solid #e5e7eb;
 }
 
-.title {
+#widget-title {
   font-weight: 700;
   font-size: 14px;
 }
@@ -80,49 +103,64 @@
 }
 
 .btn {
-  border: 1px solid #d1d5db;
-  background: #fff;
+  background: #ffffff;
+
   padding: 6px 10px;
+
+  border: 1px solid #d1d5db;
   border-radius: 8px;
-  cursor: pointer;
+
   font-size: 12px;
+
+  cursor: pointer;
 }
 
 .btn:hover {
   background: #f9fafb;
 }
 
-.search {
+#widget-search {
+  width: 180px;
+
+  padding: 6px 10px;
+
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  padding: 6px 10px;
+
   font-size: 12px;
-  width: 180px;
 }
 
-.body {
-  overflow: auto;
+.widget-body {
   max-height: 45vh;
+
+  overflow: auto;
 }
 
 table {
-  border-collapse: collapse;
   width: 100%;
+
+  border-collapse: collapse;
+  
   font-size: 12px;
 }
 
 th, td {
   padding: 8px 10px;
+
   border-bottom: 1px solid #f3f4f6;
+
   vertical-align: top;
 }
 
 th {
+  background: #f9fafb;
+
   position: sticky;
   top: 0;
-  background: #f9fafb;
+ 
   text-align: left;
   font-weight: 700;
+
   cursor: pointer;
 }
 
@@ -135,25 +173,33 @@ tr:hover td {
 }
 
 .pill {
-  display: inline-block;
-  padding: 2px 6px;
-  border-radius: 999px;
   background: #eef2ff;
+
+  display: inline-block;
+
+  padding: 2px 6px;
+
   border: 1px solid #e0e7ff;
+  border-radius: 999px;
+
   font-size: 11px;
 }
 
-.foot {
-  padding: 8px 12px;
-  border-top: 1px solid #e5e7eb;
+.widget-footer {
   display: flex;
-  gap: 8px;
   align-items: center;
+
+  padding: 8px 12px;
+  
+  gap: 8px;
+
+  border-top: 1px solid #e5e7eb;
 }
 
-.count {
-  font-size: 12px;
+#widget-course-count {
   color: #4b5563;
+
+  font-size: 12px;
 }
 
 .days {
