@@ -3,24 +3,33 @@
   "name": "Workday Course Extractor",
   "version": "1.0",
   "description": "Extract your registered courses from the Workday View My Courses page.",
+
   "permissions": ["storage"],
-  "host_permissions": ["https://*.myworkday.com/*"],
+
+  "host_permissions": [
+    "https://*.myworkday.com/*"
+  ],
+
   "action": {
     "default_popup": "src/popup.html",
     "default_title": "Workday Course Extractor"
   },
+
   "content_scripts": [
     {
-      "matches": ["https://*.myworkday.com/*"],
+      "matches": [
+        "https://*.myworkday.com/*"
+      ],
       "js": ["src/content.js"],
       "run_at": "document_idle",
       "all_frames": true
     }
   ],
+
   "web_accessible_resources": [
     {
       "resources": ["src/panel.css", "src/panel.html", "src/W.svg"],
-      "matches": ["https://*.myworkday.com/*", "https://wd10.myworkday.ca/*"]
+      "matches": ["https://*.myworkday.com/*"]
     }
   ]
 }
