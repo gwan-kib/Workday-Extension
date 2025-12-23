@@ -461,11 +461,11 @@ if (isLab || isSeminar) {
         "";
 
       tr.innerHTML = `
-        <td class="code">${c.code || ""}</td>
         <td class="title">
           <div class="title-main">${c.title || ""}</div>
           ${badge ? `<div class="muted">${badge}</div>` : ""}
         </td>
+        <td class="code">${c.code || ""}</td>
         <td class="sect">${(c.section_number || c.sect || "").trim()} ${(c.section_type || "").trim()}</td>
         <td class="instructor">${c.instructor || ""}</td>
         <td class="meeting">${c.meeting || ""}</td>
