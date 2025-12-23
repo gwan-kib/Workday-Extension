@@ -157,8 +157,8 @@
 
     // IMPORTANT: include Instructor explicitly (your request)
     const KEYS = {
-      instructor: ["instructor"],
-      meeting: ["meeting", "meeting times", "meeting time", "schedule", "time"],
+      instructor: ["instructor", "instructors"],
+      meeting: ["meeting", "meeting patterns", "meeting pattern"],
       status: ["status", "registration status"],
       title: ["title", "course listing", "course name", "course"],
       code: ["class code", "code", "course code", "course id"],
@@ -251,6 +251,143 @@
       full: str,
     };
   }
+
+  function extractMeetingLinesFromCell(meetingEl) {
+  if (!meetingEl) return [];
+
+  // BEST SOURCE: menu items expose full meeting strings in aria-label
+  const menuItems = Array.from(
+    meetingEl.querySelectorAll('[data-automation-id="menuItem"][aria-label]')
+  );
+
+  let lines = menuItems
+    .map((el) => (el.getAttribute("aria-label") || "").trim())
+    .filter(Boolean);
+
+  // fallback: promptOption text (sometimes present)
+  if (!lines.length) {
+    const prompts = Array.from(
+      meetingEl.querySelectorAll('[data-automation-id="promptOption"]')
+    );
+    lines = prompts
+      .map((el) =>
+        (
+          el.getAttribute("data-automation-label") ||
+          el.getAttribute("title") ||
+          el.textContent ||
+          ""
+        ).trim()
+      )
+      .filter(Boolean);
+  }
+
+  // final fallback: innerText split
+  if (!lines.length) {
+    lines = String(meetingEl.innerText || "")
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+
+  // only keep real meeting sentences
+  const DATE_RE = /\b\d{4}-\d{2}-\d{2}\s*-\s*\d{4}-\d{2}-\d{2}\b/;
+  const TIME_RE = /\b\d{1,2}:\d{2}\s*[ap]\.?m\.?\b/i;
+  const DAY_RE = /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/i;
+
+  return lines.filter((s) => DATE_RE.test(s) && TIME_RE.test(s) && DAY_RE.test(s));
+}
+
+function formatMeetingLineForPanel(line) {
+  const parts = String(line || "")
+    .split("|")
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  // Example parts:
+  // [0] date range
+  // [1] "Wed Fri"
+  // [2] "12:30 p.m. - 2:00 p.m."
+  // [3] "UBCO"
+  // [4] "Library (LIB)"
+  // [5] "Floor: 3"
+  // [6] "Room: 317"
+
+  const dayPart = parts.find((p) => /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/.test(p)) || "";
+  const timePart = parts.find((p) => /\d{1,2}:\d{2}/.test(p) && /-/.test(p)) || "";
+  const buildingPart = parts.find((p) => /\([A-Z]{2,}\)/.test(p)) || ""; // "Library (LIB)"
+  const floorPart = parts.find((p) => /^Floor:/i.test(p)) || "";
+  const roomPart = parts.find((p) => /^Room:/i.test(p)) || "";
+
+  // Keep it “meeting-pattern-ish” (days + time + location)
+  return [dayPart, timePart, buildingPart, floorPart, roomPart].filter(Boolean).join(" | ");
+}
+
+function extractMeetingLinesFromRow(rowEl) {
+  if (!rowEl) return [];
+  // look anywhere in the row for the "menuItem" aria-label pattern
+  const items = Array.from(rowEl.querySelectorAll('[data-automation-id="menuItem"][aria-label]'));
+  const lines = items
+    .map((el) => (el.getAttribute("aria-label") || "").trim())
+    .filter(Boolean);
+
+  // reuse the same strict filter you already use
+  const DATE_RE = /\b\d{4}-\d{2}-\d{2}\s*-\s*\d{4}-\d{2}-\d{2}\b/;
+  const TIME_RE = /\b\d{1,2}:\d{2}\s*[ap]\.?m\.?\b/i;
+  const DAY_RE = /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/i;
+
+  return lines.filter((s) => DATE_RE.test(s) && TIME_RE.test(s) && DAY_RE.test(s));
+}
+
+function cellHasPanelHeading(cell, heading) {
+  if (!cell) return false;
+  const want = normalizeText(heading);
+
+  // Workday often has <div title="Instructor"><h4>Instructor</h4>
+  const titled = Array.from(cell.querySelectorAll('[data-automation-id="panel"] [title], [data-automation-id="panel"] h4'));
+  for (const el of titled) {
+    const t = el.getAttribute && el.getAttribute("title");
+    if (t && normalizeText(t) === want) return true;
+    if (el.tagName === "H4" && normalizeText(el.textContent) === want) return true;
+  }
+  return false;
+}
+
+function findCellByPanelHeading(cells, heading) {
+  for (const cell of cells) {
+    if (cellHasPanelHeading(cell, heading)) return cell;
+  }
+  return null;
+}
+
+function extractInstructorNamesFromCell(instructorEl) {
+  if (!instructorEl) return "";
+
+  // Same structure as meetings: selected menu items with aria-label
+  const items = Array.from(instructorEl.querySelectorAll('[data-automation-id="menuItem"][aria-label]'))
+    .map((el) => (el.getAttribute("aria-label") || "").trim())
+    .filter(Boolean);
+
+  // Filter out junk (dates / meeting-like strings)
+  const looksLikeDateOrMeeting = (s) =>
+    /^\d{4}-\d{2}-\d{2}$/.test(s) ||
+    /\b\d{4}-\d{2}-\d{2}\s*-\s*\d{4}-\d{2}-\d{2}\b/.test(s) ||
+    /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/i.test(s) ||
+    /\b\d{1,2}:\d{2}\b/.test(s);
+
+  const names = items.filter((s) => !looksLikeDateOrMeeting(s));
+  if (names.length) return names.join(", ");
+
+  // fallback: promptOption
+  const prompt = instructorEl.querySelector('[data-automation-id="promptOption"]');
+  const txt = (
+    (prompt && (prompt.getAttribute("data-automation-label") || prompt.getAttribute("title") || prompt.textContent)) ||
+    instructorEl.textContent ||
+    ""
+  ).trim();
+
+  return looksLikeDateOrMeeting(txt) ? "" : txt;
+}
+
 
   function extractFromRow(row, headerMaps) {
     const { colMap, posMap } = headerMaps;
@@ -356,43 +493,55 @@
       seminarLike(sectionLinkString) ||
       seminarLike(raw.join(" "));
 
-    // ---------- Instructor (improved extraction) ----------
-    // ---------- Instructor (from Instructor column cell) ----------
+    // ---------- Instructor (robust: find the cell by its internal "Instructor" panel header) ----------
 let instructor = "";
 
-// pick the actual instructor cell element (by aria-colindex if possible)
-const instructorCol = colMap.instructor;
-let instructorEl = null;
-
-if (instructorCol != null && cellByCol.has(instructorCol)) {
-  instructorEl = cellByCol.get(instructorCol);
-} else if (posMap.instructor != null && posMap.instructor >= 0 && posMap.instructor < cells.length) {
-  instructorEl = cells[posMap.instructor];
-}
+let instructorEl =
+  findCellByPanelHeading(cells, "Instructor") || // ✅ best: matches your pasted element
+  (() => {
+    const instructorCol = colMap.instructor;
+    if (instructorCol != null && cellByCol.has(instructorCol)) return cellByCol.get(instructorCol);
+    if (posMap.instructor != null && posMap.instructor >= 0 && posMap.instructor < cells.length) return cells[posMap.instructor];
+    return null;
+  })();
 
 if (isLab || isSeminar) {
   instructor = "N/A";
-} else if (instructorEl) {
-  const prompt = instructorEl.querySelector('[data-automation-id="promptOption"]');
-  instructor = (
-    (prompt && (
-      prompt.getAttribute("data-automation-label") ||
-      prompt.getAttribute("title") ||
-      prompt.textContent
-    )) ||
-    instructorEl.textContent ||
-    ""
-  ).trim();
 } else {
-  instructor = (instructorCell || "").trim();
+  instructor = extractInstructorNamesFromCell(instructorEl) || (instructorCell || "").trim();
 }
 
 
-    // ---------- Meeting ----------
-    let meeting = (meetingCell || "").trim();
-    if (meeting && !/\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun|am|pm|\d{1,2}:\d{2})\b/i.test(meeting)) {
-      meeting = "";
-    }
+
+    // ---------- Meeting (improved: responsiveMonikerInput list items) ----------
+let meeting = "";
+
+// pick the actual meeting cell element (by aria-colindex if possible)
+const meetingCol = colMap.meeting;
+let meetingEl = null;
+
+if (meetingCol != null && cellByCol.has(meetingCol)) {
+  meetingEl = cellByCol.get(meetingCol);
+} else if (posMap.meeting != null && posMap.meeting >= 0 && posMap.meeting < cells.length) {
+  meetingEl = cells[posMap.meeting];
+}
+
+// 1) try the mapped meeting cell first
+let lines = meetingEl ? extractMeetingLinesFromCell(meetingEl) : [];
+
+// 2) if mapping failed (common), search the whole row for those menuItem aria-labels
+if (!lines.length) {
+  lines = extractMeetingLinesFromRow(row);
+}
+
+if (lines.length) {
+  meeting = lines.map(formatMeetingLineForPanel).filter(Boolean).join(" / ");
+} else {
+  // last fallback
+  meeting = (meetingCell || "").trim();
+}
+
+
 
     // ---------- Status ----------
     const status = (statusCell || "").trim();
@@ -402,6 +551,17 @@ if (isLab || isSeminar) {
       const idx = sectionLinkString.indexOf(" - ");
       if (idx >= 0) title = sectionLinkString.slice(idx + 3).trim();
     }
+
+// ---------- Sanity swap: fix common mis-maps (instructor ends up as date, meeting as name) ----------
+const looksLikeDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || "").trim());
+const looksLikeName = (s) => /^[A-Z][a-z]+(?: [A-Z][a-z]+)+$/.test(String(s || "").trim());
+
+if (looksLikeDate(instructor) && looksLikeName(meeting)) {
+  const tmp = instructor;
+  instructor = meeting;
+  meeting = tmp;
+}
+
 
     return {
       code,
