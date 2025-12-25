@@ -148,8 +148,13 @@ th, td {
   padding: 8px 10px;
 
   border-bottom: 1px solid #f3f4f6;
+  border-right: 1px solid #e5e7eb;
 
   vertical-align: top;
+}
+
+th:last-child, td:last-child {
+  border-right: none;
 }
 
 th {
@@ -162,6 +167,18 @@ th {
   font-weight: 700;
 
   cursor: pointer;
+}
+
+tr th {
+   text-align: center;
+}
+
+th:nth-child(2), th:nth-child(3), th:nth-child(4), th:nth-child(6) {
+  text-align: center;
+}
+
+tr td:nth-child(2), tr td:nth-child(3), tr td:nth-child(4), tr td:nth-child(6) {
+  text-align: center;
 }
 
 th:nth-child(1) { width: 175px; } /* Title */
