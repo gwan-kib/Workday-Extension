@@ -244,9 +244,7 @@
     // Split rest into section token + title (ONLY if first part looks like a section)
 const parts = rest.split(/\s*[-–—]\s*/).map((p) => p.trim()).filter(Boolean);
 
-console.log(rest);
-console.log(rest);
-console.log(parts);
+console.log("DEBUG parseSectionLinkString:", { input, str, rest, parts });
 
 const looksLikeSection = (s) =>
   /^\d{3}$/.test(s) ||            // 001, 101
@@ -255,12 +253,10 @@ const looksLikeSection = (s) =>
 let sectionToken = "";
 let parsedTitle = "";
 
-if (parts.length >= 2 && looksLikeSection(parts[0])) {
+console.log("DEBUG parts[0]:", parts[0], "looksLikeSection:", looksLikeSection(parts[0]));
   sectionToken = parts[0];
   parsedTitle = parts.slice(1).join(" - ").trim();
-} else {
-  parsedTitle = rest.trim();
-}
+
 
 parsedTitle = parsedTitle.replace(/\s*:\s*/g, ":\n");
 
@@ -435,15 +431,35 @@ function extractInstructorNamesFromCell(instructorEl) {
       return "";
     };
 
-    // Workday section link element (best single source for code+section+title)
-    const sectionLinkEl =
-      $(row, '[data-automation-id="promptOption"][role="link"]') ||
-      $(row, '.gwt-Label.WFMO.WOKO[data-automation-id="promptOption"][role="link"]');
+    // ✅ Search the entire row for the promptOption link (most reliable)
+    // It contains the full course string: "COSC_O 222-101 - Data Structures"
+    // Note: There may be multiple promptOption elements, find the one with CODE-SECTION format
+    const allPromptOptions = $$(row, '[data-automation-id="promptOption"]');
+    let sectionLinkEl = null;
+    
+    // Prefer the one that has the code-section-title pattern (with a dash after the code)
+    for (const el of allPromptOptions) {
+      const text = el.getAttribute("data-automation-label") || 
+                   el.getAttribute("title") || 
+                   el.getAttribute("aria-label") || 
+                   el.textContent || "";
+      // Look for pattern like "CODE_X 123-456" or "CODE_X 123-L2B"
+      if (/^[A-Z][A-Z0-9_]*\s*\d{2,3}-/.test(text)) {
+        sectionLinkEl = el;
+        break;
+      }
+    }
+    
+    // Fallback: if no code-section pattern found, use first promptOption
+    if (!sectionLinkEl && allPromptOptions.length > 0) {
+      sectionLinkEl = allPromptOptions[0];
+    }
 
     const sectionLinkString =
       (sectionLinkEl &&
         (sectionLinkEl.getAttribute("data-automation-label") ||
           sectionLinkEl.getAttribute("title") ||
+          sectionLinkEl.getAttribute("aria-label") ||
           sectionLinkEl.textContent)) ||
       "";
 
@@ -469,9 +485,9 @@ function extractInstructorNamesFromCell(instructorEl) {
       code = parsed.code;
       section_number = parsed.section_number;
       title = parsed.title;
-      console.log("found section link for:", title);
+      console.log("✓ parsed section link:", { code, section_number, title, sectionLinkString });
     } else {
-      console.log("did not find section link for", title);
+      console.log("✗ failed to parse section link:", { sectionLinkString, titleCell });
     }
     
 
