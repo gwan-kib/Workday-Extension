@@ -3,6 +3,7 @@
 // Works with panel.html and panel.css placed in the extension root.
 
 (() => {
+  console.log("✓ Content script loaded");
   const EXT_ID = "wd-courses-capture";
   const STATE = {
     courses: [],
@@ -229,20 +230,40 @@
     let str = String(input || "").replace(/\u00A0/g, " ").trim();
     if (!str) return null;
 
-    // use first line only
-    str = str.split("\n")[0].trim();
+    // keep ALL lines; Workday wraps titles with \n
+    str = str.replace(/\s*\n\s*/g, " ").trim();
 
     // REQUIRED pattern:
-    const m = str.match(/^\s*([A-Z][A-Z0-9_]*\s*\d{2,3}[A-Z]?)-(.+?)\s*$/);
+    const m = str.match(/^\s*([A-Z][A-Z0-9_]*\s*\d{3}[A-Z]?)\s*-\s*(.+?)\s*$/);
     if (!m) return null;
 
     const baseCode = m[1].trim(); // "COSC_O 222"
     const rest = m[2].trim();     // "L2D - Data Structures" or "101 - Data Structures"
 
-    // Split rest into section token + title (split only on spaced " - ")
-    const parts = rest.split(/\s+-\s+/).map((p) => p.trim()).filter(Boolean);
-    const sectionToken = parts[0] || "";
-    const parsedTitle = parts.length > 1 ? parts.slice(1).join(" - ").trim() : "";
+    
+    // Split rest into section token + title (ONLY if first part looks like a section)
+const parts = rest.split(/\s*[-–—]\s*/).map((p) => p.trim()).filter(Boolean);
+
+console.log(rest);
+console.log(rest);
+console.log(parts);
+
+const looksLikeSection = (s) =>
+  /^\d{3}$/.test(s) ||            // 001, 101
+  /^[A-Z]\d{1,2}[A-Z]?$/.test(s); // L2B, L2D, L02
+
+let sectionToken = "";
+let parsedTitle = "";
+
+if (parts.length >= 2 && looksLikeSection(parts[0])) {
+  sectionToken = parts[0];
+  parsedTitle = parts.slice(1).join(" - ").trim();
+} else {
+  parsedTitle = rest.trim();
+}
+
+parsedTitle = parsedTitle.replace(/\s*:\s*/g, ":\n");
+
 
     return {
       code: baseCode,
@@ -390,6 +411,7 @@ function extractInstructorNamesFromCell(instructorEl) {
 
 
   function extractFromRow(row, headerMaps) {
+    console.log("✓ extractFromRow loaded");
     const { colMap, posMap } = headerMaps;
 
     const cells = $$(row, "td, [role='gridcell']");
@@ -446,34 +468,15 @@ function extractInstructorNamesFromCell(instructorEl) {
     if (parsed) {
       code = parsed.code;
       section_number = parsed.section_number;
-      if (parsed.title) title = parsed.title;
+      title = parsed.title;
+      console.log("found section link for:", title);
+    } else {
+      console.log("did not find section link for", title);
     }
-
-    // 2) If the section link wasn't found, try parsing title cell if it looks like that pattern
-    if ((!code || !section_number) && titleCell) {
-      const parsedTitle = parseSectionLinkString(titleCell);
-      if (parsedTitle) {
-        if (!code) code = parsedTitle.code;
-        if (!section_number) section_number = parsedTitle.section_number;
-        if (parsedTitle.title) title = parsedTitle.title;
-      }
-    }
+    
 
     // 3) Fallback guesses
     if (!code) code = guessCode(codeCell) || guessCode(titleCell) || guessCode(raw.join(" ")) || "";
-
-    // 4) If still missing section_number, scan anywhere loosely
-    if (!section_number) {
-      const hay = [sectionLinkString, titleCell, codeCell, raw.join(" | ")].join(" | ");
-      const m = hay.match(/([A-Z][A-Z0-9_]*\s*\d{2,3}[A-Z]?)\s*-\s*([A-Z0-9]{2,4}|\d{3})\b/i);
-      if (m) {
-        code = m[1].trim();
-        section_number = m[2].trim();
-      }
-    }
-
-    // 5) fallback: sect cell
-    if (!section_number && sect) section_number = sect.trim();
 
     // ---------- Lab / Seminar detection ----------
     const labLike = (s) => /\b(lab|laboratory|labratory)\b/i.test(String(s || ""));

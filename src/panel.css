@@ -164,8 +164,8 @@ th {
   cursor: pointer;
 }
 
+th:nth-child(1) { width: 175px; } /* Title */
 th:nth-child(2) { width: 70px; } /* Code */
-th:nth-child(1) { width: 150px; } /* Title */
 th:nth-child(3) { width: 30px; } /* Sect */
 th:nth-child(4) { width: 100px; } /* Instructor */
 th:nth-child(5) { width: 500px; } /* Meeting */
@@ -212,3 +212,5 @@ tr:hover td {
 .days {
   white-space: nowrap;
 }
+
+.title-main { white-space: pre-line; }
