@@ -339,8 +339,11 @@ function formatMeetingLineForPanel(line) {
   // [4] "Library (LIB)"
   // [5] "Floor: 3"
   // [6] "Room: 317"
-
-  const dayPart = parts.find((p) => /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/.test(p)) || "";
+const dayPart = (
+  parts.find((p) => /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/.test(p)) || ""
+)
+  .split(/\s+/)
+  .join(" / ");
   const timePart = parts.find((p) => /\d{1,2}:\d{2}/.test(p) && /-/.test(p)) || "";
   const buildingPart = parts.find((p) => /\([A-Z]{2,}\)/.test(p)) || ""; // "Library (LIB)"
   const floorPart = parts.find((p) => /^Floor:/i.test(p)) || "";
@@ -709,7 +712,19 @@ if (looksLikeDate(instructor) && looksLikeName(meeting)) {
         <td class="code">${c.code || ""}</td>
         <td class="sect">${(c.section_number || c.sect || "").trim()} ${(c.section_type || "").trim()}</td>
         <td class="instructor">${c.instructor || ""}</td>
-        <td class="meeting">${escHTML(c.meeting || "").replace(/\n/g, "<br>")}</td>
+        <td class="meeting">
+  ${(() => {
+    const parts = String(c.meeting || "").split("\n");
+    const main = parts[0] || "";
+    const sub = parts[1] || "";
+
+    return `
+      ${main ? `<span class="meeting-pill">${escHTML(main)}</span>` : ""}
+      ${sub ? `<div class="meeting-sub">${escHTML(sub)}</div>` : ""}
+    `;
+  })()}
+</td>
+
         <td class="status">${c.status || ""}</td>
       `;
 

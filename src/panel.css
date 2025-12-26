@@ -231,3 +231,26 @@ tr:hover td {
 }
 
 .title-main { white-space: pre-line; }
+
+.meeting {
+  line-height: 1.4;
+}
+
+.meeting-pill {
+  display: inline-block;
+
+  padding: 4px 10px;
+  margin-bottom: 4px;
+
+  background: #eef2ff;
+  border: 1px solid #e0e7ff;
+  border-radius: 999px;
+
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.meeting-sub {
+  font-size: 11px;
+  color: #374151;
+}
