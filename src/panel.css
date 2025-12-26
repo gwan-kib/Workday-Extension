@@ -186,7 +186,7 @@ th:nth-child(2) { width: 70px; } /* Code */
 th:nth-child(3) { width: 30px; } /* Sect */
 th:nth-child(4) { width: 100px; } /* Instructor */
 th:nth-child(5) { width: 450px; } /* Meeting */
-th:nth-child(6) { width: 80px; } /* Status */
+th:nth-child(6) { width: 80px; } /* class-type */
 
 tr:hover td {
   background: #fbfbfb;

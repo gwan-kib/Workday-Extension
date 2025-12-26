@@ -100,23 +100,22 @@
     return m ? m[0].replace(/\s+/g, " ").trim() : "";
   }
 
- function normalizeMeeting(text) {
-  // preserve line breaks, normalize each line
-  return String(text || "")
-    .split(/\r?\n/)
-    .map((line) => line.replace(/\s+/g, " ").trim())
-    .filter(Boolean)
-    .join("\n");
-}
+  function normalizeMeeting(text) {
+    // preserve line breaks, normalize each line
+    return String(text || "")
+      .split(/\r?\n/)
+      .map((line) => line.replace(/\s+/g, " ").trim())
+      .filter(Boolean)
+      .join("\n");
+  }
 
-const escHTML = (s) =>
-  String(s ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-
+  const escHTML = (s) =>
+    String(s ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
 
   function getHeaderText(headerEl) {
     if (!headerEl) return "";
@@ -169,16 +168,25 @@ const escHTML = (s) =>
       return hit || null;
     };
 
-    // IMPORTANT: include Instructor explicitly (your request)
+    // IMPORTANT: rename status -> instructionalFormat to match what it actually contains
     const KEYS = {
       instructor: ["instructor", "instructors"],
       meeting: ["meeting", "meeting patterns", "meeting pattern"],
-      status: ["status", "registration status"],
-      deliveryMode: ["delivery mode", "mode", "modality"],  // ✅ ADD THIS
+      deliveryMode: ["delivery mode", "mode", "modality"],
       title: ["title", "course listing", "course name", "course"],
       code: ["class code", "code", "course code", "course id"],
       section: ["section", "sect", "sec"],
-      type: ["instructional format", "type", "component", "format"],
+
+      // What you were calling "Status" is actually reading Instructional Format
+      instructionalFormat: [
+        "instructional format",
+        "format",
+        "component",
+        "type",
+        // keep these as fallbacks in case Workday labels vary:
+        "status",
+        "registration status",
+      ],
     };
 
     const colMap = {};
@@ -206,13 +214,15 @@ const escHTML = (s) =>
         "thead th, [role='columnheader'], .wd-GridHeaderCell, .grid-column-header"
       );
 
-      // require at least *some* known headers
       const headerText = headerEls.map((h) => normalizeText(getHeaderText(h)));
+
+      // still require "section" + at least one other expected header
       const looksRight =
         headerText.some((t) => t.includes("section")) &&
         (headerText.some((t) => t.includes("instructor")) ||
           headerText.some((t) => t.includes("meeting")) ||
-          headerText.some((t) => t.includes("registration status")) ||
+          headerText.some((t) => t.includes("instructional format")) ||
+          headerText.some((t) => t.includes("format")) ||
           headerText.some((t) => t.includes("status")));
 
       if (!looksRight) continue;
@@ -230,15 +240,6 @@ const escHTML = (s) =>
 
   /**
    * Parse the Workday "promptOption" section link string.
-   * REQUIRED first step regex:
-   *   m = str.match(/^\s*([A-Z][A-Z0-9_]*\s*\d{2,3}[A-Z]?)-(.+?)\s*$/);
-   *
-   * Example:
-   *   "COSC_O 222-L2D - Data Structures"
-   *   baseCode = "COSC_O 222"
-   *   rest = "L2D - Data Structures"
-   *   section_number = "L2D"
-   *   title = "Data Structures"
    */
   function parseSectionLinkString(input) {
     let str = String(input || "").replace(/\u00A0/g, " ").trim();
@@ -254,23 +255,16 @@ const escHTML = (s) =>
     const baseCode = m[1].trim(); // "COSC_O 222"
     const rest = m[2].trim();     // "L2D - Data Structures" or "101 - Data Structures"
 
-    
-    // Split rest into section token + title (ONLY if first part looks like a section)
-const parts = rest.split(/\s*[-–—]\s*/).map((p) => p.trim()).filter(Boolean);
+    // Split rest into section token + title
+    const parts = rest.split(/\s*[-–—]\s*/).map((p) => p.trim()).filter(Boolean);
 
-const looksLikeSection = (s) =>
-  /^\d{3}$/.test(s) ||            // 001, 101
-  /^[A-Z]\d{1,2}[A-Z]?$/.test(s); // L2B, L2D, L02
+    let sectionToken = "";
+    let parsedTitle = "";
 
-let sectionToken = "";
-let parsedTitle = "";
+    sectionToken = parts[0];
+    parsedTitle = parts.slice(1).join(" - ").trim();
 
-  sectionToken = parts[0];
-  parsedTitle = parts.slice(1).join(" - ").trim();
-
-
-parsedTitle = parsedTitle.replace(/\s*:\s*/g, ":\n");
-
+    parsedTitle = parsedTitle.replace(/\s*:\s*/g, ":\n");
 
     return {
       code: baseCode,
@@ -281,165 +275,145 @@ parsedTitle = parsedTitle.replace(/\s*:\s*/g, ":\n");
   }
 
   function extractMeetingLinesFromCell(meetingEl) {
-  if (!meetingEl) return [];
+    if (!meetingEl) return [];
 
-  // BEST SOURCE: menu items expose full meeting strings in aria-label
-  const menuItems = Array.from(
-    meetingEl.querySelectorAll('[data-automation-id="menuItem"][aria-label]')
-  );
-
-  let lines = menuItems
-    .map((el) => (el.getAttribute("aria-label") || "").trim())
-    .filter(Boolean);
-
-  // fallback: promptOption text (sometimes present)
-  if (!lines.length) {
-    const prompts = Array.from(
-      meetingEl.querySelectorAll('[data-automation-id="promptOption"]')
+    // BEST SOURCE: menu items expose full meeting strings in aria-label
+    const menuItems = Array.from(
+      meetingEl.querySelectorAll('[data-automation-id="menuItem"][aria-label]')
     );
-    lines = prompts
-      .map((el) =>
-        (
-          el.getAttribute("data-automation-label") ||
-          el.getAttribute("title") ||
-          el.textContent ||
-          ""
-        ).trim()
-      )
+
+    let lines = menuItems
+      .map((el) => (el.getAttribute("aria-label") || "").trim())
       .filter(Boolean);
+
+    // fallback: promptOption text (sometimes present)
+    if (!lines.length) {
+      const prompts = Array.from(
+        meetingEl.querySelectorAll('[data-automation-id="promptOption"]')
+      );
+      lines = prompts
+        .map((el) =>
+          (
+            el.getAttribute("data-automation-label") ||
+            el.getAttribute("title") ||
+            el.textContent ||
+            ""
+          ).trim()
+        )
+        .filter(Boolean);
+    }
+
+    // final fallback: innerText split
+    if (!lines.length) {
+      lines = String(meetingEl.innerText || "")
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
+
+    // only keep real meeting sentences
+    const DATE_RE = /\b\d{4}-\d{2}-\d{2}\s*-\s*\d{4}-\d{2}-\d{2}\b/;
+    const TIME_RE = /\b\d{1,2}:\d{2}\s*[ap]\.?m\.?\b/i;
+    const DAY_RE = /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/i;
+
+    return lines.filter((s) => DATE_RE.test(s) && TIME_RE.test(s) && DAY_RE.test(s));
   }
 
-  // final fallback: innerText split
-  if (!lines.length) {
-    lines = String(meetingEl.innerText || "")
-      .split("\n")
-      .map((s) => s.trim())
+  function formatMeetingLineForPanel(line) {
+    const parts = String(line || "")
+      .split("|")
+      .map((p) => p.trim())
       .filter(Boolean);
+
+    const dayPartRaw = parts.find((p) => /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/.test(p)) || "";
+    const dayPart = dayPartRaw.split(/\s+/).join(" / ");
+
+    const timePart = parts.find((p) => /\d{1,2}:\d{2}/.test(p) && /-/.test(p)) || "";
+    const buildingPart = parts.find((p) => /\([A-Z]{2,}\)/.test(p)) || ""; // "Library (LIB)"
+    const floorPart = parts.find((p) => /^Floor:/i.test(p)) || "";
+    const roomPart = parts.find((p) => /^Room:/i.test(p)) || "";
+
+    return {
+      days: dayPart,
+      time: timePart,
+      location: [buildingPart, floorPart, roomPart].filter(Boolean).join(" | "),
+    };
   }
 
-  // only keep real meeting sentences
-  const DATE_RE = /\b\d{4}-\d{2}-\d{2}\s*-\s*\d{4}-\d{2}-\d{2}\b/;
-  const TIME_RE = /\b\d{1,2}:\d{2}\s*[ap]\.?m\.?\b/i;
-  const DAY_RE = /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/i;
+  function extractMeetingLinesFromRow(rowEl) {
+    if (!rowEl) return [];
+    const items = Array.from(rowEl.querySelectorAll('[data-automation-id="menuItem"][aria-label]'));
+    const lines = items
+      .map((el) => (el.getAttribute("aria-label") || "").trim())
+      .filter(Boolean);
 
-  return lines.filter((s) => DATE_RE.test(s) && TIME_RE.test(s) && DAY_RE.test(s));
-}
+    const DATE_RE = /\b\d{4}-\d{2}-\d{2}\s*-\s*\d{4}-\d{2}-\d{2}\b/;
+    const TIME_RE = /\b\d{1,2}:\d{2}\s*[ap]\.?m\.?\b/i;
+    const DAY_RE = /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/i;
 
-function formatMeetingLineForPanel(line) {
-  const parts = String(line || "")
-    .split("|")
-    .map((p) => p.trim())
-    .filter(Boolean);
-
-  // Example parts:
-  // [0] date range
-  // [1] "Wed Fri"
-  // [2] "12:30 p.m. - 2:00 p.m."
-  // [3] "UBCO"
-  // [4] "Library (LIB)"
-  // [5] "Floor: 3"
-  // [6] "Room: 317"
-const dayPart = (
-  parts.find((p) => /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/.test(p)) || ""
-)
-  .split(/\s+/)
-  .join(" / ");
-  const timePart = parts.find((p) => /\d{1,2}:\d{2}/.test(p) && /-/.test(p)) || "";
-  const buildingPart = parts.find((p) => /\([A-Z]{2,}\)/.test(p)) || ""; // "Library (LIB)"
-  const floorPart = parts.find((p) => /^Floor:/i.test(p)) || "";
-  const roomPart = parts.find((p) => /^Room:/i.test(p)) || "";
-
-  // Return an object with days, time, and location
-  return {
-    days: dayPart,
-    time: timePart,
-    location: [buildingPart, floorPart, roomPart].filter(Boolean).join(" | ")
-  };
-}
-
-function extractMeetingLinesFromRow(rowEl) {
-  if (!rowEl) return [];
-  // look anywhere in the row for the "menuItem" aria-label pattern
-  const items = Array.from(rowEl.querySelectorAll('[data-automation-id="menuItem"][aria-label]'));
-  const lines = items
-    .map((el) => (el.getAttribute("aria-label") || "").trim())
-    .filter(Boolean);
-
-  // reuse the same strict filter you already use
-  const DATE_RE = /\b\d{4}-\d{2}-\d{2}\s*-\s*\d{4}-\d{2}-\d{2}\b/;
-  const TIME_RE = /\b\d{1,2}:\d{2}\s*[ap]\.?m\.?\b/i;
-  const DAY_RE = /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/i;
-
-  return lines.filter((s) => DATE_RE.test(s) && TIME_RE.test(s) && DAY_RE.test(s));
-}
-
-function cellHasPanelHeading(cell, heading) {
-  if (!cell) return false;
-  const want = normalizeText(heading);
-
-  // Workday often has <div title="Instructor"><h4>Instructor</h4>
-  const titled = Array.from(cell.querySelectorAll('[data-automation-id="panel"] [title], [data-automation-id="panel"] h4'));
-  for (const el of titled) {
-    const t = el.getAttribute && el.getAttribute("title");
-    if (t && normalizeText(t) === want) return true;
-    if (el.tagName === "H4" && normalizeText(el.textContent) === want) return true;
+    return lines.filter((s) => DATE_RE.test(s) && TIME_RE.test(s) && DAY_RE.test(s));
   }
-  return false;
-}
 
-function findCellByPanelHeading(cells, heading) {
-  for (const cell of cells) {
-    if (cellHasPanelHeading(cell, heading)) return cell;
+  function cellHasPanelHeading(cell, heading) {
+    if (!cell) return false;
+    const want = normalizeText(heading);
+
+    const titled = Array.from(
+      cell.querySelectorAll('[data-automation-id="panel"] [title], [data-automation-id="panel"] h4')
+    );
+    for (const el of titled) {
+      const t = el.getAttribute && el.getAttribute("title");
+      if (t && normalizeText(t) === want) return true;
+      if (el.tagName === "H4" && normalizeText(el.textContent) === want) return true;
+    }
+    return false;
   }
-  return null;
-}
 
-function extractInstructorNamesFromCell(instructorEl) {
-  if (!instructorEl) return "";
+  function findCellByPanelHeading(cells, heading) {
+    for (const cell of cells) {
+      if (cellHasPanelHeading(cell, heading)) return cell;
+    }
+    return null;
+  }
 
-  // Same structure as meetings: selected menu items with aria-label
-  const items = Array.from(instructorEl.querySelectorAll('[data-automation-id="menuItem"][aria-label]'))
-    .map((el) => (el.getAttribute("aria-label") || "").trim())
-    .filter(Boolean);
+  function extractInstructorNamesFromCell(instructorEl) {
+    if (!instructorEl) return "";
 
-  // Filter out junk (dates / meeting-like strings)
-  const looksLikeDateOrMeeting = (s) =>
-    /^\d{4}-\d{2}-\d{2}$/.test(s) ||
-    /\b\d{4}-\d{2}-\d{2}\s*-\s*\d{4}-\d{2}-\d{2}\b/.test(s) ||
-    /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/i.test(s) ||
-    /\b\d{1,2}:\d{2}\b/.test(s);
+    const items = Array.from(instructorEl.querySelectorAll('[data-automation-id="menuItem"][aria-label]'))
+      .map((el) => (el.getAttribute("aria-label") || "").trim())
+      .filter(Boolean);
 
-  const names = items.filter((s) => !looksLikeDateOrMeeting(s));
-  if (names.length) return names.join(", ");
+    const looksLikeDateOrMeeting = (s) =>
+      /^\d{4}-\d{2}-\d{2}$/.test(s) ||
+      /\b\d{4}-\d{2}-\d{2}\s*-\s*\d{4}-\d{2}-\d{2}\b/.test(s) ||
+      /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/i.test(s) ||
+      /\b\d{1,2}:\d{2}\b/.test(s);
 
-  // fallback: promptOption
-  const prompt = instructorEl.querySelector('[data-automation-id="promptOption"]');
-  const txt = (
-    (prompt && (prompt.getAttribute("data-automation-label") || prompt.getAttribute("title") || prompt.textContent)) ||
-    instructorEl.textContent ||
-    ""
-  ).trim();
+    const names = items.filter((s) => !looksLikeDateOrMeeting(s));
+    if (names.length) return names.join(", ");
 
-  return looksLikeDateOrMeeting(txt) ? "" : txt;
-}
+    const prompt = instructorEl.querySelector('[data-automation-id="promptOption"]');
+    const txt = (
+      (prompt && (prompt.getAttribute("data-automation-label") || prompt.getAttribute("title") || prompt.textContent)) ||
+      instructorEl.textContent ||
+      ""
+    ).trim();
 
-function deliveryModeIndicatesOnline(deliveryModeCellEl) {
-  if (!deliveryModeCellEl) return false;
+    return looksLikeDateOrMeeting(txt) ? "" : txt;
+  }
 
-  // BEST: just read what Workday is showing in that delivery mode cell
-  const txt = (deliveryModeCellEl.innerText || deliveryModeCellEl.textContent || "").trim();
-  if (/online learning/i.test(txt)) return true;
+  function deliveryModeIndicatesOnline(deliveryModeCellEl) {
+    if (!deliveryModeCellEl) return false;
 
-  // backup: scan promptOption labels inside the cell
-  const prompts = Array.from(deliveryModeCellEl.querySelectorAll('[data-automation-id="promptOption"]'));
-  return prompts.some((el) => {
-    const label = (el.getAttribute("data-automation-label") || el.getAttribute("title") || el.textContent || "").trim();
-    return /online learning/i.test(label);
-  });
-}
+    const txt = (deliveryModeCellEl.innerText || deliveryModeCellEl.textContent || "").trim();
+    if (/online learning/i.test(txt)) return true;
 
-
-
+    const prompts = Array.from(deliveryModeCellEl.querySelectorAll('[data-automation-id="promptOption"]'));
+    return prompts.some((el) => {
+      const label = (el.getAttribute("data-automation-label") || el.getAttribute("title") || el.textContent || "").trim();
+      return /online learning/i.test(label);
+    });
+  }
 
   function extractFromRow(row, headerMaps) {
     const { colMap, posMap } = headerMaps;
@@ -464,38 +438,33 @@ function deliveryModeIndicatesOnline(deliveryModeCellEl) {
       return null;
     };
 
-
     const readByKey = (key) => {
       const col = colMap[key];
       if (col != null && cellByCol.has(col)) {
         return (cellByCol.get(col).innerText || "").trim();
       }
-      // fallback to positional index
       const pos = posMap[key];
       if (pos != null && pos >= 0 && pos < raw.length) return raw[pos] || "";
       return "";
     };
 
     // ✅ Search the entire row for the promptOption link (most reliable)
-    // It contains the full course string: "COSC_O 222-101 - Data Structures"
-    // Note: There may be multiple promptOption elements, find the one with CODE-SECTION format
     const allPromptOptions = $$(row, '[data-automation-id="promptOption"]');
     let sectionLinkEl = null;
-    
-    // Prefer the one that has the code-section-title pattern (with a dash after the code)
+
     for (const el of allPromptOptions) {
-      const text = el.getAttribute("data-automation-label") || 
-                   el.getAttribute("title") || 
-                   el.getAttribute("aria-label") || 
-                   el.textContent || "";
-      // Look for pattern like "CODE_X 123-456" or "CODE_X 123-L2B"
+      const text =
+        el.getAttribute("data-automation-label") ||
+        el.getAttribute("title") ||
+        el.getAttribute("aria-label") ||
+        el.textContent ||
+        "";
       if (/^[A-Z][A-Z0-9_]*\s*\d{2,3}-/.test(text)) {
         sectionLinkEl = el;
         break;
       }
     }
-    
-    // Fallback: if no code-section pattern found, use first promptOption
+
     if (!sectionLinkEl && allPromptOptions.length > 0) {
       sectionLinkEl = allPromptOptions[0];
     }
@@ -508,14 +477,12 @@ function deliveryModeIndicatesOnline(deliveryModeCellEl) {
           sectionLinkEl.textContent)) ||
       "";
 
-    // Read columns (now Instructor comes from Instructor column properly)
     const titleCell = readByKey("title");
     const codeCell = readByKey("code");
     const sectCell = readByKey("section");
-    const typeCell = readByKey("type");
-    const statusCell = readByKey("status");
     const meetingCell = readByKey("meeting");
-    const instructorCell = readByKey("instructor"); // <-- FIXED SOURCE
+    const instructorCell = readByKey("instructor");
+    const instructionalFormatCell = readByKey("instructionalFormat"); // ✅ renamed
 
     // ---------- Core parse: (code + section + title) from the same string ----------
     let code = "";
@@ -524,16 +491,13 @@ function deliveryModeIndicatesOnline(deliveryModeCellEl) {
     let section_number = "";
     let section_type = "";
 
-    // 1) Parse the Section link string first (most reliable)
     const parsed = parseSectionLinkString(sectionLinkString);
     if (parsed) {
       code = parsed.code;
       section_number = parsed.section_number;
       title = parsed.title;
     }
-    
 
-    // 3) Fallback guesses
     if (!code) code = guessCode(codeCell) || guessCode(titleCell) || guessCode(raw.join(" ")) || "";
 
     // ---------- Lab / Seminar detection ----------
@@ -541,111 +505,95 @@ function deliveryModeIndicatesOnline(deliveryModeCellEl) {
     const seminarLike = (s) => /\bseminar\b/i.test(String(s || ""));
 
     const isLab =
-      labLike(typeCell) ||
+      labLike(instructionalFormatCell) ||
       labLike(sectCell) ||
       labLike(title) ||
       labLike(sectionLinkString) ||
       labLike(raw.join(" "));
 
     const isSeminar =
-      seminarLike(typeCell) ||
+      seminarLike(instructionalFormatCell) ||
       seminarLike(sectCell) ||
       seminarLike(title) ||
       seminarLike(sectionLinkString) ||
       seminarLike(raw.join(" "));
 
-    // ---------- Instructor (robust: find the cell by its internal "Instructor" panel header) ----------
-let instructor = "";
+    // ---------- Instructor ----------
+    let instructor = "";
 
-let instructorEl =
-  findCellByPanelHeading(cells, "Instructor") || // ✅ best: matches your pasted element
-  (() => {
-    const instructorCol = colMap.instructor;
-    if (instructorCol != null && cellByCol.has(instructorCol)) return cellByCol.get(instructorCol);
-    if (posMap.instructor != null && posMap.instructor >= 0 && posMap.instructor < cells.length) return cells[posMap.instructor];
-    return null;
-  })();
+    let instructorEl =
+      findCellByPanelHeading(cells, "Instructor") ||
+      (() => {
+        const instructorCol = colMap.instructor;
+        if (instructorCol != null && cellByCol.has(instructorCol)) return cellByCol.get(instructorCol);
+        if (posMap.instructor != null && posMap.instructor >= 0 && posMap.instructor < cells.length)
+          return cells[posMap.instructor];
+        return null;
+      })();
 
-if (isLab || isSeminar) {
-  instructor = "N/A";
-} else {
-  instructor = extractInstructorNamesFromCell(instructorEl) || (instructorCell || "").trim();
-}
+    if (isLab || isSeminar) {
+      instructor = "N/A";
+    } else {
+      instructor = extractInstructorNamesFromCell(instructorEl) || (instructorCell || "").trim();
+    }
 
+    // ---------- Meeting ----------
+    let meeting = "";
 
+    const meetingCol = colMap.meeting;
+    let meetingEl = null;
 
-    // ---------- Meeting (improved: responsiveMonikerInput list items) ----------
-let meeting = "";
+    if (meetingCol != null && cellByCol.has(meetingCol)) {
+      meetingEl = cellByCol.get(meetingCol);
+    } else if (posMap.meeting != null && posMap.meeting >= 0 && posMap.meeting < cells.length) {
+      meetingEl = cells[posMap.meeting];
+    }
 
-// pick the actual meeting cell element (by aria-colindex if possible)
-const meetingCol = colMap.meeting;
-let meetingEl = null;
+    let lines = meetingEl ? extractMeetingLinesFromCell(meetingEl) : [];
+    if (!lines.length) lines = extractMeetingLinesFromRow(row);
 
-if (meetingCol != null && cellByCol.has(meetingCol)) {
-  meetingEl = cellByCol.get(meetingCol);
-} else if (posMap.meeting != null && posMap.meeting >= 0 && posMap.meeting < cells.length) {
-  meetingEl = cells[posMap.meeting];
-}
+    let meetingObj = { days: "", time: "", location: "" };
 
-// 1) try the mapped meeting cell first
-let lines = meetingEl ? extractMeetingLinesFromCell(meetingEl) : [];
+    if (lines.length) {
+      const firstLine = lines[0];
+      meetingObj = formatMeetingLineForPanel(firstLine);
+    } else {
+      meeting = (meetingCell || "").trim();
+    }
 
-// 2) if mapping failed (common), search the whole row for those menuItem aria-labels
-if (!lines.length) {
-  lines = extractMeetingLinesFromRow(row);
-}
+    const deliveryModeCell = getCellEl("deliveryMode");
+    const isOnlineDelivery = deliveryModeIndicatesOnline(deliveryModeCell);
 
-let meetingObj = { days: "", time: "", location: "" };
+    if (isOnlineDelivery) {
+      meetingObj.location = "Online";
+    }
 
-if (lines.length) {
-  const firstLine = lines[0];
-  meetingObj = formatMeetingLineForPanel(firstLine);
-} else {
-  // last fallback: use raw meeting cell text
-  meeting = (meetingCell || "").trim();
-}
+    if (meetingObj.days || meetingObj.time || meetingObj.location) {
+      meeting = [meetingObj.days, meetingObj.time].filter(Boolean).join(" | ");
+      if (meetingObj.location) meeting += `\n${meetingObj.location}`;
+      else meeting += `\nOnline`;
+    } else {
+      meeting = (meetingCell || "").trim();
+    }
 
-const deliveryModeCell = getCellEl("deliveryMode");
-const isOnlineDelivery = deliveryModeIndicatesOnline(deliveryModeCell);
+    // ---------- Instructional Format (was "status") ----------
+    const instructionalFormat = (instructionalFormatCell || "").trim();
 
-if (isOnlineDelivery) {
-  meetingObj.location = "Online";
-}
-
-console.log("meeting stuff:", meetingObj);
-
-// Convert meeting object back to normalized string for storage
-if (meetingObj.days || meetingObj.time || meetingObj.location) {
-  meeting = [meetingObj.days, meetingObj.time].filter(Boolean).join(" | ")
-  if (meetingObj.location) 
-    meeting += `\n${meetingObj.location}` 
-  else 
-    meeting += `\nOnline`;
-} else {
-  meeting = (meetingCell || "").trim();
-}
-
-
-
-    // ---------- Status ----------
-    const status = (statusCell || "").trim();
-
-    // Final title fallback: if still empty, try after " - " in sectionLinkString
+    // Final title fallback
     if (!title && sectionLinkString) {
       const idx = sectionLinkString.indexOf(" - ");
       if (idx >= 0) title = sectionLinkString.slice(idx + 3).trim();
     }
 
-// ---------- Sanity swap: fix common mis-maps (instructor ends up as date, meeting as name) ----------
-const looksLikeDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || "").trim());
-const looksLikeName = (s) => /^[A-Z][a-z]+(?: [A-Z][a-z]+)+$/.test(String(s || "").trim());
+    // ---------- Sanity swap ----------
+    const looksLikeDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || "").trim());
+    const looksLikeName = (s) => /^[A-Z][a-z]+(?: [A-Z][a-z]+)+$/.test(String(s || "").trim());
 
-if (looksLikeDate(instructor) && looksLikeName(meeting)) {
-  const tmp = instructor;
-  instructor = meeting;
-  meeting = tmp;
-}
-
+    if (looksLikeDate(instructor) && looksLikeName(meeting)) {
+      const tmp = instructor;
+      instructor = meeting;
+      meeting = tmp;
+    }
 
     return {
       code,
@@ -655,7 +603,7 @@ if (looksLikeDate(instructor) && looksLikeName(meeting)) {
       section_type,
       instructor,
       meeting: normalizeMeeting(meeting),
-      status,
+      instructionalFormat, // ✅ renamed field
       isLab,
       isSeminar,
     };
@@ -713,19 +661,18 @@ if (looksLikeDate(instructor) && looksLikeName(meeting)) {
         <td class="sect">${(c.section_number || c.sect || "").trim()} ${(c.section_type || "").trim()}</td>
         <td class="instructor">${c.instructor || ""}</td>
         <td class="meeting">
-  ${(() => {
-    const parts = String(c.meeting || "").split("\n");
-    const main = parts[0] || "";
-    const sub = parts[1] || "";
+          ${(() => {
+            const parts = String(c.meeting || "").split("\n");
+            const main = (parts[0] || "").trim();   // "Wed / Fri | 12:30 p.m. - 2:00 p.m."
+            const sub  = (parts[1] || "").trim();   // "Online" OR "Library (LIB) | Floor: 3 | Room: 317"
 
-    return `
-      ${main ? `<span class="meeting-pill">${escHTML(main)}</span>` : ""}
-      ${sub ? `<div class="meeting-sub">${escHTML(sub)}</div>` : ""}
-    `;
-  })()}
-</td>
-
-        <td class="status">${c.status || ""}</td>
+            return `
+              ${main ? `<span class="meeting-pill">${escHTML(main)}</span>` : ""}
+              ${sub  ? `<div class="meeting-sub">${escHTML(sub)}</div>` : ""}
+            `;
+          })()}
+        </td>
+        <td class="instructionalFormat">${c.instructionalFormat || ""}</td>
       `;
 
       frag.appendChild(tr);
@@ -741,7 +688,7 @@ if (looksLikeDate(instructor) && looksLikeName(meeting)) {
       return;
     }
     STATE.filtered = STATE.courses.filter((c) => {
-      return ["code", "title", "section_number", "instructor", "meeting", "status"].some(
+      return ["code", "title", "section_number", "instructor", "meeting", "instructionalFormat"].some(
         (k) => (c[k] || "").toLowerCase().includes(q)
       );
     });
@@ -771,7 +718,7 @@ if (looksLikeDate(instructor) && looksLikeName(meeting)) {
   }
 
   function exportCSV() {
-    const headers = ["code", "title", "section_number", "instructor", "meeting", "status"];
+    const headers = ["code", "title", "section_number", "instructor", "meeting", "instructionalFormat"];
     const csv = toCSV(STATE.filtered, headers);
 
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
@@ -799,7 +746,7 @@ if (looksLikeDate(instructor) && looksLikeName(meeting)) {
     });
 
     on(ctx.refresh, "click", async () => {
-      STATE.courses = await robustScan(); // ✅ refresh works
+      STATE.courses = await robustScan();
       applySearchFilter(ctx.search.value);
       sortBy(STATE.sort.key || "code");
       renderRows(ctx, STATE.filtered);
@@ -819,7 +766,7 @@ if (looksLikeDate(instructor) && looksLikeName(meeting)) {
 
     wireSorting(ctx);
 
-    STATE.courses = await robustScan(); // ✅ initial scan stable
+    STATE.courses = await robustScan();
     STATE.filtered = [...STATE.courses];
     sortBy("code");
     renderRows(ctx, STATE.filtered);
