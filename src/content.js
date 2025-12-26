@@ -3,7 +3,6 @@
 // Works with panel.html and panel.css placed in the extension root.
 
 (() => {
-  console.log("✓ Content script loaded");
   const EXT_ID = "wd-courses-capture";
   const STATE = {
     courses: [],
@@ -101,9 +100,23 @@
     return m ? m[0].replace(/\s+/g, " ").trim() : "";
   }
 
-  function normalizeMeeting(text) {
-    return String(text || "").replace(/\s+/g, " ").trim();
-  }
+ function normalizeMeeting(text) {
+  // preserve line breaks, normalize each line
+  return String(text || "")
+    .split(/\r?\n/)
+    .map((line) => line.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .join("\n");
+}
+
+const escHTML = (s) =>
+  String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
 
   function getHeaderText(headerEl) {
     if (!headerEl) return "";
@@ -161,6 +174,7 @@
       instructor: ["instructor", "instructors"],
       meeting: ["meeting", "meeting patterns", "meeting pattern"],
       status: ["status", "registration status"],
+      deliveryMode: ["delivery mode", "mode", "modality"],  // ✅ ADD THIS
       title: ["title", "course listing", "course name", "course"],
       code: ["class code", "code", "course code", "course id"],
       section: ["section", "sect", "sec"],
@@ -244,8 +258,6 @@
     // Split rest into section token + title (ONLY if first part looks like a section)
 const parts = rest.split(/\s*[-–—]\s*/).map((p) => p.trim()).filter(Boolean);
 
-console.log("DEBUG parseSectionLinkString:", { input, str, rest, parts });
-
 const looksLikeSection = (s) =>
   /^\d{3}$/.test(s) ||            // 001, 101
   /^[A-Z]\d{1,2}[A-Z]?$/.test(s); // L2B, L2D, L02
@@ -253,7 +265,6 @@ const looksLikeSection = (s) =>
 let sectionToken = "";
 let parsedTitle = "";
 
-console.log("DEBUG parts[0]:", parts[0], "looksLikeSection:", looksLikeSection(parts[0]));
   sectionToken = parts[0];
   parsedTitle = parts.slice(1).join(" - ").trim();
 
@@ -335,8 +346,12 @@ function formatMeetingLineForPanel(line) {
   const floorPart = parts.find((p) => /^Floor:/i.test(p)) || "";
   const roomPart = parts.find((p) => /^Room:/i.test(p)) || "";
 
-  // Keep it “meeting-pattern-ish” (days + time + location)
-  return [dayPart, timePart, buildingPart, floorPart, roomPart].filter(Boolean).join(" | ");
+  // Return an object with days, time, and location
+  return {
+    days: dayPart,
+    time: timePart,
+    location: [buildingPart, floorPart, roomPart].filter(Boolean).join(" | ")
+  };
 }
 
 function extractMeetingLinesFromRow(rowEl) {
@@ -405,9 +420,25 @@ function extractInstructorNamesFromCell(instructorEl) {
   return looksLikeDateOrMeeting(txt) ? "" : txt;
 }
 
+function deliveryModeIndicatesOnline(deliveryModeCellEl) {
+  if (!deliveryModeCellEl) return false;
+
+  // BEST: just read what Workday is showing in that delivery mode cell
+  const txt = (deliveryModeCellEl.innerText || deliveryModeCellEl.textContent || "").trim();
+  if (/online learning/i.test(txt)) return true;
+
+  // backup: scan promptOption labels inside the cell
+  const prompts = Array.from(deliveryModeCellEl.querySelectorAll('[data-automation-id="promptOption"]'));
+  return prompts.some((el) => {
+    const label = (el.getAttribute("data-automation-label") || el.getAttribute("title") || el.textContent || "").trim();
+    return /online learning/i.test(label);
+  });
+}
+
+
+
 
   function extractFromRow(row, headerMaps) {
-    console.log("✓ extractFromRow loaded");
     const { colMap, posMap } = headerMaps;
 
     const cells = $$(row, "td, [role='gridcell']");
@@ -419,6 +450,17 @@ function extractInstructorNamesFromCell(instructorEl) {
       const col = getColIndex(cell) ?? (i + 1);
       if (!cellByCol.has(col)) cellByCol.set(col, cell);
     });
+
+    const getCellEl = (key) => {
+      const col = colMap[key];
+      if (col != null && cellByCol.has(col)) return cellByCol.get(col);
+
+      const pos = posMap[key];
+      if (pos != null && pos >= 0 && pos < cells.length) return cells[pos];
+
+      return null;
+    };
+
 
     const readByKey = (key) => {
       const col = colMap[key];
@@ -485,9 +527,6 @@ function extractInstructorNamesFromCell(instructorEl) {
       code = parsed.code;
       section_number = parsed.section_number;
       title = parsed.title;
-      console.log("✓ parsed section link:", { code, section_number, title, sectionLinkString });
-    } else {
-      console.log("✗ failed to parse section link:", { sectionLinkString, titleCell });
     }
     
 
@@ -553,10 +592,33 @@ if (!lines.length) {
   lines = extractMeetingLinesFromRow(row);
 }
 
+let meetingObj = { days: "", time: "", location: "" };
+
 if (lines.length) {
-  meeting = lines.map(formatMeetingLineForPanel).filter(Boolean).join(" / ");
+  const firstLine = lines[0];
+  meetingObj = formatMeetingLineForPanel(firstLine);
 } else {
-  // last fallback
+  // last fallback: use raw meeting cell text
+  meeting = (meetingCell || "").trim();
+}
+
+const deliveryModeCell = getCellEl("deliveryMode");
+const isOnlineDelivery = deliveryModeIndicatesOnline(deliveryModeCell);
+
+if (isOnlineDelivery) {
+  meetingObj.location = "Online";
+}
+
+console.log("meeting stuff:", meetingObj);
+
+// Convert meeting object back to normalized string for storage
+if (meetingObj.days || meetingObj.time || meetingObj.location) {
+  meeting = [meetingObj.days, meetingObj.time].filter(Boolean).join(" | ")
+  if (meetingObj.location) 
+    meeting += `\n${meetingObj.location}` 
+  else 
+    meeting += `\nOnline`;
+} else {
   meeting = (meetingCell || "").trim();
 }
 
@@ -647,7 +709,7 @@ if (looksLikeDate(instructor) && looksLikeName(meeting)) {
         <td class="code">${c.code || ""}</td>
         <td class="sect">${(c.section_number || c.sect || "").trim()} ${(c.section_type || "").trim()}</td>
         <td class="instructor">${c.instructor || ""}</td>
-        <td class="meeting">${c.meeting || ""}</td>
+        <td class="meeting">${escHTML(c.meeting || "").replace(/\n/g, "<br>")}</td>
         <td class="status">${c.status || ""}</td>
       `;
 

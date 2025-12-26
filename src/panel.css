@@ -150,7 +150,7 @@ th, td {
   border-bottom: 1px solid #f3f4f6;
   border-right: 1px solid #e5e7eb;
 
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 th:last-child, td:last-child {
@@ -173,11 +173,11 @@ tr th {
    text-align: center;
 }
 
-th:nth-child(2), th:nth-child(3), th:nth-child(4), th:nth-child(6) {
+th:nth-child(1), th:nth-child(2), th:nth-child(3), th:nth-child(4), th:nth-child(5), th:nth-child(6) {
   text-align: center;
 }
 
-tr td:nth-child(2), tr td:nth-child(3), tr td:nth-child(4), tr td:nth-child(6) {
+tr td:nth-child(1), tr td:nth-child(2), tr td:nth-child(3), tr td:nth-child(4), tr td:nth-child(5), tr td:nth-child(6) {
   text-align: center;
 }
 
@@ -185,7 +185,7 @@ th:nth-child(1) { width: 175px; } /* Title */
 th:nth-child(2) { width: 70px; } /* Code */
 th:nth-child(3) { width: 30px; } /* Sect */
 th:nth-child(4) { width: 100px; } /* Instructor */
-th:nth-child(5) { width: 500px; } /* Meeting */
+th:nth-child(5) { width: 450px; } /* Meeting */
 th:nth-child(6) { width: 80px; } /* Status */
 
 tr:hover td {
