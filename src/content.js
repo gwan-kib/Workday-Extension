@@ -90,7 +90,6 @@
       exportBtn: shadow.querySelector("#widget-export"),
       tableBody: shadow.querySelector("tbody"),
       tableHead: shadow.querySelector("thead"),
-      titleEl: shadow.querySelector("#widget-title"),
     };
   }
 
@@ -354,28 +353,6 @@
     return lines.filter((s) => DATE_RE.test(s) && TIME_RE.test(s) && DAY_RE.test(s));
   }
 
-  function cellHasPanelHeading(cell, heading) {
-    if (!cell) return false;
-    const want = normalizeText(heading);
-
-    const titled = Array.from(
-      cell.querySelectorAll('[data-automation-id="panel"] [title], [data-automation-id="panel"] h4')
-    );
-    for (const el of titled) {
-      const t = el.getAttribute && el.getAttribute("title");
-      if (t && normalizeText(t) === want) return true;
-      if (el.tagName === "H4" && normalizeText(el.textContent) === want) return true;
-    }
-    return false;
-  }
-
-  function findCellByPanelHeading(cells, heading) {
-    for (const cell of cells) {
-      if (cellHasPanelHeading(cell, heading)) return cell;
-    }
-    return null;
-  }
-
   function extractInstructorNamesFromCell(instructorEl) {
     if (!instructorEl) return "";
 
@@ -419,7 +396,7 @@
     const { colMap, posMap } = headerMaps;
 
     const cells = $$(row, "td, [role='gridcell']");
-    const raw = cells.map((c) => (c.innerText || "").trim());
+    const allText = (row.innerText || "").trim();
 
     // map row cells by aria-colindex (preferred)
     const cellByCol = new Map();
@@ -444,7 +421,9 @@
         return (cellByCol.get(col).innerText || "").trim();
       }
       const pos = posMap[key];
-      if (pos != null && pos >= 0 && pos < raw.length) return raw[pos] || "";
+      if (pos != null && pos >= 0 && pos < cells.length) {
+        return (cells[pos].innerText || "").trim();
+      }
       return "";
     };
 
@@ -487,9 +466,7 @@
     // ---------- Core parse: (code + section + title) from the same string ----------
     let code = "";
     let title = titleCell || "";
-    let sect = sectCell || "";
     let section_number = "";
-    let section_type = "";
 
     const parsed = parseSectionLinkString(sectionLinkString);
     if (parsed) {
@@ -498,7 +475,7 @@
       title = parsed.title;
     }
 
-    if (!code) code = guessCode(codeCell) || guessCode(titleCell) || guessCode(raw.join(" ")) || "";
+    if (!code) code = guessCode(codeCell) || guessCode(titleCell) || guessCode(allText) || "";
 
     // ---------- Lab / Seminar detection ----------
     const labLike = (s) => /\b(lab|laboratory|labratory)\b/i.test(String(s || ""));
@@ -509,20 +486,19 @@
       labLike(sectCell) ||
       labLike(title) ||
       labLike(sectionLinkString) ||
-      labLike(raw.join(" "));
+      labLike(allText)
 
     const isSeminar =
       seminarLike(instructionalFormatCell) ||
       seminarLike(sectCell) ||
       seminarLike(title) ||
       seminarLike(sectionLinkString) ||
-      seminarLike(raw.join(" "));
+      seminarLike(allText)
 
     // ---------- Instructor ----------
     let instructor = "";
 
     let instructorEl =
-      findCellByPanelHeading(cells, "Instructor") ||
       (() => {
         const instructorCol = colMap.instructor;
         if (instructorCol != null && cellByCol.has(instructorCol)) return cellByCol.get(instructorCol);
@@ -538,7 +514,7 @@
     }
 
     // ---------- Meeting ----------
-    let meeting = "";
+    let meeting;
 
     const meetingCol = colMap.meeting;
     let meetingEl = null;
@@ -598,9 +574,7 @@
     return {
       code,
       title,
-      sect,
       section_number,
-      section_type,
       instructor,
       meeting: normalizeMeeting(meeting),
       instructionalFormat, // ✅ renamed field
@@ -658,7 +632,7 @@
           ${badge ? `<div class="muted">${badge}</div>` : ""}
         </td>
         <td class="code">${c.code || ""}</td>
-        <td class="sect">${(c.section_number || c.sect || "").trim()} ${(c.section_type || "").trim()}</td>
+        <td class="sect">${(c.section_number || "").trim()}</td>
         <td class="instructor">${c.instructor || ""}</td>
         <td class="meeting">
           ${(() => {
