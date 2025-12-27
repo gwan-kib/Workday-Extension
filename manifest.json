@@ -17,10 +17,8 @@
 
   "content_scripts": [
     {
-      "matches": [
-        "https://*.myworkday.com/*"
-      ],
-      "js": ["src/content.js"],
+      "matches": ["https://*.myworkday.com/*"],
+      "js": ["dist/content.js"],
       "run_at": "document_idle",
       "all_frames": true
     }
