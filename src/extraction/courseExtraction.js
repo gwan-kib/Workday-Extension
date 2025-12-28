@@ -45,26 +45,37 @@ export function extractFromRow(row, headerMaps) {
     const cells = $$(row, "td, [role='gridcell']");
     const allText = (row.innerText || "").trim();
 
-    // map row cells by aria-colindex (preferred)
-    const cellByCol = new Map();
-    cells.forEach((cell, i) => {
-      const col = getColIndex(cell) ?? (i + 1);
+   // map row cells by position (1-based)
+  function getCellKey(cell) {
+  // looks inside the cell for the container with id like "gen-dwr-comp-252.9-640"
+  const inner = cell.querySelector('[id^="gen-dwr-comp-"]');
+  const id = inner?.id || "";
+  const m = id.match(/^gen-dwr-comp-(\d+\.\d+)-/);
+  return m ? m[1] : null; // "252.9"
+}
 
-      if (!cellByCol.has(col))
-        cellByCol.set(col, cell);
-    });
+// map row cells by Workday key (e.g., "252.9"), not by position
+const cellByCol = new Map();
+cells.forEach((cell) => {
+  const key = getCellKey(cell);
+  if (key && !cellByCol.has(key))
+    cellByCol.set(key, cell);
+});
 
-    const getCellEl = (key) => {
-      const col = colMap[key];
-      if (col != null && cellByCol.has(col))
-        return cellByCol.get(col);
 
-      const pos = posMap[key];
-      if (pos != null && pos >= 0 && pos < cells.length)
-        return cells[pos];
 
-      return null;
-    };
+   const getCellEl = (keyName) => {
+  const key = colMap[keyName]; // e.g., "252.9"
+  if (key != null && cellByCol.has(key))
+    return cellByCol.get(key);
+
+  const pos = posMap[keyName];
+  if (pos != null && pos >= 0 && pos < cells.length)
+    return cells[pos];
+
+  return null;
+};
+
 
     const readByKey = (key) => {
       const col = colMap[key];
@@ -112,8 +123,7 @@ export function extractFromRow(row, headerMaps) {
     const codeCell = readByKey("code");
     const sectCell = readByKey("section");
     const meetingCell = readByKey("meeting");
-    const instructorCell = readByKey("instructor");
-    const instructionalFormatCell = readByKey("instructionalFormat"); // ✅ renamed
+    const instructionalFormatCell = readByKey("instructionalFormat"); 
 
     // ---------- Core parse: (code + section + title) from the same string ----------
     let code = "";
@@ -149,38 +159,19 @@ export function extractFromRow(row, headerMaps) {
       seminarLike(allText)
 
     // ---------- Instructor ----------
+
+    const instructorEl = getCellEl("instructor"); // uses colMap/posMap + cellByCol
+
     let instructor = "";
-
-    let instructorEl =
-      (() => {
-        const instructorCol = colMap.instructor;
-        if (instructorCol != null && cellByCol.has(instructorCol))
-            return cellByCol.get(instructorCol);
-
-        if (posMap.instructor != null && posMap.instructor >= 0 && posMap.instructor < cells.length)
-          return cells[posMap.instructor];
-
-        return null;
-      })();
-
-    const looksLikeDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || "").trim());
-    const looksLikeName = (s) => /^[A-Z][a-z]+(?: [A-Z][a-z]+)+$/.test(String(s || "").trim());
-
 
     if (isLab || isSeminar) {
       instructor = "N/A";
     } else {
-      instructor = extractInstructorNamesFromCell(instructorEl) || (instructorCell || "").trim();
-      if (!instructor || looksLikeDate(instructor)) {
-        for (const cell of cells) {
-          const fallback = extractInstructorNamesFromCell(cell) || (cell.innerText || "").trim();
-          if (looksLikeName(fallback)) {
-            instructor = fallback;
-            break;
-          }
-        }
-      }
+      instructor =
+        extractInstructorNamesFromCell(instructorEl) ||
+        (readByKey("instructor") || "").trim();
     }
+
 
     // ---------- Meeting ----------
     let meeting;
@@ -225,20 +216,6 @@ export function extractFromRow(row, headerMaps) {
 
     // ---------- Instructional Format (was "status") ----------
     const instructionalFormat = (instructionalFormatCell || "").trim();
-
-    // Final title fallback
-    if (!title && sectionLinkString) {
-      const idx = sectionLinkString.indexOf(" - ");
-      if (idx >= 0)
-        title = sectionLinkString.slice(idx + 3).trim();
-    }
-
-    // ---------- Sanity swap ----------
-    if (looksLikeDate(instructor) && looksLikeName(meeting)) {
-      const tmp = instructor;
-      instructor = meeting;
-      meeting = tmp;
-    }
 
     return {
       code,
