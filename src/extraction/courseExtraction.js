@@ -163,10 +163,23 @@ export function extractFromRow(row, headerMaps) {
         return null;
       })();
 
+    const looksLikeDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || "").trim());
+    const looksLikeName = (s) => /^[A-Z][a-z]+(?: [A-Z][a-z]+)+$/.test(String(s || "").trim());
+
+
     if (isLab || isSeminar) {
       instructor = "N/A";
     } else {
       instructor = extractInstructorNamesFromCell(instructorEl) || (instructorCell || "").trim();
+      if (!instructor || looksLikeDate(instructor)) {
+        for (const cell of cells) {
+          const fallback = extractInstructorNamesFromCell(cell) || (cell.innerText || "").trim();
+          if (looksLikeName(fallback)) {
+            instructor = fallback;
+            break;
+          }
+        }
+      }
     }
 
     // ---------- Meeting ----------
@@ -221,9 +234,6 @@ export function extractFromRow(row, headerMaps) {
     }
 
     // ---------- Sanity swap ----------
-    const looksLikeDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || "").trim());
-    const looksLikeName = (s) => /^[A-Z][a-z]+(?: [A-Z][a-z]+)+$/.test(String(s || "").trim());
-
     if (looksLikeDate(instructor) && looksLikeName(meeting)) {
       const tmp = instructor;
       instructor = meeting;

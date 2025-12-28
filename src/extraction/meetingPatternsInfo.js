@@ -1,6 +1,8 @@
 export function extractMeetingLinesFromCell(meetingEl) {
-    if (!meetingEl)
-        return [];
+    if (!meetingEl) {
+      console.log("extractMeetingLinesFromCell failed 1");
+      return [];
+    }
 
     // BEST SOURCE: menu items expose full meeting strings in aria-label
     const menuItems = Array.from(
