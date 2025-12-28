@@ -45,8 +45,8 @@ import { exportCSV } from "./exporting/cvs.js"
   }
 
   if (document.readyState === "complete") {
-    boot();
-  } else {
     document.addEventListener("DOMContentLoaded", boot, { once: true });
+  } else {
+    boot();
   }
 })();
