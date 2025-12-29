@@ -19,8 +19,8 @@ const DAY_REGEX = /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/g;
 const TIME_REGEX = /(\d{1,2}):(\d{2})\s*([ap])\.?m\.?/gi;
 
 const SEMESTER_MONTHS = {
-  first: "09",
-  second: "01",
+  first: ["09", "08"],
+  second: ["01", "12"],
 };
 
 function parseTimeToken(token) {
@@ -73,9 +73,9 @@ function getSemester(startDate) {
 
   const month = startDate.split("-")[1];
 
-  if (month === SEMESTER_MONTHS.first)
+  if (SEMESTER_MONTHS.first.includes(month))
     return "first";
-  if (month === SEMESTER_MONTHS.second)
+  if (SEMESTER_MONTHS.second.includes(month))
     return "second";
 
   return null;
@@ -104,6 +104,7 @@ function buildDayEvents(courses, term) {
   DAYS.forEach((d) => eventsByDay.set(d, []));
 
   const seen = new Set();
+  let eventId = 0;
 
   courses.forEach((course) => {
     const startDate = course.startDate || extractStartDate(course.meetingLines?.[0]) || "";
@@ -151,6 +152,7 @@ function buildDayEvents(courses, term) {
         seen.add(key);
 
         eventsByDay.get(day).push({
+          id: eventId++,
           code: course.code || "",
           title: course.title || "",
           timeLabel: parsed.timeLabel,
@@ -184,26 +186,42 @@ function addConflicts(eventsByDay) {
 
     const groups = [];
 
-    for (const ev of events) {
-      const evStart = ev.startIdx;
-      const evEnd = ev.endIdx;
+      let current = null;
+    let currentKey = null;
 
-      const last = groups[groups.length - 1];
+    for (let r = 0; r < SLOTS.length - 1; r++) {
+      const active = events.filter((ev) => ev.startIdx <= r && ev.endIdx > r);
+      const key = active.length
+        ? active.map((ev) => ev.id).sort((a, b) => a - b).join("|")
+        : null;
 
-      if (!last || evStart >= last.end) {
-        groups.push({
-          start: evStart,
-          end: evEnd,
-          events: [ev],
-          hasConflict: false,
-        });
-      } else {
-        last.end = Math.max(last.end, evEnd);
-        last.events.push(ev);
+      if (!key) {
+        if (current)
+          groups.push(current);
+        current = null;
+        currentKey = null;
+        continue;
       }
+
+      if (current && key === currentKey) {
+        current.end = r + 1;
+        continue;
+      }
+
+      if (current)
+        groups.push(current);
+
+      current = {
+        start: r,
+        end: r + 1,
+        events: active,
+        hasConflict: active.length > 1,
+      };
+      currentKey = key;
     }
 
-    groups.forEach((g) => { g.hasConflict = g.events.length > 1; });
+    if (current)
+      groups.push(current);
 
     groupedByDay.set(day, groups);
   });
@@ -220,20 +238,67 @@ function formatSlotLabel(minutes) {
   return `${hh}:${mm}`;
 }
 
-function buildScheduleTable(groupedByDay) {
+function toLocalRect(parentRect, childRect) {
+  return {
+    left: childRect.left - parentRect.left,
+    top: childRect.top - parentRect.top,
+    right: childRect.right - parentRect.left,
+    bottom: childRect.bottom - parentRect.top,
+    width: childRect.width,
+    height: childRect.height,
+  };
+}
+
+// Given an intersection rect (LOCAL to a block) and a "no-paint" rect (LOCAL),
+// return up to 4 rectangles that represent intersection minus noPaint.
+function subtractRect(inter, cut) {
+  // compute overlap in local space
+  const o = rectIntersection(
+    { left: inter.left, top: inter.top, right: inter.right, bottom: inter.bottom },
+    { left: cut.left, top: cut.top, right: cut.right, bottom: cut.bottom }
+  );
+  if (!o) return [inter];
+
+  const out = [];
+
+  // top slice
+  if (o.top > inter.top) {
+    out.push({ left: inter.left, top: inter.top, right: inter.right, bottom: o.top });
+  }
+  // bottom slice
+  if (o.bottom < inter.bottom) {
+    out.push({ left: inter.left, top: o.bottom, right: inter.right, bottom: inter.bottom });
+  }
+  // left slice
+  if (o.left > inter.left) {
+    out.push({ left: inter.left, top: o.top, right: o.left, bottom: o.bottom });
+  }
+  // right slice
+  if (o.right < inter.right) {
+    out.push({ left: o.right, top: o.top, right: inter.right, bottom: o.bottom });
+  }
+
+  // normalize + remove zero areas
+  return out
+    .map((r) => ({ ...r, width: r.right - r.left, height: r.bottom - r.top }))
+    .filter((r) => r.width > 0 && r.height > 0);
+}
+
+
+function buildScheduleTable() {
+  // Wrap so we can overlay blocks on top of the table
+  const wrap = document.createElement("div");
+  wrap.className = "schedule-table-wrap";
+
   const table = document.createElement("table");
   table.className = "schedule-table";
-
-  // Track which grid cells are "covered" by a rowspan event so we skip rendering them
-  // key = `${day}|${rowIndex}`
-  const activeSpans = new Map();
 
   const thead = document.createElement("thead");
   const headRow = document.createElement("tr");
 
   headRow.innerHTML = `
     <th class="schedule-time">Time</th>
-    ${DAYS.map((day) => `<th>${day}</th>`).join("")}
+    ${DAYS.map((day) => `<th class="schedule-day-head" data-day="${day}">${day}</th>`).join("")}
   `;
 
   thead.appendChild(headRow);
@@ -250,45 +315,17 @@ function buildScheduleTable(groupedByDay) {
     timeTd.textContent = formatSlotLabel(SLOTS[r]);
     row.appendChild(timeTd);
 
-    // Day columns
+    // Day columns (NO MERGING / NO ROWSPAN)
     DAYS.forEach((day) => {
-       const active = activeSpans.get(day);
-
-      if (active && r >= active.endRow) {
-        activeSpans.delete(day);
-      }
-
-      const current = activeSpans.get(day);
-
       const td = document.createElement("td");
       td.className = "schedule-cell";
+      td.dataset.day = day;
+      td.dataset.row = String(r);
 
-      // Find group that starts at this row for this day
-      const group = (groupedByDay.get(day) || []).find((g) => g.start === r);
-
-      if (group) {
-        const groupSpan = group.end - group.start;
-        td.rowSpan = groupSpan;
-
-        // Mark covered rows so we don't render duplicate cells underneath
-        for (let k = 1; k < groupSpan; k++) {
-          covered.add(`${day}|${r + k}`);
-        }
-
-        // Mark conflict blocks (2+ courses overlapping in this day column)
-        if (group.hasConflict)
-          td.classList.add("has-conflict");
-
-        group.events.forEach((ev) => {
-          const wrap = document.createElement("div");
-          wrap.className = "schedule-entry";
-          wrap.innerHTML = `
-            <div class="schedule-entry-title">${ev.code || ev.title}</div>
-            <div class="schedule-entry-time">${ev.timeLabel}</div>
-          `;
-          td.appendChild(wrap);
-        });
-      }
+      // Optional: inner div if you want future per-cell stuff
+      const inner = document.createElement("div");
+      inner.className = "schedule-cell-inner";
+      td.appendChild(inner);
 
       row.appendChild(td);
     });
@@ -297,17 +334,237 @@ function buildScheduleTable(groupedByDay) {
   }
 
   table.appendChild(tbody);
-  return table;
+  wrap.appendChild(table);
+
+  // Overlay layer that will hold the floating blocks
+  const overlay = document.createElement("div");
+  overlay.className = "schedule-overlay";
+  wrap.appendChild(overlay);
+
+  return wrap;
 }
 
+function rectsOverlap(a, b) {
+  return !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom);
+}
+
+function rectIntersection(a, b) {
+  const left = Math.max(a.left, b.left);
+  const right = Math.min(a.right, b.right);
+  const top = Math.max(a.top, b.top);
+  const bottom = Math.min(a.bottom, b.bottom);
+  if (right <= left || bottom <= top) return null;
+  return { left, right, top, bottom, width: right - left, height: bottom - top };
+}
+
+function rectFromBlock(block) {
+  const x = parseFloat(block.style.left) || 0;
+  const y = parseFloat(block.style.top) || 0;
+  const w = parseFloat(block.style.width) || 0;
+  const h = parseFloat(block.style.height) || 0;
+  return { left: x, top: y, right: x + w, bottom: y + h, width: w, height: h };
+}
+
+// text collision check (within overlay coordinate space)
+function textBoxOverlapsAny(candidate, existing) {
+  for (const r of existing) {
+    if (rectsOverlap(candidate, r)) return true;
+  }
+  return false;
+}
+
+function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
+  const overlay = wrap.querySelector(".schedule-overlay");
+  overlay.innerHTML = "";
+
+  const table = wrap.querySelector(".schedule-table");
+
+  const firstBodyRow = table.querySelector("tbody tr");
+  const firstDayCell = table.querySelector('tbody tr td.schedule-cell[data-day="Mon"]');
+  const timeTh = table.querySelector("thead th.schedule-time");
+
+  if (!firstBodyRow || !firstDayCell || !timeTh) return;
+
+  const timeColWidth = timeTh.getBoundingClientRect().width;
+  const dayColWidth = firstDayCell.getBoundingClientRect().width;
+  const headerHeight = table.querySelector("thead").getBoundingClientRect().height;
+  const rowHeight = firstBodyRow.getBoundingClientRect().height;
+
+  // --- build blocks first (one per event), store rects for overlap detection ---
+  const placedBlocks = []; // { el, day, ev, rect, overlapLayerEl, overlaps: [] }
+
+  DAYS.forEach((day, dayIndex) => {
+    const events = eventsByDay.get(day) || [];
+
+    events.forEach((ev) => {
+      const left = timeColWidth + dayIndex * dayColWidth;
+      const top = headerHeight + ev.rowStart * rowHeight;
+      const height = ev.rowSpan * rowHeight;
+
+      const block = document.createElement("div");
+      block.className = "schedule-entry-float";
+
+      block.style.left = `${left}px`;
+      block.style.top = `${top}px`;
+      block.style.width = `${dayColWidth}px`;
+      block.style.height = `${height}px`;
+
+      // overlap layer (red rectangles go here)
+      const overlapLayer = document.createElement("div");
+      overlapLayer.className = "schedule-entry-overlap-layer";
+      block.appendChild(overlapLayer);
+
+      // text wrapper (MUST be above overlap layer)
+      const text = document.createElement("div");
+      text.className = "schedule-entry-text";
+      text.innerHTML = `
+        <div class="schedule-entry-title">${ev.code || ev.title}</div>
+        <div class="schedule-entry-time">${ev.timeLabel}</div>
+      `;
+      block.appendChild(text);
+
+      overlay.appendChild(block);
+
+      placedBlocks.push({
+        el: block,
+        day,
+        ev,
+        rect: rectFromBlock(block),
+        overlapLayerEl: overlapLayer,
+        overlaps: [],
+        textEl: text,
+      });
+    });
+  });
+
+  // --- detect overlaps + apply opacity + add red intersection rects ---
+  for (let i = 0; i < placedBlocks.length; i++) {
+    for (let j = i + 1; j < placedBlocks.length; j++) {
+      const A = placedBlocks[i];
+      const B = placedBlocks[j];
+
+      // only compare blocks in same day column (since different columns can't overlap)
+      if (A.day !== B.day) continue;
+
+      if (!rectsOverlap(A.rect, B.rect)) continue;
+
+      const inter = rectIntersection(A.rect, B.rect);
+      if (!inter) continue;
+
+      // mark both as conflicted
+      A.el.style.opacity = "0.6";
+B.el.style.opacity = "0.6";
+
+A.el.classList.add("is-overlap");
+B.el.classList.add("is-overlap");
+
+
+      // intersection rect coordinates relative to each block
+      const aLocal = {
+        left: inter.left - A.rect.left,
+        top: inter.top - A.rect.top,
+        width: inter.width,
+        height: inter.height,
+      };
+      const bLocal = {
+        left: inter.left - B.rect.left,
+        top: inter.top - B.rect.top,
+        width: inter.width,
+        height: inter.height,
+      };
+
+      const aRed = document.createElement("div");
+      aRed.className = "schedule-entry-overlap-rect";
+      aRed.style.left = `${aLocal.left}px`;
+      aRed.style.top = `${aLocal.top}px`;
+      aRed.style.width = `${aLocal.width}px`;
+      aRed.style.height = `${aLocal.height}px`;
+      A.overlapLayerEl.appendChild(aRed);
+
+      const bRed = document.createElement("div");
+      bRed.className = "schedule-entry-overlap-rect";
+      bRed.style.left = `${bLocal.left}px`;
+      bRed.style.top = `${bLocal.top}px`;
+      bRed.style.width = `${bLocal.width}px`;
+      bRed.style.height = `${bLocal.height}px`;
+      B.overlapLayerEl.appendChild(bRed);
+    }
+  }
+
+  // --- text placement: push down if text area overlaps already-placed text ---
+  // We do this per-day so text collisions only matter inside a column.
+  const TEXT_STEP_PX = 14;        // "preset amount"
+  const MAX_TRIES = 30;           // prevents infinite loops
+  const H_PAD = 6;                // match your block padding roughly
+  const V_PAD = 6;
+
+  DAYS.forEach((day) => {
+    const blocks = placedBlocks
+      .filter((b) => b.day === day)
+      .sort((a, b) => a.rect.top - b.rect.top);
+
+    const usedTextRects = []; // in overlay coords
+
+    blocks.forEach((b) => {
+      // base text box estimate (good enough without measuring)
+      const baseX = b.rect.left + H_PAD;
+      let y = b.rect.top + V_PAD;
+
+      // We will position the text wrapper inside the block by translateY
+      // but collision checking is in absolute overlay coords.
+      let tries = 0;
+
+      // Estimate width/height of text area; if you want exact, swap to getBoundingClientRect after layout.
+      const estW = b.rect.width - H_PAD * 2;
+      const estH = 26; // title + time on 10px font
+
+      while (tries < MAX_TRIES) {
+        const candidate = {
+          left: baseX,
+          top: y,
+          right: baseX + estW,
+          bottom: y + estH,
+        };
+
+        // must also stay inside the block vertically
+        if (candidate.bottom > b.rect.bottom - V_PAD) break;
+
+        if (!textBoxOverlapsAny(candidate, usedTextRects)) {
+          // place it: move text wrapper down inside the block
+          const localY = y - b.rect.top;
+          b.textEl.style.transform = `translateY(${localY}px)`;
+          usedTextRects.push(candidate);
+          return;
+        }
+
+        y += TEXT_STEP_PX;
+        tries++;
+      }
+
+      // fallback: just keep at top if no free spot found
+      b.textEl.style.transform = `translateY(${V_PAD}px)`;
+      usedTextRects.push({
+        left: baseX,
+        top: b.rect.top + V_PAD,
+        right: baseX + estW,
+        bottom: b.rect.top + V_PAD + estH,
+      });
+    });
+  });
+}
+
+
 export function renderSchedule(ctx, courses, term) {
-  if (!ctx.scheduleGrid)
-    return;
+  if (!ctx.scheduleGrid) return;
 
   ctx.scheduleGrid.innerHTML = "";
 
   const eventsByDay = buildDayEvents(courses, term);
   const groupedByDay = addConflicts(eventsByDay);
 
-  ctx.scheduleGrid.appendChild(buildScheduleTable(groupedByDay));
+  const wrap = buildScheduleTable();
+  ctx.scheduleGrid.appendChild(wrap);
+
+  // overlay needs DOM measurements, so do it after append
+  renderOverlayBlocks(wrap, eventsByDay, groupedByDay);
 }

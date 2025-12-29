@@ -245,6 +245,11 @@
   vertical-align: middle;
 }
 
+.schedule-table td {
+
+  vertical-align: top;
+}
+
 .schedule-table th {
   background: #f3f4f6;
 
@@ -302,9 +307,6 @@
   background: #eef2ff;
   padding: 6px 6px;
 
-    position: absolute;
-  left: 0;
-  right: 0;
 }
 
 
@@ -437,17 +439,6 @@ tr:hover td {
   color: #374151;
 }
 
-/* Make merged schedule cells become the blue block */
-.schedule-cell[rowspan] {
-  background: #eef2ff;
-  padding: 0;                 /* keep flush */
-}
-
-/* Ensure text is centered in the merged block */
-.schedule-cell[rowspan] {
-  vertical-align: middle;     /* table centering */
-}
-
 .schedule-conflict {
   position: absolute;
   left: 0;
@@ -479,4 +470,92 @@ tr:hover td {
   position: relative;
   width: 100%;
   height: 100%;
+}
+
+.schedule-table-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.schedule-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* floating “merged” block */
+.schedule-entry-float {
+  position: absolute;
+  pointer-events: auto;
+  z-index: 6;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+
+  text-align: center;
+
+  background: #eef2ff;
+  border: 1px solid #e0e7ff;
+
+  padding: 6px 6px;
+  box-sizing: border-box;
+
+  font-size: 10px;
+}
+
+/* Make block a stacking context so we can layer overlap-red under text */
+.schedule-entry-float {
+  position: absolute;
+  pointer-events: auto;
+  z-index: 6;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+
+  background: #eef2ff;
+  border: 1px solid #e0e7ff;
+
+  padding: 6px 6px;
+  box-sizing: border-box;
+
+  font-size: 10px;
+
+  overflow: hidden; /* so red overlap stays inside the box */
+}
+
+/* inner layer that holds the red intersection, under the text */
+.schedule-entry-overlap-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* the red intersection rectangle */
+.schedule-entry-overlap-rect {
+  position: absolute;
+  background: #ef4444;
+  opacity: 0.85;
+}
+
+/* actual text must be above overlap layer */
+.schedule-entry-text {
+  position: relative;
+  z-index: 2;
+  display: block;
+  text-align: center;
+}
+
+.schedule-entry-title { font-weight: 600; }
+.schedule-entry-time { color: #6b7280; white-space: nowrap; }
+
+/* If a block overlaps, force readable text */
+.schedule-entry-float.is-overlap .schedule-entry-title,
+.schedule-entry-float.is-overlap .schedule-entry-time {
+  color: #000000 !important;
 }
