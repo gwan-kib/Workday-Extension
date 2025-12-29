@@ -7,7 +7,7 @@ const START_HOUR = 8;
 const END_HOUR = 22;           // last visible hour (exclusive end)
 const SLOT_MINUTES = 30;
 
-// Build slot start times: 7:00, 7:30, 8:00, ...
+// Build slot start times: 8:00, 8:30, 9:00, ...
 const SLOTS = [];
 for (let h = START_HOUR; h < END_HOUR; h++) {
   SLOTS.push(h * 60);
@@ -56,7 +56,6 @@ function parseMeetingLine(line) {
   if (startMinutes == null || endMinutes == null)
     return null;
 
-  // Handle weird cases where end < start (rare formatting issues)
   if (endMinutes <= startMinutes)
     return null;
 
@@ -104,7 +103,6 @@ function buildDayEvents(courses, term) {
   const eventsByDay = new Map();
   DAYS.forEach((d) => eventsByDay.set(d, []));
 
-  // Used to prevent duplicates when meetingLines contain repeated info
   const seen = new Set();
 
   courses.forEach((course) => {
@@ -121,7 +119,6 @@ function buildDayEvents(courses, term) {
       if (!parsed)
         return;
 
-      // Clamp + snap to our 30-min grid
       let startMin = clampToGrid(parsed.startMinutes);
       let endMin = clampToGrid(parsed.endMinutes);
 
@@ -157,38 +154,79 @@ function buildDayEvents(courses, term) {
           code: course.code || "",
           title: course.title || "",
           timeLabel: parsed.timeLabel,
+
           rowStart: startIdx,
           rowSpan,
+
+          startIdx,
+          endIdx,
         });
       });
     });
   });
 
-  // Sort each day: earliest first
   DAYS.forEach((day) => {
-    eventsByDay.get(day).sort((a, b) => a.rowStart - b.rowStart);
+    eventsByDay.get(day).sort((a, b) => a.startIdx - b.startIdx || a.endIdx - b.endIdx);
   });
 
   return eventsByDay;
+}
+
+// Build overlap groups per DAY column.
+// Each group becomes ONE rowspan cell; if group has 2+ events, it’s a conflict cluster.
+function addConflicts(eventsByDay) {
+  const groupedByDay = new Map();
+
+  DAYS.forEach((day) => {
+    const events = (eventsByDay.get(day) || [])
+      .slice()
+      .sort((a, b) => a.startIdx - b.startIdx || a.endIdx - b.endIdx);
+
+    const groups = [];
+
+    for (const ev of events) {
+      const evStart = ev.startIdx;
+      const evEnd = ev.endIdx;
+
+      const last = groups[groups.length - 1];
+
+      if (!last || evStart >= last.end) {
+        groups.push({
+          start: evStart,
+          end: evEnd,
+          events: [ev],
+          hasConflict: false,
+        });
+      } else {
+        last.end = Math.max(last.end, evEnd);
+        last.events.push(ev);
+      }
+    }
+
+    groups.forEach((g) => { g.hasConflict = g.events.length > 1; });
+
+    groupedByDay.set(day, groups);
+  });
+
+  return groupedByDay;
 }
 
 function formatSlotLabel(minutes) {
   const h24 = Math.floor(minutes / 60);
   const m = minutes % 60;
 
-  // If you want 12-hour labels, tell me — for now match your style like "12:00"
   const hh = String(h24);
   const mm = String(m).padStart(2, "0");
   return `${hh}:${mm}`;
 }
 
-function buildScheduleTable(eventsByDay) {
+function buildScheduleTable(groupedByDay) {
   const table = document.createElement("table");
   table.className = "schedule-table";
 
   // Track which grid cells are "covered" by a rowspan event so we skip rendering them
   // key = `${day}|${rowIndex}`
-  const covered = new Set();
+  const activeSpans = new Map();
 
   const thead = document.createElement("thead");
   const headRow = document.createElement("tr");
@@ -214,34 +252,34 @@ function buildScheduleTable(eventsByDay) {
 
     // Day columns
     DAYS.forEach((day) => {
-      const coverKey = `${day}|${r}`;
+       const active = activeSpans.get(day);
 
-      // If an earlier rowSpan covers this row, skip creating a cell
-      if (covered.has(coverKey))
-        return;
+      if (active && r >= active.endRow) {
+        activeSpans.delete(day);
+      }
+
+      const current = activeSpans.get(day);
 
       const td = document.createElement("td");
       td.className = "schedule-cell";
 
-      // Find events that start at this exact row for this day
-      const starters = eventsByDay.get(day).filter((ev) => ev.rowStart === r);
+      // Find group that starts at this row for this day
+      const group = (groupedByDay.get(day) || []).find((g) => g.start === r);
 
-      if (starters.length > 0) {
-        // If multiple events start at the same time, we still have to stack them.
-        // But this is now a real conflict (same start time), not the old "everything in one hour" bug.
-        // We'll render each one as its own block inside the rowspan cell.
-
-        // Use the max span so the cell rowspan covers the full time block.
-        // If you want separate columns for overlaps later, that’s a different layout.
-        const maxSpan = Math.max(...starters.map((ev) => ev.rowSpan));
-        td.rowSpan = maxSpan;
+      if (group) {
+        const groupSpan = group.end - group.start;
+        td.rowSpan = groupSpan;
 
         // Mark covered rows so we don't render duplicate cells underneath
-        for (let k = 1; k < maxSpan; k++) {
+        for (let k = 1; k < groupSpan; k++) {
           covered.add(`${day}|${r + k}`);
         }
 
-        starters.forEach((ev) => {
+        // Mark conflict blocks (2+ courses overlapping in this day column)
+        if (group.hasConflict)
+          td.classList.add("has-conflict");
+
+        group.events.forEach((ev) => {
           const wrap = document.createElement("div");
           wrap.className = "schedule-entry";
           wrap.innerHTML = `
@@ -269,5 +307,7 @@ export function renderSchedule(ctx, courses, term) {
   ctx.scheduleGrid.innerHTML = "";
 
   const eventsByDay = buildDayEvents(courses, term);
-  ctx.scheduleGrid.appendChild(buildScheduleTable(eventsByDay));
+  const groupedByDay = addConflicts(eventsByDay);
+
+  ctx.scheduleGrid.appendChild(buildScheduleTable(groupedByDay));
 }
