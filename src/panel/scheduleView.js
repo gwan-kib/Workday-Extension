@@ -3,8 +3,8 @@ import { extractStartDate } from "../extraction/meetingPatternsInfo.js";
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 
 // 30-min grid so 12:30 fits naturally
-const START_HOUR = 7;
-const END_HOUR = 21;           // last visible hour (exclusive end)
+const START_HOUR = 8;
+const END_HOUR = 22;           // last visible hour (exclusive end)
 const SLOT_MINUTES = 30;
 
 // Build slot start times: 7:00, 7:30, 8:00, ...
@@ -13,6 +13,7 @@ for (let h = START_HOUR; h < END_HOUR; h++) {
   SLOTS.push(h * 60);
   SLOTS.push(h * 60 + 30);
 }
+SLOTS.push(END_HOUR * 60);
 
 const DAY_REGEX = /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/g;
 const TIME_REGEX = /(\d{1,2}):(\d{2})\s*([ap])\.?m\.?/gi;
@@ -176,7 +177,7 @@ function formatSlotLabel(minutes) {
   const m = minutes % 60;
 
   // If you want 12-hour labels, tell me — for now match your style like "12:00"
-  const hh = String(h24).padStart(2, "0");
+  const hh = String(h24);
   const mm = String(m).padStart(2, "0");
   return `${hh}:${mm}`;
 }

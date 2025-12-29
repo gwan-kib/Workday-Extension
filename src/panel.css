@@ -221,10 +221,12 @@
 
 .schedule-grid {
   padding: 0 12px 12px;
+
+    overflow: hidden;
 }
 
 .schedule-table {
-  width: 100%;
+  width: max-content;
 
   border-collapse: collapse;
 
@@ -240,7 +242,7 @@
   padding: 4px 6px;
 
   text-align: center;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .schedule-table th {
@@ -251,7 +253,7 @@
 
 .schedule-table th.schedule-time,
 .schedule-table td.schedule-time {
-  width: 70px;         /* pick a value */
+  width: 40px;         /* pick a value */
 }
 
 
@@ -275,16 +277,17 @@
 
 .schedule-cell {
   padding: 0;          /* important */
-  vertical-align: top; /* keep rowspan behaving predictably */
+  vertical-align: middle; /* keep rowspan behaving predictably */
 }
 
 /* The event block (NOT a pill) */
 .schedule-entry {
-  height: 100%;                /* fill the rowspan cell’s height */
+  height: 100%;        
   display: flex;
   flex-direction: column;
   justify-content: center;     /* vertical center */
   align-items: center;         /* horizontal center */
+  text-align: center;
   
   background: transparent;     /* remove pill bg */
   border: none;                /* remove pill border look */
@@ -355,12 +358,12 @@ tr td:nth-child(1), tr td:nth-child(2), tr td:nth-child(3), tr td:nth-child(4), 
   text-align: center;
 }
 
-th:nth-child(1) { width: 175px; } /* Title */
-th:nth-child(2) { width: 70px; } /* Code */
-th:nth-child(3) { width: 30px; } /* Sect */
-th:nth-child(4) { width: 100px; } /* Instructor */
-th:nth-child(5) { width: 450px; } /* Meeting */
-th:nth-child(6) { width: 80px; } /* class-type */
+[data-panel="list"] th:nth-child(1) { width: 175px; } /* Title */
+[data-panel="list"] th:nth-child(2) { width: 70px; } /* Code */
+[data-panel="list"] th:nth-child(3) { width: 30px; } /* Sect */
+[data-panel="list"] th:nth-child(4) { width: 100px; } /* Instructor */
+[data-panel="list"] th:nth-child(5) { width: 450px; } /* Meeting */
+[data-panel="list"] th:nth-child(6) { width: 80px; } /* class-type */
 
 tr:hover td {
   background: #fbfbfb;
@@ -427,4 +430,15 @@ tr:hover td {
 .meeting-sub {
   font-size: 11px;
   color: #374151;
+}
+
+/* Make merged schedule cells become the blue block */
+.schedule-cell[rowspan] {
+  background: #eef2ff;
+  padding: 0;                 /* keep flush */
+}
+
+/* Ensure text is centered in the merged block */
+.schedule-cell[rowspan] {
+  vertical-align: middle;     /* table centering */
 }
