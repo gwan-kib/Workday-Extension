@@ -91,3 +91,8 @@ export function normalizeMeetingPatternsText(text) {
       .filter(Boolean)
       .join("\n");
 }
+
+export function extractStartDate(line) {
+    const match = String(line || "").match(/\b(\d{4}-\d{2}-\d{2})\b/);
+    return match ? match[1] : "";
+}

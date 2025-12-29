@@ -136,6 +136,179 @@
   overflow: auto;
 }
 
+.widget-tabs {
+  display: flex;
+  gap: 8px;
+
+  padding: 8px 12px;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  background: #fafafa;
+}
+
+.tab-button {
+  background: #f3f4f6;
+
+  padding: 6px 12px;
+
+  border: 1px solid transparent;
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  color: #374151;
+
+  cursor: pointer;
+}
+
+.tab-button.is-active {
+  background: #ffffff;
+
+  border-color: #d1d5db;
+
+  color: #111827;
+}
+
+.widget-panel {
+  display: none;
+}
+
+.widget-panel.is-active {
+  display: block;
+}
+
+.schedule-controls {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 8px 12px;
+}
+
+.schedule-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.schedule-term-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.term-button {
+  background: #f3f4f6;
+
+  padding: 4px 10px;
+
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.term-button.is-active {
+  background: #ffffff;
+
+  border-color: #d1d5db;
+}
+
+.schedule-grid {
+  padding: 0 12px 12px;
+}
+
+.schedule-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  font-size: 11px;
+
+  table-layout: fixed;
+}
+
+.schedule-table th,
+.schedule-table td {
+  border: 1px solid #e5e7eb;
+
+  padding: 4px 6px;
+
+  text-align: center;
+  vertical-align: top;
+}
+
+.schedule-table th {
+  background: #f3f4f6;
+
+  font-weight: 700;
+}
+
+.schedule-table th.schedule-time,
+.schedule-table td.schedule-time {
+  width: 70px;         /* pick a value */
+}
+
+
+/* For the day columns, */
+.schedule-table th,
+.schedule-table td {
+  width: 130px;        /* applies to all columns unless overridden */
+}
+
+
+
+.schedule-time {
+  background: #fafafa;
+  font-weight: 600;
+  color: #374151;
+}
+
+.schedule-table tbody tr {
+  height: 36px; /* tweak this */
+}
+
+.schedule-cell {
+  padding: 0;          /* important */
+  vertical-align: top; /* keep rowspan behaving predictably */
+}
+
+/* The event block (NOT a pill) */
+.schedule-entry {
+  height: 100%;                /* fill the rowspan cell’s height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;     /* vertical center */
+  align-items: center;         /* horizontal center */
+  
+  background: transparent;     /* remove pill bg */
+  border: none;                /* remove pill border look */
+  border-radius: 0;            /* remove pill rounding */
+  margin: 0;                   /* remove pill spacing */
+  padding: 0;                  /* remove pill spacing */
+
+  font-size: 11px;
+  color: #111827;
+
+  background: #eef2ff;
+  padding: 6px 6px;
+}
+
+
+.schedule-entry-title {
+  font-weight: 600;
+}
+
+.schedule-entry-time {
+  color: #6b7280;
+   white-space: nowrap;
+}
+
 table {
   width: 100%;
 

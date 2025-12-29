@@ -1,7 +1,7 @@
 import { $$ } from "../utilities/dom"
 import { buildHeaderMaps, getColIndex } from "./headerMaps.js"
 import { parseSectionLinkString, guessClassCode } from "./sectionLinkInfo.js"
-import { extractMeetingLinesFromCell, extractMeetingLinesFromRow, formatMeetingLineForPanel, normalizeMeetingPatternsText } from "./meetingPatternsInfo.js"
+import { extractMeetingLinesFromCell, extractMeetingLinesFromRow, formatMeetingLineForPanel, normalizeMeetingPatternsText, extractStartDate } from "./meetingPatternsInfo.js"
 import { extractInstructorNamesFromCell } from "./instructorInfo.js"
 import { onlineClassCheck } from "./onlineClassCheck.js"
 import { findingTables } from "./findingTables.js"
@@ -124,6 +124,7 @@ cells.forEach((cell) => {
     const sectCell = readByKey("section");
     const meetingCell = readByKey("meeting");
     const instructionalFormatCell = readByKey("instructionalFormat"); 
+         const startDateCell = readByKey("startDate");
 
     // ---------- Core parse: (code + section + title) from the same string ----------
     let code = "";
@@ -190,6 +191,7 @@ cells.forEach((cell) => {
         lines = extractMeetingLinesFromRow(row);
 
     let meetingObj = { days: "", time: "", location: "" };
+    let startDate = extractStartDate(lines[0]) || extractStartDate(startDateCell);
 
     if (lines.length) {
       const firstLine = lines[0];
@@ -224,6 +226,8 @@ cells.forEach((cell) => {
       instructor,
       meeting: normalizeMeetingPatternsText(meeting),
       instructionalFormat, // ✅ renamed field
+            startDate,
+      meetingLines: lines,
       isLab,
       isSeminar,
     };

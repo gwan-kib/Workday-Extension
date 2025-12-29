@@ -29,5 +29,9 @@ export async function loadPanel(shadow) {
     exportBtn: shadow.querySelector("#widget-export"),
     tableBody: shadow.querySelector("tbody"),
     tableHead: shadow.querySelector("thead"),
+    tabButtons: shadow.querySelectorAll(".tab-button"),
+    panels: shadow.querySelectorAll(".widget-panel"),
+    scheduleGrid: shadow.querySelector("#schedule-grid"),
+    termButtons: shadow.querySelectorAll(".term-button"),
   };
 }
