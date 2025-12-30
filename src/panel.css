@@ -49,13 +49,13 @@ h3,
   justify-content: center;
 
   position: fixed;
-  right: 0;
+  right: 780px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 999999;
 
   width: 44px;
-  height: 90px;
+  height: 130px;
 
   padding: 10px 6px;
 
@@ -74,6 +74,10 @@ h3,
   line-height: 1.2;
 
   transition: all 0.2s ease;
+}
+
+#floating-button.is-collapsed {
+  right: 0;
 }
 
 #floating-button:hover {
@@ -109,7 +113,7 @@ h3,
   flex-direction: column;
 
   position: fixed;
-  right: 44px; 
+  right: 0;
   top: 50%;
   transform: translateY(-50%) translateX(0);
   z-index: 999999;
@@ -122,7 +126,7 @@ h3,
   overflow: hidden;
 
   opacity: 1;
-  transition: transform 0.25s ease, opacity 0.25s ease;
+  transition: all 0.25s ease;
 
   width: min(780px, 92vw);
   max-height: 86vh;
