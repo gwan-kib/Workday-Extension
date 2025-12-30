@@ -1,3 +1,15 @@
+.widget {
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+h1, h2, h3,
+.panel-title,
+.section-title,
+.table-header {
+  font-family: 'Manrope', 'Inter', system-ui;
+  font-weight: 600;
+}
+
 /* Floating toggle button that stays visible */
 #floating-button {
   background: linear-gradient(180deg, #afebff, #002046);
@@ -95,7 +107,7 @@
 
 #widget-title {
   font-weight: 700;
-  font-size: 14px;
+  font-size: 25px;
 }
 
 .spacer {
@@ -131,7 +143,7 @@
 }
 
 .widget-body {
-  max-height: 45vh;
+  max-height: 60vh;
 
   overflow: auto;
 }
@@ -357,6 +369,12 @@ tr th {
   font-size: 14px;
 }
 
+thead th {
+  border-bottom: 3px solid #d2d3d8;
+
+  font-size: 12px;
+}
+
 th:nth-child(1), th:nth-child(2), th:nth-child(3), th:nth-child(4), th:nth-child(5), th:nth-child(6) {
   text-align: center;
 }
@@ -366,7 +384,7 @@ tr td:nth-child(1), tr td:nth-child(2), tr td:nth-child(3), tr td:nth-child(4), 
 }
 
 [data-panel="list"] th:nth-child(1) { width: 175px; } /* Title */
-[data-panel="list"] th:nth-child(2) { width: 70px; } /* Code */
+[data-panel="list"] th:nth-child(2) { width: 75px; } /* Code */
 [data-panel="list"] th:nth-child(3) { width: 30px; } /* Sect */
 [data-panel="list"] th:nth-child(4) { width: 100px; } /* Instructor */
 [data-panel="list"] th:nth-child(5) { width: 450px; } /* Meeting */
@@ -379,6 +397,11 @@ tr:hover td {
 .muted {
   color: #6b7280;
 }
+
+.meeting-location {
+  white-space: pre-line;
+}
+
 
 .pill {
   background: #eef2ff;
@@ -430,7 +453,7 @@ tr:hover td {
   border: 1px solid #e0e7ff;
   border-radius: 999px;
 
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
 }
 

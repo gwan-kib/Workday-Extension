@@ -79,7 +79,7 @@ export function formatMeetingLineForPanel(line) {
     return {
       days: dayPart,
       time: timePart,
-      location: [buildingPart, floorPart, roomPart].filter(Boolean).join(" | "),
+      location: [buildingPart, [floorPart, roomPart].join(" | ")].filter(Boolean).join("\n"),
     };
 }
 
