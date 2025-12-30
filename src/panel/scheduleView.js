@@ -4,7 +4,7 @@ const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 
 // 30-min grid so 12:30 fits naturally
 const START_HOUR = 8;
-const END_HOUR = 21;           // last visible hour (exclusive end)
+const END_HOUR = 21; // last visible hour (exclusive end)
 const SLOT_MINUTES = 30;
 
 // Build slot start times: 8:00, 8:30, 9:00, ...
@@ -24,21 +24,17 @@ const SEMESTER_MONTHS = {
 };
 
 function parseTimeToken(token) {
-  if (!token)
-    return null;
+  if (!token) return null;
 
   const match = token.trim().match(/(\d{1,2}):(\d{2})\s*([ap])\.?m\.?/i);
-  if (!match)
-    return null;
+  if (!match) return null;
 
   let hours = Number.parseInt(match[1], 10);
   const minutes = Number.parseInt(match[2], 10);
   const period = match[3].toLowerCase();
 
-  if (period === "p" && hours !== 12)
-    hours += 12;
-  if (period === "a" && hours === 12)
-    hours = 0;
+  if (period === "p" && hours !== 12) hours += 12;
+  if (period === "a" && hours === 12) hours = 0;
 
   return hours * 60 + minutes;
 }
@@ -47,17 +43,14 @@ function parseMeetingLine(line) {
   const days = String(line || "").match(DAY_REGEX) || [];
   const timeTokens = String(line || "").match(TIME_REGEX) || [];
 
-  if (days.length === 0 || timeTokens.length < 2)
-    return null;
+  if (days.length === 0 || timeTokens.length < 2) return null;
 
   const startMinutes = parseTimeToken(timeTokens[0]);
   const endMinutes = parseTimeToken(timeTokens[1]);
 
-  if (startMinutes == null || endMinutes == null)
-    return null;
+  if (startMinutes == null || endMinutes == null) return null;
 
-  if (endMinutes <= startMinutes)
-    return null;
+  if (endMinutes <= startMinutes) return null;
 
   return {
     days: [...new Set(days)],
@@ -68,15 +61,12 @@ function parseMeetingLine(line) {
 }
 
 function getSemester(startDate) {
-  if (!startDate)
-    return null;
+  if (!startDate) return null;
 
   const month = startDate.split("-")[1];
 
-  if (SEMESTER_MONTHS.first.includes(month))
-    return "first";
-  if (SEMESTER_MONTHS.second.includes(month))
-    return "second";
+  if (SEMESTER_MONTHS.first.includes(month)) return "first";
+  if (SEMESTER_MONTHS.second.includes(month)) return "second";
 
   return null;
 }
@@ -107,18 +97,17 @@ function buildDayEvents(courses, term) {
   let eventId = 0;
 
   courses.forEach((course) => {
-    const startDate = course.startDate || extractStartDate(course.meetingLines?.[0]) || "";
+    const startDate =
+      course.startDate || extractStartDate(course.meetingLines?.[0]) || "";
     const semester = getSemester(startDate);
 
-    if (semester !== term)
-      return;
+    if (semester !== term) return;
 
     const lines = course.meetingLines?.length ? course.meetingLines : [];
 
     lines.forEach((line) => {
       const parsed = parseMeetingLine(line);
-      if (!parsed)
-        return;
+      if (!parsed) return;
 
       let startMin = clampToGrid(parsed.startMinutes);
       let endMin = clampToGrid(parsed.endMinutes);
@@ -129,14 +118,12 @@ function buildDayEvents(courses, term) {
       const startIdx = slotIndexOf(startMin);
       const endIdx = slotIndexOf(endMin);
 
-      if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx)
-        return;
+      if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) return;
 
       const rowSpan = endIdx - startIdx;
 
       parsed.days.forEach((day) => {
-        if (!eventsByDay.has(day))
-          return;
+        if (!eventsByDay.has(day)) return;
 
         const key = [
           day,
@@ -147,8 +134,7 @@ function buildDayEvents(courses, term) {
           rowSpan,
         ].join("|");
 
-        if (seen.has(key))
-          return;
+        if (seen.has(key)) return;
         seen.add(key);
 
         eventsByDay.get(day).push({
@@ -168,7 +154,9 @@ function buildDayEvents(courses, term) {
   });
 
   DAYS.forEach((day) => {
-    eventsByDay.get(day).sort((a, b) => a.startIdx - b.startIdx || a.endIdx - b.endIdx);
+    eventsByDay
+      .get(day)
+      .sort((a, b) => a.startIdx - b.startIdx || a.endIdx - b.endIdx);
   });
 
   return eventsByDay;
@@ -186,18 +174,20 @@ function addConflicts(eventsByDay) {
 
     const groups = [];
 
-      let current = null;
+    let current = null;
     let currentKey = null;
 
     for (let r = 0; r < SLOTS.length - 1; r++) {
       const active = events.filter((ev) => ev.startIdx <= r && ev.endIdx > r);
       const key = active.length
-        ? active.map((ev) => ev.id).sort((a, b) => a - b).join("|")
+        ? active
+            .map((ev) => ev.id)
+            .sort((a, b) => a - b)
+            .join("|")
         : null;
 
       if (!key) {
-        if (current)
-          groups.push(current);
+        if (current) groups.push(current);
         current = null;
         currentKey = null;
         continue;
@@ -208,8 +198,7 @@ function addConflicts(eventsByDay) {
         continue;
       }
 
-      if (current)
-        groups.push(current);
+      if (current) groups.push(current);
 
       current = {
         start: r,
@@ -220,8 +209,7 @@ function addConflicts(eventsByDay) {
       currentKey = key;
     }
 
-    if (current)
-      groups.push(current);
+    if (current) groups.push(current);
 
     groupedByDay.set(day, groups);
   });
@@ -251,7 +239,9 @@ function buildScheduleTable() {
 
   headRow.innerHTML = `
     <th class="schedule-time">Time</th>
-    ${DAYS.map((day) => `<th class="schedule-day-head" data-day="${day}">${day}</th>`).join("")}
+    ${DAYS.map(
+      (day) => `<th class="schedule-day-head" data-day="${day}">${day}</th>`
+    ).join("")}
   `;
 
   thead.appendChild(headRow);
@@ -298,7 +288,12 @@ function buildScheduleTable() {
 }
 
 function rectsOverlap(a, b) {
-  return !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom);
+  return !(
+    a.right <= b.left ||
+    a.left >= b.right ||
+    a.bottom <= b.top ||
+    a.top >= b.bottom
+  );
 }
 
 function rectIntersection(a, b) {
@@ -307,7 +302,14 @@ function rectIntersection(a, b) {
   const top = Math.max(a.top, b.top);
   const bottom = Math.min(a.bottom, b.bottom);
   if (right <= left || bottom <= top) return null;
-  return { left, right, top, bottom, width: right - left, height: bottom - top };
+  return {
+    left,
+    right,
+    top,
+    bottom,
+    width: right - left,
+    height: bottom - top,
+  };
 }
 
 function rectFromBlock(block) {
@@ -333,14 +335,18 @@ function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
   const table = wrap.querySelector(".schedule-table");
 
   const firstBodyRow = table.querySelector("tbody tr");
-  const firstDayCell = table.querySelector('tbody tr td.schedule-cell[data-day="Mon"]');
+  const firstDayCell = table.querySelector(
+    'tbody tr td.schedule-cell[data-day="Mon"]'
+  );
   const timeTh = table.querySelector("thead th.schedule-time");
 
   if (!firstBodyRow || !firstDayCell || !timeTh) return;
 
   const timeColWidth = timeTh.getBoundingClientRect().width;
   const dayColWidth = firstDayCell.getBoundingClientRect().width;
-  const headerHeight = table.querySelector("thead").getBoundingClientRect().height;
+  const headerHeight = table
+    .querySelector("thead")
+    .getBoundingClientRect().height;
   const rowHeight = firstBodyRow.getBoundingClientRect().height;
 
   // --- build blocks first (one per event), store rects for overlap detection ---
@@ -406,11 +412,10 @@ function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
 
       // mark both as conflicted
       A.el.style.opacity = "0.6";
-B.el.style.opacity = "0.6";
+      B.el.style.opacity = "0.6";
 
-A.el.classList.add("is-overlap");
-B.el.classList.add("is-overlap");
-
+      A.el.classList.add("is-overlap");
+      B.el.classList.add("is-overlap");
 
       // intersection rect coordinates relative to each block
       const aLocal = {
@@ -446,9 +451,9 @@ B.el.classList.add("is-overlap");
 
   // --- text placement: push down if text area overlaps already-placed text ---
   // We do this per-day so text collisions only matter inside a column.
-  const TEXT_STEP_PX = 36;        // "preset amount" height of box
-  const MAX_TRIES = 30;           // prevents infinite loops
-  const H_PAD = 6;                // match your block padding roughly
+  const TEXT_STEP_PX = 36; // "preset amount" height of box
+  const MAX_TRIES = 30; // prevents infinite loops
+  const H_PAD = 6; // match your block padding roughly
   const V_PAD = 6;
 
   DAYS.forEach((day) => {
@@ -505,7 +510,6 @@ B.el.classList.add("is-overlap");
     });
   });
 }
-
 
 export function renderSchedule(ctx, courses, term) {
   if (!ctx.scheduleGrid) return;

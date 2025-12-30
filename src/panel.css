@@ -3,17 +3,18 @@
 /* -------------------------------------------------------------------------- */
 
 .widget {
-  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial;
 }
 
-h1, h2, h3,
+h1,
+h2,
+h3,
 .panel-title,
 .section-title,
 .table-header {
-  font-family: 'Manrope', 'Inter', system-ui;
+  font-family: "Manrope", "Inter", system-ui;
   font-weight: 600;
 }
-
 
 /* -------------------------------------------------------------------------- */
 /* SHADOW DOM RESET / HOST RESET                                               */
@@ -23,39 +24,39 @@ h1, h2, h3,
   all: initial;
 }
 
-
 /* -------------------------------------------------------------------------- */
 /* FLOATING TOGGLE BUTTON                                                      */
 /* -------------------------------------------------------------------------- */
 
 /* Floating toggle button that stays visible */
 #floating-button {
-  background: linear-gradient(180deg, #afebff, #002046);
+  background: #ffffff;
 
   display: flex;
-  flex-direction: column;  
-  align-items: center;      
+  align-items: center;
   justify-content: center;
 
   position: fixed;
-  right: 16px;
-  bottom: 16px;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 999999;
 
-  width: 70px;
-  height: 70px;
+  width: 44px;
+  height: 90px;
 
-  padding: 10px 14px;
+  padding: 10px 6px;
 
-  border-radius: 12px;
+  border-radius: 12px 0 0 12px;
   border: 1px solid #d1d5db;
+  border-right: none;
 
-  box-shadow: 0 6px 20px rgba(0,0,0,.10);
+  box-shadow: 0 6px 20px rgba(0,0,0,.12);
 
   cursor: pointer;
 
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  font-size: 10px;
+  font-size: 11px;
 
   text-align: center;
   line-height: 1.2;
@@ -63,28 +64,29 @@ h1, h2, h3,
   transition: all 0.2s ease;
 }
 
-#wd-logo {
-  color: #ffffff;
-
-  width: 50px;     
-  height: auto;   
-
-  vertical-align: middle; 
-
-  transition: all 0.2s ease;
-}
-
 #floating-button:hover {
-  background: linear-gradient(180deg, #bbeeff, #002046);
+  background: #f8fafc;
 }
 
-#floating-button:hover #wd-logo{
-  color: #b7e2ff;
-
-  transform: scale(1.08); 
+.floating-button__icon {
+  display: block;
+  font-size: 16px;
+  color: #0f172a;
+  transition: transform 0.2s ease;
 }
 
+.floating-button__label {
+  margin-top: 6px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  letter-spacing: 0.4px;
+  font-weight: 600;
+  color: #0f172a;
+}
 
+#floating-button.is-collapsed .floating-button__icon {
+  transform: rotate(180deg);
+}
 /* -------------------------------------------------------------------------- */
 /* MAIN WIDGET SHELL (POSITIONING + VISIBILITY)                                */
 /* -------------------------------------------------------------------------- */
@@ -94,10 +96,11 @@ h1, h2, h3,
 
   display: flex;
   flex-direction: column;
-  
+
   position: fixed;
-  right: 16px;
-  bottom: 90px; 
+  right: 44px; 
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 999999;
 
   border: 1px solid #e5e7eb;
@@ -106,12 +109,14 @@ h1, h2, h3,
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
 
   overflow: hidden;
+  
+  width: min(780px, 92vw);
+  max-height: 86vh;
 }
 
-.widget.is-hidden { 
-  display: none !important; 
+.widget.is-hidden {
+  display: none !important;
 }
-
 
 /* -------------------------------------------------------------------------- */
 /* WIDGET HEADER (TITLE + ACTION BUTTONS)                             */
@@ -163,7 +168,6 @@ h1, h2, h3,
 
   overflow: auto;
 }
-
 
 /* -------------------------------------------------------------------------- */
 /* TABS (COURSE LIST + SCHEDULE VIEW SWITCHER + SEARCH)                                 */
@@ -231,11 +235,12 @@ table {
   width: 100%;
 
   border-collapse: collapse;
-  
+
   font-size: 12px;
 }
 
-th, td {
+th,
+td {
   padding: 8px 10px;
 
   border-bottom: 1px solid #f3f4f6;
@@ -244,7 +249,8 @@ th, td {
   vertical-align: middle;
 }
 
-th:last-child, td:last-child {
+th:last-child,
+td:last-child {
   border-right: none;
 }
 
@@ -253,7 +259,7 @@ th {
 
   position: sticky;
   top: 0;
- 
+
   text-align: left;
   font-weight: 700;
 
@@ -271,32 +277,53 @@ thead th {
   font-size: 11px;
 }
 
-th:nth-child(1), th:nth-child(2), th:nth-child(3), th:nth-child(4), th:nth-child(5), th:nth-child(6) {
+th:nth-child(1),
+th:nth-child(2),
+th:nth-child(3),
+th:nth-child(4),
+th:nth-child(5),
+th:nth-child(6) {
   text-align: center;
 }
 
-tr td:nth-child(1), tr td:nth-child(2), tr td:nth-child(3), tr td:nth-child(4), tr td:nth-child(5), tr td:nth-child(6) {
+tr td:nth-child(1),
+tr td:nth-child(2),
+tr td:nth-child(3),
+tr td:nth-child(4),
+tr td:nth-child(5),
+tr td:nth-child(6) {
   text-align: center;
 }
 
-[data-panel="list"] th:nth-child(1) { width: 175px; } /* Title */
-[data-panel="list"] th:nth-child(2) { width: 75px; } /* Code */
-[data-panel="list"] th:nth-child(3) { width: 30px; } /* Sect */
-[data-panel="list"] th:nth-child(4) { width: 100px; } /* Instructor */
-[data-panel="list"] th:nth-child(5) { width: 450px; } /* Meeting */
-[data-panel="list"] th:nth-child(6) { width: 80px; } /* class-type */
+[data-panel="list"] th:nth-child(1) {
+  width: 175px;
+} /* Title */
+[data-panel="list"] th:nth-child(2) {
+  width: 75px;
+} /* Code */
+[data-panel="list"] th:nth-child(3) {
+  width: 30px;
+} /* Sect */
+[data-panel="list"] th:nth-child(4) {
+  width: 100px;
+} /* Instructor */
+[data-panel="list"] th:nth-child(5) {
+  width: 450px;
+} /* Meeting */
+[data-panel="list"] th:nth-child(6) {
+  width: 80px;
+} /* class-type */
 
 tr:hover td {
   background: #fbfbfb;
 }
 
-
 /* -------------------------------------------------------------------------- */
 /* COURSE LIST VIEW: MEETING CELL CONTENT (PILLS + SUBTEXT)                    */
 /* -------------------------------------------------------------------------- */
 
-.title-main { 
-  white-space: pre-line; 
+.title-main {
+  white-space: pre-line;
 }
 
 .days {
@@ -324,14 +351,13 @@ tr:hover td {
 
 .meeting-sub,
 .meeting-location {
-  white-space: pre-line;     /* keeps your \n */
+  white-space: pre-line; /* keeps your \n */
 }
 
 .meeting-sub {
   font-size: 11px;
   color: #374151;
 }
-
 
 /* -------------------------------------------------------------------------- */
 /* GENERIC UI HELPERS (MUTED TEXT, GENERIC PILL)                               */
@@ -353,7 +379,6 @@ tr:hover td {
 
   font-size: 11px;
 }
-
 
 /* -------------------------------------------------------------------------- */
 /* SCHEDULE VIEW: TOP CONTROLS (TERM TOGGLES)                                  */
@@ -399,7 +424,6 @@ tr:hover td {
   border-color: #d1d5db;
 }
 
-
 /* -------------------------------------------------------------------------- */
 /* SCHEDULE VIEW: GRID + TABLE (TIME GRID STRUCTURE)                           */
 /* -------------------------------------------------------------------------- */
@@ -429,12 +453,12 @@ tr:hover td {
   text-align: center;
   vertical-align: middle;
 
-  width: 110px;        /* applies to all day columns unless overridden */
+  width: 110px; /* applies to all day columns unless overridden */
 }
 
 .schedule-table th.schedule-time,
 .schedule-table td.schedule-time {
-  width: 40px;         /* pick a value */
+  width: 40px; /* pick a value */
 }
 
 .schedule-table td {
@@ -458,10 +482,9 @@ tr:hover td {
 }
 
 .schedule-cell {
-  padding: 0;                /* important */
-  vertical-align: middle;    /* keep rowspan behaving predictably */
+  padding: 0; /* important */
+  vertical-align: middle; /* keep rowspan behaving predictably */
 }
-
 
 /* -------------------------------------------------------------------------- */
 /* SCHEDULE VIEW: EVENT BLOCKS (IN-CELL)                                       */
@@ -471,11 +494,11 @@ tr:hover td {
 .schedule-entry {
   background: #eef2ff;
 
-  height: 100%;        
+  height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;     /* vertical center */
-  align-items: center;         /* horizontal center */
+  justify-content: center; /* vertical center */
+  align-items: center; /* horizontal center */
   text-align: center;
   z-index: 4;
 
@@ -496,7 +519,6 @@ tr:hover td {
   color: #000;
   white-space: nowrap;
 }
-
 
 /* -------------------------------------------------------------------------- */
 /* SCHEDULE VIEW: CONFLICT OVERLAYS + LAYERING                                 */
@@ -531,7 +553,7 @@ tr:hover td {
 }
 
 .schedule-cell.has-conflict {
-  background: #fee2e2;            /* light red */
+  background: #fee2e2; /* light red */
 }
 
 /* keep text on top */
@@ -546,7 +568,6 @@ tr:hover td {
   align-items: center;
   text-align: center;
 }
-
 
 /* -------------------------------------------------------------------------- */
 /* SCHEDULE VIEW: FLOATING MERGED BLOCKS + OVERLAP LAYER                       */
@@ -599,7 +620,6 @@ tr:hover td {
   color: #000000 !important;
 }
 
-
 /* -------------------------------------------------------------------------- */
 /* WIDGET FOOTER                                                              */
 /* -------------------------------------------------------------------------- */
@@ -609,7 +629,7 @@ tr:hover td {
   align-items: center;
 
   padding: 8px 12px;
-  
+
   gap: 8px;
 
   border-top: 1px solid #e5e7eb;

@@ -1,5 +1,6 @@
 <button id="floating-button" type="button">
-   <span id="logo"><img id="wd-logo" alt="Logo"></span>
+  <span class="floating-button__icon" aria-hidden="true">◀</span>
+  <span class="floating-button__label">Schedule</span>
 </button>
 
 <div class="widget is-hidden">
@@ -11,10 +12,17 @@
     <button id="widget-refresh" class="btn" type="button">Refresh</button>
     <button id="widget-export" class="btn" type="button">Export CSV</button>
   </div>
-   <div class="widget-tabs">
-    <button class="tab-button is-active" type="button" data-panel="list">Course List</button>
-    <button class="tab-button" type="button" data-panel="schedule">Schedule View</button>
-    <input id="widget-search" placeholder="Search by Course Name/Course code/Instructor…" />
+  <div class="widget-tabs">
+    <button class="tab-button is-active" type="button" data-panel="list">
+      Course List
+    </button>
+    <button class="tab-button" type="button" data-panel="schedule">
+      Schedule View
+    </button>
+    <input
+      id="widget-search"
+      placeholder="Search by Course Name/Course code/Instructor…"
+    />
   </div>
   <div class="widget-body">
     <div class="widget-panel is-active" data-panel="list">
@@ -37,8 +45,12 @@
       <div class="schedule-controls">
         <span class="schedule-label">Terms</span>
         <div class="schedule-term-buttons">
-          <button class="term-button is-active" type="button" data-term="first">T1</button>
-          <button class="term-button" type="button" data-term="second">T2</button>
+          <button class="term-button is-active" type="button" data-term="first">
+            T1
+          </button>
+          <button class="term-button" type="button" data-term="second">
+            T2
+          </button>
         </div>
       </div>
       <div class="schedule-grid" id="schedule-grid"></div>

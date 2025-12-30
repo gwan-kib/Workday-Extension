@@ -17,10 +17,6 @@ export async function loadPanel(shadow) {
   wrap.innerHTML = html;
   shadow.appendChild(wrap);
 
-  const logoImg = shadow.querySelector("#wd-logo");
-  if (logoImg)
-    logoImg.src = chrome.runtime.getURL("src/W.svg");
-
   return {
     button: shadow.querySelector("#floating-button"),
     widget: shadow.querySelector(".widget"),

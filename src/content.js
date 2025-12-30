@@ -1,19 +1,27 @@
-import { on, debounce } from "./utilities/dom.js"
-import { STATE } from "./core/state.js"
-import { ensureMount } from "./utilities/shadowMount.js"
-import { loadPanel } from "./panel/loadPanel.js"
-import { extractAllCourses } from "./extraction/courseExtraction.js"
-import { applySearchFilter, sortBy, wireSorting } from "./panel/panelInteractions.js"
-import { renderRows } from "./panel/renderRows.js"
-import { renderSchedule } from "./panel/scheduleView.js"
-import { exportCSV } from "./exporting/cvs.js"
+import { on, debounce } from "./utilities/dom.js";
+import { STATE } from "./core/state.js";
+import { ensureMount } from "./utilities/shadowMount.js";
+import { loadPanel } from "./panel/loadPanel.js";
+import { extractAllCourses } from "./extraction/courseExtraction.js";
+import {
+  applySearchFilter,
+  sortBy,
+  wireSorting,
+} from "./panel/panelInteractions.js";
+import { renderRows } from "./panel/renderRows.js";
+import { renderSchedule } from "./panel/scheduleView.js";
+import { exportCSV } from "./exporting/cvs.js";
 
 (() => {
   console.log("[WD] content script loaded");
   async function boot() {
     const shadow = ensureMount();
     const ctx = await loadPanel(shadow);
-     const updateSchedule = () => {
+    ctx.button.classList.toggle(
+      "is-collapsed",
+      ctx.widget.classList.contains("is-hidden")
+    );
+    const updateSchedule = () => {
       renderSchedule(ctx, STATE.filtered, STATE.view.term);
     };
 
@@ -31,8 +39,7 @@ import { exportCSV } from "./exporting/cvs.js"
     ctx.tabButtons.forEach((btn) => {
       on(btn, "click", () => {
         setActivePanel(btn.dataset.panel);
-        if (btn.dataset.panel === "schedule")
-          updateSchedule();
+        if (btn.dataset.panel === "schedule") updateSchedule();
       });
     });
 
@@ -40,7 +47,10 @@ import { exportCSV } from "./exporting/cvs.js"
       on(btn, "click", () => {
         STATE.view.term = btn.dataset.term;
         ctx.termButtons.forEach((termBtn) => {
-          termBtn.classList.toggle("is-active", termBtn.dataset.term === STATE.view.term);
+          termBtn.classList.toggle(
+            "is-active",
+            termBtn.dataset.term === STATE.view.term
+          );
         });
         updateSchedule();
       });
@@ -48,6 +58,7 @@ import { exportCSV } from "./exporting/cvs.js"
 
     on(ctx.button, "click", () => {
       ctx.widget.classList.toggle("is-hidden");
+      ctx.button.classList.toggle("is-collapsed", ctx.widget.classList.contains("is-hidden"));
     });
 
     on(ctx.refresh, "click", async () => {
@@ -67,7 +78,7 @@ import { exportCSV } from "./exporting/cvs.js"
         applySearchFilter(ctx.search.value);
         sortBy(STATE.sort.key || "code");
         renderRows(ctx, STATE.filtered);
-         updateSchedule();
+        updateSchedule();
       }, 100)
     );
 
@@ -77,7 +88,7 @@ import { exportCSV } from "./exporting/cvs.js"
     STATE.filtered = [...STATE.courses];
     sortBy("code");
     renderRows(ctx, STATE.filtered);
-        updateSchedule();
+    updateSchedule();
     setActivePanel(STATE.view.panel);
   }
 
