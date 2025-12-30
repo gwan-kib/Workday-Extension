@@ -383,6 +383,11 @@ tr td:nth-child(1), tr td:nth-child(2), tr td:nth-child(3), tr td:nth-child(4), 
   text-align: center;
 }
 
+[data-panel="list"] td:nth-child(5) {
+   white-space: pre-line;
+  vertical-align: top;
+}
+
 [data-panel="list"] th:nth-child(1) { width: 175px; } /* Title */
 [data-panel="list"] th:nth-child(2) { width: 75px; } /* Code */
 [data-panel="list"] th:nth-child(3) { width: 30px; } /* Sect */
@@ -456,6 +461,12 @@ tr:hover td {
   font-size: 12px;
   white-space: nowrap;
 }
+
+.meeting-sub,
+.meeting-location {
+  white-space: pre-line;     /* keeps your \n */
+}
+
 
 .meeting-sub {
   font-size: 11px;

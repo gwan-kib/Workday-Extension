@@ -73,8 +73,8 @@ export function formatMeetingLineForPanel(line) {
 
     const timePart = parts.find((p) => /\d{1,2}:\d{2}/.test(p) && /-/.test(p)) || "";
     const buildingPart = parts.find((p) => /\([A-Z]{2,}\)/.test(p)) || ""; // "Library (LIB)"
-    const floorPart = parts.find((p) => /^Floor:/i.test(p)) || "";
-    const roomPart = parts.find((p) => /^Room:/i.test(p)) || "";
+    const floorPart = parts.find((p) => /^Floor\b/i.test(p)) || "";
+const roomPart  = parts.find((p) => /^(Room|Rm)\b/i.test(p)) || "";
 
     return {
       days: dayPart,
