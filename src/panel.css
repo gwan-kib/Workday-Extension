@@ -1,3 +1,7 @@
+/* -------------------------------------------------------------------------- */
+/* GLOBAL FONT STACKS + TYPOGRAPHY                                             */
+/* -------------------------------------------------------------------------- */
+
 .widget {
   font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial;
 }
@@ -9,6 +13,20 @@ h1, h2, h3,
   font-family: 'Manrope', 'Inter', system-ui;
   font-weight: 600;
 }
+
+
+/* -------------------------------------------------------------------------- */
+/* SHADOW DOM RESET / HOST RESET                                               */
+/* -------------------------------------------------------------------------- */
+
+:host {
+  all: initial;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* FLOATING TOGGLE BUTTON                                                      */
+/* -------------------------------------------------------------------------- */
 
 /* Floating toggle button that stays visible */
 #floating-button {
@@ -56,6 +74,9 @@ h1, h2, h3,
   transition: all 0.2s ease;
 }
 
+#floating-button:hover {
+  background: linear-gradient(180deg, #bbeeff, #002046);
+}
 
 #floating-button:hover #wd-logo{
   color: #b7e2ff;
@@ -63,13 +84,10 @@ h1, h2, h3,
   transform: scale(1.08); 
 }
 
-#floating-button:hover {
-  background: linear-gradient(180deg, #bbeeff, #002046);
-}
 
-:host {
-  all: initial;
-}
+/* -------------------------------------------------------------------------- */
+/* MAIN WIDGET SHELL (POSITIONING + VISIBILITY)                                */
+/* -------------------------------------------------------------------------- */
 
 .widget {
   background: #ffffff;
@@ -93,6 +111,11 @@ h1, h2, h3,
 .widget.is-hidden { 
   display: none !important; 
 }
+
+
+/* -------------------------------------------------------------------------- */
+/* WIDGET HEADER (TITLE + SEARCH + ACTION BUTTONS)                             */
+/* -------------------------------------------------------------------------- */
 
 .widget-header {
   display: flex;
@@ -142,11 +165,21 @@ h1, h2, h3,
   font-size: 12px;
 }
 
+
+/* -------------------------------------------------------------------------- */
+/* WIDGET BODY (SCROLL CONTAINER)                                              */
+/* -------------------------------------------------------------------------- */
+
 .widget-body {
   max-height: 60vh;
 
   overflow: auto;
 }
+
+
+/* -------------------------------------------------------------------------- */
+/* TABS (COURSE LIST / SCHEDULE VIEW SWITCHER)                                 */
+/* -------------------------------------------------------------------------- */
 
 .widget-tabs {
   display: flex;
@@ -191,145 +224,10 @@ h1, h2, h3,
   display: block;
 }
 
-.schedule-controls {
-  display: flex;
-  align-items: center;
 
-  gap: 10px;
-
-  padding: 8px 12px;
-}
-
-.schedule-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #374151;
-}
-
-.schedule-term-buttons {
-  display: flex;
-  gap: 6px;
-}
-
-.term-button {
-  background: #f3f4f6;
-
-  padding: 4px 10px;
-
-  border: 1px solid transparent;
-  border-radius: 8px;
-
-  font-size: 11px;
-  font-weight: 600;
-
-  cursor: pointer;
-}
-
-.term-button.is-active {
-  background: #ffffff;
-
-  border-color: #d1d5db;
-}
-
-.schedule-grid {
-  padding: 0 12px 12px;
-
-    overflow: hidden;
-}
-
-.schedule-table {
-  width: max-content;
-
-  border-collapse: collapse;
-
-  font-size: 11px;
-
-  table-layout: fixed;
-}
-
-.schedule-table th,
-.schedule-table td {
-  border: 1px solid #e5e7eb;
-
-  padding: 4px 6px;
-
-  text-align: center;
-  vertical-align: middle;
-}
-
-.schedule-table td {
-
-  vertical-align: top;
-}
-
-.schedule-table th {
-  background: #f3f4f6;
-
-  font-weight: 700;
-}
-
-.schedule-table th.schedule-time,
-.schedule-table td.schedule-time {
-  width: 40px;         /* pick a value */
-}
-
-
-/* For the day columns, */
-.schedule-table th,
-.schedule-table td {
-  width: 130px;        /* applies to all columns unless overridden */
-}
-
-
-
-.schedule-time {
-  background: #fafafa;
-  font-weight: 600;
-  color: #374151;
-}
-
-.schedule-table tbody tr {
-  height: 36px; /* tweak this */
-}
-
-.schedule-cell {
-  padding: 0;          /* important */
-  vertical-align: middle; /* keep rowspan behaving predictably */
-}
-
-/* The event block (NOT a pill) */
-.schedule-entry {
-  height: 100%;        
-  display: flex;
-  flex-direction: column;
-  justify-content: center;     /* vertical center */
-  align-items: center;         /* horizontal center */
-  text-align: center;
-   z-index: 4;
-
-  background: transparent;     /* remove pill bg */
-  border: none;                /* remove pill border look */
-  border-radius: 0;            /* remove pill rounding */
-  margin: 0;                   /* remove pill spacing */
-  padding: 0;                  /* remove pill spacing */
-
-  font-size: 11px;
-  color: #111827;
-
-  background: #eef2ff;
-  padding: 6px 6px;
-
-}
-
-
-.schedule-entry-title {
-  font-weight: 600;
-}
-
-.schedule-entry-time {
-  color: #6b7280;
-   white-space: nowrap;
-}
+/* -------------------------------------------------------------------------- */
+/* COURSE LIST VIEW: TABLE BASE STYLES                                         */
+/* -------------------------------------------------------------------------- */
 
 table {
   width: 100%;
@@ -379,8 +277,6 @@ th:nth-child(1), th:nth-child(2), th:nth-child(3), th:nth-child(4), th:nth-child
   text-align: center;
 }
 
-
-
 tr td:nth-child(1), tr td:nth-child(2), tr td:nth-child(3), tr td:nth-child(4), tr td:nth-child(5), tr td:nth-child(6) {
   text-align: center;
 }
@@ -396,14 +292,56 @@ tr:hover td {
   background: #fbfbfb;
 }
 
+
+/* -------------------------------------------------------------------------- */
+/* COURSE LIST VIEW: MEETING CELL CONTENT (PILLS + SUBTEXT)                    */
+/* -------------------------------------------------------------------------- */
+
+.title-main { 
+  white-space: pre-line; 
+}
+
+.days {
+  white-space: nowrap;
+}
+
+.meeting {
+  line-height: 1.4;
+}
+
+.meeting-pill {
+  background: #eef2ff;
+
+  display: inline-block;
+
+  padding: 4px 10px;
+  margin-bottom: 4px;
+
+  border: 1px solid #e0e7ff;
+  border-radius: 999px;
+
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.meeting-sub,
+.meeting-location {
+  white-space: pre-line;     /* keeps your \n */
+}
+
+.meeting-sub {
+  font-size: 11px;
+  color: #374151;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* GENERIC UI HELPERS (MUTED TEXT, GENERIC PILL)                               */
+/* -------------------------------------------------------------------------- */
+
 .muted {
   color: #6b7280;
 }
-
-.meeting-location {
-  white-space: pre-line;
-}
-
 
 .pill {
   background: #eef2ff;
@@ -417,6 +355,256 @@ tr:hover td {
 
   font-size: 11px;
 }
+
+
+/* -------------------------------------------------------------------------- */
+/* SCHEDULE VIEW: TOP CONTROLS (TERM TOGGLES)                                  */
+/* -------------------------------------------------------------------------- */
+
+.schedule-controls {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 8px 12px;
+}
+
+.schedule-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.schedule-term-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.term-button {
+  background: #f3f4f6;
+
+  padding: 4px 10px;
+
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.term-button.is-active {
+  background: #ffffff;
+
+  border-color: #d1d5db;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* SCHEDULE VIEW: GRID + TABLE (TIME GRID STRUCTURE)                           */
+/* -------------------------------------------------------------------------- */
+
+.schedule-grid {
+  padding: 0 12px 12px;
+
+  overflow: hidden;
+}
+
+.schedule-table {
+  width: max-content;
+
+  border-collapse: collapse;
+
+  font-size: 11px;
+
+  table-layout: fixed;
+}
+
+.schedule-table th,
+.schedule-table td {
+  border: 1px solid #e5e7eb;
+
+  padding: 4px 6px;
+
+  text-align: center;
+  vertical-align: middle;
+
+  width: 130px;        /* applies to all day columns unless overridden */
+}
+
+.schedule-table th.schedule-time,
+.schedule-table td.schedule-time {
+  width: 40px;         /* pick a value */
+}
+
+.schedule-table td {
+  vertical-align: top;
+}
+
+.schedule-table th {
+  background: #f3f4f6;
+
+  font-weight: 700;
+}
+
+.schedule-time {
+  background: #fafafa;
+  font-weight: 600;
+  color: #374151;
+}
+
+.schedule-table tbody tr {
+  height: 36px; /* tweak this */
+}
+
+.schedule-cell {
+  padding: 0;                /* important */
+  vertical-align: middle;    /* keep rowspan behaving predictably */
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* SCHEDULE VIEW: EVENT BLOCKS (IN-CELL)                                       */
+/* -------------------------------------------------------------------------- */
+
+/* The event block (NOT a pill) */
+.schedule-entry {
+  background: #eef2ff;
+
+  height: 100%;        
+  display: flex;
+  flex-direction: column;
+  justify-content: center;     /* vertical center */
+  align-items: center;         /* horizontal center */
+  text-align: center;
+  z-index: 4;
+
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 6px 6px;
+
+  font-size: 11px;
+  color: #111827;
+}
+
+.schedule-entry-title {
+  font-weight: 600;
+}
+
+.schedule-entry-time {
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* SCHEDULE VIEW: CONFLICT OVERLAYS + LAYERING                                 */
+/* -------------------------------------------------------------------------- */
+
+.schedule-table-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.schedule-cell-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.schedule-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.schedule-conflict {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: #fecaca;
+  opacity: 0.95;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.schedule-cell.has-conflict {
+  background: #fee2e2;            /* light red */
+}
+
+/* keep text on top */
+.schedule-entry-content {
+  position: relative;
+  z-index: 2;
+
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* SCHEDULE VIEW: FLOATING MERGED BLOCKS + OVERLAP LAYER                       */
+/* -------------------------------------------------------------------------- */
+
+.schedule-entry-float {
+  background: #eef2ff;
+
+  position: absolute;
+  pointer-events: auto;
+  z-index: 6;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+
+  border: 1px solid #e0e7ff;
+
+  padding: 0;
+  box-sizing: border-box;
+
+  font-size: 10px;
+
+  overflow: hidden; /* so red overlap stays inside the box */
+}
+
+.schedule-entry-overlap-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.schedule-entry-overlap-rect {
+  position: absolute;
+  background: #ef4444;
+  opacity: 0.85;
+}
+
+.schedule-entry-text {
+  position: relative;
+  z-index: 2;
+  display: block;
+  text-align: center;
+}
+
+.schedule-entry-float.is-overlap .schedule-entry-title,
+.schedule-entry-float.is-overlap .schedule-entry-time {
+  color: #000000 !important;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* WIDGET FOOTER                                                              */
+/* -------------------------------------------------------------------------- */
 
 .widget-footer {
   display: flex;
@@ -433,160 +621,4 @@ tr:hover td {
   color: #4b5563;
 
   font-size: 12px;
-}
-
-.days {
-  white-space: nowrap;
-}
-
-.title-main { white-space: pre-line; }
-
-.meeting {
-  line-height: 1.4;
-}
-
-.meeting-pill {
-  display: inline-block;
-
-  padding: 4px 10px;
-  margin-bottom: 4px;
-
-  background: #eef2ff;
-  border: 1px solid #e0e7ff;
-  border-radius: 999px;
-
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-.meeting-sub,
-.meeting-location {
-  white-space: pre-line;     /* keeps your \n */
-}
-
-
-.meeting-sub {
-  font-size: 11px;
-  color: #374151;
-}
-
-.schedule-conflict {
-  position: absolute;
-  left: 0;
-  right: 0;
-  background: #fecaca;
-  opacity: 0.95;
-  pointer-events: none;
-  z-index: 3;
-}
-
-/* keep text on top */
-.schedule-entry-content {
-  position: relative;
-  z-index: 2;
-
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.schedule-cell.has-conflict {
-  background: #fee2e2;            /* light red */
-}
-
-.schedule-cell-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.schedule-table-wrap {
-  position: relative;
-  display: inline-block;
-}
-
-.schedule-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 5;
-}
-
-/* floating “merged” block */
-.schedule-entry-float {
-  position: absolute;
-  pointer-events: auto;
-  z-index: 6;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-
-  text-align: center;
-
-  background: #eef2ff;
-  border: 1px solid #e0e7ff;
-
-  padding: 6px 6px;
-  box-sizing: border-box;
-
-  font-size: 10px;
-}
-
-/* Make block a stacking context so we can layer overlap-red under text */
-.schedule-entry-float {
-  position: absolute;
-  pointer-events: auto;
-  z-index: 6;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;
-
-  background: #eef2ff;
-  border: 1px solid #e0e7ff;
-
-  padding: 6px 6px;
-  box-sizing: border-box;
-
-  font-size: 10px;
-
-  overflow: hidden; /* so red overlap stays inside the box */
-}
-
-/* inner layer that holds the red intersection, under the text */
-.schedule-entry-overlap-layer {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-/* the red intersection rectangle */
-.schedule-entry-overlap-rect {
-  position: absolute;
-  background: #ef4444;
-  opacity: 0.85;
-}
-
-/* actual text must be above overlap layer */
-.schedule-entry-text {
-  position: relative;
-  z-index: 2;
-  display: block;
-  text-align: center;
-}
-
-.schedule-entry-title { font-weight: 600; }
-.schedule-entry-time { color: #6b7280; white-space: nowrap; }
-
-/* If a block overlaps, force readable text */
-.schedule-entry-float.is-overlap .schedule-entry-title,
-.schedule-entry-float.is-overlap .schedule-entry-time {
-  color: #000000 !important;
 }
