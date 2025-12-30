@@ -6,6 +6,14 @@ export const escHTML = (s) => {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
+function cleanLines(text) {
+  return String(text || "")
+    .replace(/[\u00A0\u200B-\u200D\uFEFF]/g, " ")  // kill nbsp/zero-width
+    .replace(/[ \t]+\n/g, "\n")                   // trailing spaces before newline
+    .replace(/\n[ \t]+/g, "\n")                   // leading spaces after newline
+    .replace(/\n{2,}/g, "\n")                     // collapse multiple newlines
+    .trim();
+}
 
 
 export function renderRows(ctx, rows) {
@@ -30,13 +38,12 @@ export function renderRows(ctx, rows) {
       <td class="instructor">${c.instructor || ""}</td>
       <td class="meeting">
         ${(() => {
-          const parts = String(c.meeting || "").split("\n");
-          const main = (parts[0] || "").trim();   // "Wed / Fri | 12:30 p.m. - 2:00 p.m."
-          const sub  = (parts[1] || "").trim();   // "Online" OR "Library (LIB) | Floor: 3 | Room: 317"
-
+          const parts = cleanLines(c.meeting).split("\n");
+          const main = (parts[0] || "").trim();
+          const sub = parts.slice(1).map((s) => s.replace(/[\u00A0\u200B-\u200D\uFEFF]/g, "").trim()).filter(Boolean).join("\n");
           return `
-            ${main ? `<span class="meeting-pill">${escHTML(main)}</span>` : ""}
-            ${sub  ? `<div class="meeting-sub">${escHTML(sub)}</div>` : ""}
+            ${main ? `<span class="meeting-pill">${escHTML(main).trim()}</span>` : ""}
+            ${sub  ? `<div class="meeting-sub">${escHTML(sub).trim()}</div>` : ""}
           `;
         })()}
       </td>
