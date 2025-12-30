@@ -4,7 +4,7 @@ const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 
 // 30-min grid so 12:30 fits naturally
 const START_HOUR = 8;
-const END_HOUR = 22;           // last visible hour (exclusive end)
+const END_HOUR = 21;           // last visible hour (exclusive end)
 const SLOT_MINUTES = 30;
 
 // Build slot start times: 8:00, 8:30, 9:00, ...
@@ -238,53 +238,6 @@ function formatSlotLabel(minutes) {
   return `${hh}:${mm}`;
 }
 
-function toLocalRect(parentRect, childRect) {
-  return {
-    left: childRect.left - parentRect.left,
-    top: childRect.top - parentRect.top,
-    right: childRect.right - parentRect.left,
-    bottom: childRect.bottom - parentRect.top,
-    width: childRect.width,
-    height: childRect.height,
-  };
-}
-
-// Given an intersection rect (LOCAL to a block) and a "no-paint" rect (LOCAL),
-// return up to 4 rectangles that represent intersection minus noPaint.
-function subtractRect(inter, cut) {
-  // compute overlap in local space
-  const o = rectIntersection(
-    { left: inter.left, top: inter.top, right: inter.right, bottom: inter.bottom },
-    { left: cut.left, top: cut.top, right: cut.right, bottom: cut.bottom }
-  );
-  if (!o) return [inter];
-
-  const out = [];
-
-  // top slice
-  if (o.top > inter.top) {
-    out.push({ left: inter.left, top: inter.top, right: inter.right, bottom: o.top });
-  }
-  // bottom slice
-  if (o.bottom < inter.bottom) {
-    out.push({ left: inter.left, top: o.bottom, right: inter.right, bottom: inter.bottom });
-  }
-  // left slice
-  if (o.left > inter.left) {
-    out.push({ left: inter.left, top: o.top, right: o.left, bottom: o.bottom });
-  }
-  // right slice
-  if (o.right < inter.right) {
-    out.push({ left: o.right, top: o.top, right: inter.right, bottom: o.bottom });
-  }
-
-  // normalize + remove zero areas
-  return out
-    .map((r) => ({ ...r, width: r.right - r.left, height: r.bottom - r.top }))
-    .filter((r) => r.width > 0 && r.height > 0);
-}
-
-
 function buildScheduleTable() {
   // Wrap so we can overlay blocks on top of the table
   const wrap = document.createElement("div");
@@ -493,7 +446,7 @@ B.el.classList.add("is-overlap");
 
   // --- text placement: push down if text area overlaps already-placed text ---
   // We do this per-day so text collisions only matter inside a column.
-  const TEXT_STEP_PX = 14;        // "preset amount"
+  const TEXT_STEP_PX = 36;        // "preset amount" height of box
   const MAX_TRIES = 30;           // prevents infinite loops
   const H_PAD = 6;                // match your block padding roughly
   const V_PAD = 6;

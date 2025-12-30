@@ -114,7 +114,7 @@ h1, h2, h3,
 
 
 /* -------------------------------------------------------------------------- */
-/* WIDGET HEADER (TITLE + SEARCH + ACTION BUTTONS)                             */
+/* WIDGET HEADER (TITLE + ACTION BUTTONS)                             */
 /* -------------------------------------------------------------------------- */
 
 .widget-header {
@@ -154,18 +154,6 @@ h1, h2, h3,
   background: #f9fafb;
 }
 
-#widget-search {
-  width: 270px;
-
-  padding: 6px 10px;
-
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-
-  font-size: 12px;
-}
-
-
 /* -------------------------------------------------------------------------- */
 /* WIDGET BODY (SCROLL CONTAINER)                                              */
 /* -------------------------------------------------------------------------- */
@@ -178,12 +166,12 @@ h1, h2, h3,
 
 
 /* -------------------------------------------------------------------------- */
-/* TABS (COURSE LIST / SCHEDULE VIEW SWITCHER)                                 */
+/* TABS (COURSE LIST + SCHEDULE VIEW SWITCHER + SEARCH)                                 */
 /* -------------------------------------------------------------------------- */
 
 .widget-tabs {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 
   padding: 8px 12px;
 
@@ -224,6 +212,16 @@ h1, h2, h3,
   display: block;
 }
 
+#widget-search {
+  width: 270px;
+
+  padding: 6px 10px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+
+  font-size: 12px;
+}
 
 /* -------------------------------------------------------------------------- */
 /* COURSE LIST VIEW: TABLE BASE STYLES                                         */
@@ -270,7 +268,7 @@ tr th {
 thead th {
   box-shadow: inset 0 -3px 0 #d2d3d8;
 
-  font-size: 12px;
+  font-size: 11px;
 }
 
 th:nth-child(1), th:nth-child(2), th:nth-child(3), th:nth-child(4), th:nth-child(5), th:nth-child(6) {
@@ -431,7 +429,7 @@ tr:hover td {
   text-align: center;
   vertical-align: middle;
 
-  width: 130px;        /* applies to all day columns unless overridden */
+  width: 110px;        /* applies to all day columns unless overridden */
 }
 
 .schedule-table th.schedule-time,
@@ -495,7 +493,7 @@ tr:hover td {
 }
 
 .schedule-entry-time {
-  color: #6b7280;
+  color: #000;
   white-space: nowrap;
 }
 
