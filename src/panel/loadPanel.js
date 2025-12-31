@@ -1,13 +1,18 @@
 export async function loadPanel(shadow) {
   const htmlUrl = chrome.runtime.getURL("src/panel.html");
    const cssFiles = [
-    "general.css",
-    "widget-shell.css",
-    "widget-buttons.css",
-    "floating-button.css",
-    "course-list.css",
-    "schedule-view.css",
-    "schedule-view-events.css",
+    "formatting/general.css",
+    "formatting/widget-shell.css",
+    "formatting/widget-buttons.css",
+    "formatting/floating-button.css",
+    "formatting/course-list.css",
+    "formatting/schedule-view.css",
+    "formatting/schedule-view-events.css",
+
+    "colors/course-list-colors.css",
+    "colors/general-colors.css",
+    "colors/schedule-view-colors.css",
+    "colors/widget-functionality-colors.css"
   ];
   const [html, ...cssParts] = await Promise.all([
     fetch(htmlUrl).then((r) => r.text()),
