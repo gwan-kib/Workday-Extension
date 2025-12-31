@@ -1,0 +1,170 @@
+/* -------------------------------------------------------------------------- */
+/* SCHEDULE VIEW: TOP CONTROLS (TERM TOGGLES)                                  */
+/* -------------------------------------------------------------------------- */
+
+.schedule-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 8px 12px;
+}
+
+.schedule-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.schedule-term-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.term-button {
+  background: #f3f4f6;
+
+  padding: 4px 10px;
+
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.term-button.is-active {
+  background: #ffffff;
+
+  border-color: #d1d5db;
+}
+
+
+
+/* -------------------------------------------------------------------------- */
+/* SCHEDULE VIEW: GRID + TABLE (TIME GRID STRUCTURE)                           */
+/* -------------------------------------------------------------------------- */
+
+.schedule-grid {
+  flex: 1;
+  min-height: 0;
+
+  padding: 0 12px 12px;
+  display: block;
+
+  overflow: auto;         /* the scroll happens here */
+  overscroll-behavior: contain;
+}
+
+
+.schedule-table {
+  width: max-content;
+
+  border-collapse: collapse;
+
+  font-size: 11px;
+
+  table-layout: fixed;
+
+  position: relative;
+}
+
+.schedule-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #f3f4f6;
+}
+
+.widget-panel[data-panel="schedule"] {
+  height: 100%;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.widget-panel[data-panel="schedule"].is-active {
+  display: flex; /* override your display:block */
+}
+
+.schedule-table th,
+.schedule-table td {
+  border: 1px solid #e5e7eb;
+
+  padding: 2px 6px;
+
+  text-align: center;
+  vertical-align: middle;
+
+  width: 120px; /* applies to all day columns unless overridden */
+}
+
+.schedule-table th.schedule-time,
+.schedule-table td.schedule-time {
+  width: 40px; /* pick a value */
+}
+
+.schedule-table td {
+  vertical-align: top;
+}
+
+.schedule-table th {
+  background: #f3f4f6;
+
+  font-weight: 700;
+}
+
+.schedule-time {
+  background: #fafafa;
+  font-weight: 600;
+  color: #374151;
+}
+
+.schedule-table tbody tr {
+  height: 25px; /* tweak this */
+}
+
+.schedule-cell {
+  padding: 0; /* important */
+  vertical-align: top; /* keep rowspan behaving predictably */
+}
+
+/* -------------------------------------------------------------------------- */
+/* SCHEDULE VIEW: CONFLICT OVERLAYS + LAYERING                                 */
+/* -------------------------------------------------------------------------- */
+
+.schedule-table-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.schedule-cell-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.schedule-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.schedule-conflict {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: #fecaca;
+  opacity: 0.95;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.schedule-cell.has-conflict {
+  background: #fee2e2; /* light red */
+}

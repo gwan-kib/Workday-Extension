@@ -1,0 +1,97 @@
+/* -------------------------------------------------------------------------- */
+/* SCHEDULE VIEW: EVENT BLOCKS (IN-CELL)                                       */
+/* -------------------------------------------------------------------------- */
+
+/* The event block (NOT a pill) */
+.schedule-entry {
+  background: #eef2ff;
+
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* horizontal center */
+  text-align: center;
+  z-index: 4;
+  justify-content: flex-start;
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 6px 6px;
+
+  font-size: 11px;
+  color: #111827;
+}
+
+.schedule-entry-title {
+  font-weight: 600;
+}
+
+.schedule-entry-time {
+  color: #000;
+  white-space: nowrap;
+}
+
+
+
+/* keep text on top */
+.schedule-entry-content {
+  position: relative;
+  z-index: 2;
+  justify-content: flex-start;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* -------------------------------------------------------------------------- */
+/* SCHEDULE VIEW: FLOATING MERGED BLOCKS + OVERLAP LAYER                       */
+/* -------------------------------------------------------------------------- */
+
+.schedule-entry-float {
+  background: #eef2ff;
+
+  position: absolute;
+  pointer-events: auto;
+  z-index: 6;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+
+  border: 1px solid #e0e7ff;
+
+  padding-top: 1.1px;
+  box-sizing: border-box;
+
+  font-size: 9px;
+
+  overflow: hidden; /* so red overlap stays inside the box */
+}
+
+.schedule-entry-overlap-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.schedule-entry-overlap-rect {
+  position: absolute;
+  background: #ef4444;
+  opacity: 0.85;
+}
+
+.schedule-entry-text {
+  position: relative;
+  z-index: 2;
+  display: block;
+  text-align: center;
+}
+
+.schedule-entry-float.is-overlap .schedule-entry-title,
+.schedule-entry-float.is-overlap .schedule-entry-time {
+  color: #000000 !important;
+}

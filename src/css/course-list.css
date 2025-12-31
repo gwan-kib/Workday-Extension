@@ -1,0 +1,130 @@
+/* -------------------------------------------------------------------------- */
+/* COURSE LIST VIEW: TABLE BASE STYLES                                         */
+/* -------------------------------------------------------------------------- */
+table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  font-size: 12px;
+}
+
+th,
+td {
+  padding: 8px 6px;
+
+  border-bottom: 1px solid #f3f4f6;
+  border-right: 1px solid #e5e7eb;
+
+  vertical-align: middle;
+}
+
+th:last-child,
+td:last-child {
+  border-right: none;
+}
+
+th {
+  background: #f9fafb;
+
+  position: sticky;
+  top: 0;
+
+  text-align: left;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+tr th {
+  text-align: center;
+  font-size: 14px;
+}
+
+thead th {
+  box-shadow: inset 0 -3px 0 #d2d3d8;
+
+  font-size: 11px;
+}
+
+th:nth-child(1),
+th:nth-child(2),
+th:nth-child(3),
+th:nth-child(4),
+th:nth-child(5),
+th:nth-child(6) {
+  text-align: center;
+}
+
+tr td:nth-child(1),
+tr td:nth-child(2),
+tr td:nth-child(3),
+tr td:nth-child(4),
+tr td:nth-child(5),
+tr td:nth-child(6) {
+  text-align: center;
+}
+
+[data-panel="list"] th:nth-child(1) {
+  width: 175px;
+} /* Title */
+[data-panel="list"] th:nth-child(2) {
+  width: 150px;
+} /* Code */
+[data-panel="list"] th:nth-child(3) {
+  width: 10px;
+} /* Sect */
+[data-panel="list"] th:nth-child(4) {
+  width: 100px;
+} /* Instructor */
+[data-panel="list"] th:nth-child(5) {
+  width: 450px;
+} /* Meeting */
+[data-panel="list"] th:nth-child(6) {
+  width: 80px;
+} /* class-type */
+
+tr:hover td {
+  background: #fbfbfb;
+}
+
+/* -------------------------------------------------------------------------- */
+/* COURSE LIST VIEW: MEETING CELL CONTENT (PILLS + SUBTEXT)                    */
+/* -------------------------------------------------------------------------- */
+
+.title-main {
+  white-space: pre-line;
+}
+
+.days {
+  white-space: nowrap;
+}
+
+.meeting {
+  line-height: 1.4;
+}
+
+.meeting-pill {
+  background: #eef2ff;
+
+  display: inline-block;
+
+  padding: 4px 10px;
+  margin-bottom: 4px;
+
+  border: 1px solid #e0e7ff;
+  border-radius: 999px;
+
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.meeting-sub,
+.meeting-location {
+  white-space: pre-line; /* keeps your \n */
+}
+
+.meeting-sub {
+  font-size: 11px;
+  color: #374151;
+}

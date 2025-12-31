@@ -1,6 +1,6 @@
 export async function loadPanel(shadow) {
   const htmlUrl = chrome.runtime.getURL("src/panel.html");
-  const cssUrl = chrome.runtime.getURL("src/panel.css");
+  const cssUrl = chrome.runtime.getURL("src/css/css-imports.css");
 
   const [html, css] = await Promise.all([
     fetch(htmlUrl).then((r) => r.text()),

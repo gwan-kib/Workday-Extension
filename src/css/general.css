@@ -1,0 +1,46 @@
+/* -------------------------------------------------------------------------- */
+/* GLOBAL FONT STACKS + TYPOGRAPHY                                             */
+/* -------------------------------------------------------------------------- */
+
+.widget {
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+h1,
+h2,
+h3,
+.panel-title,
+.section-title,
+.table-header {
+  font-family: "Manrope", "Inter", system-ui;
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------------------- */
+/* SHADOW DOM RESET / HOST RESET                                               */
+/* -------------------------------------------------------------------------- */
+
+:host {
+  all: initial;
+}
+
+/* -------------------------------------------------------------------------- */
+/* GENERIC UI HELPERS (MUTED TEXT, GENERIC PILL)                               */
+/* -------------------------------------------------------------------------- */
+
+.muted {
+  color: #6b7280;
+}
+
+.pill {
+  background: #eef2ff;
+
+  display: inline-block;
+
+  padding: 2px 6px;
+
+  border: 1px solid #e0e7ff;
+  border-radius: 999px;
+
+  font-size: 11px;
+}
