@@ -1,13 +1,21 @@
 export async function loadPanel(shadow) {
   const htmlUrl = chrome.runtime.getURL("src/panel.html");
-  const cssUrl = chrome.runtime.getURL("src/css/css-imports.css");
-  console.log("htmlUrl", htmlUrl);
-console.log("cssUrl", cssUrl);
-
-  const [html, css] = await Promise.all([
+   const cssFiles = [
+    "general.css",
+    "widget-shell.css",
+    "widget-buttons.css",
+    "floating-button.css",
+    "course-list.css",
+    "schedule-view.css",
+    "schedule-view-events.css",
+  ];
+  const [html, ...cssParts] = await Promise.all([
     fetch(htmlUrl).then((r) => r.text()),
-    fetch(cssUrl).then((r) => r.text()),
+    ...cssFiles.map((file) =>
+      fetch(chrome.runtime.getURL(`src/css/${file}`)).then((r) => r.text())
+    ),
   ]);
+  const css = cssParts.join("\n");
 
   shadow.innerHTML = "";
 
