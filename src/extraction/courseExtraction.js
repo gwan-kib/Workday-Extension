@@ -1,5 +1,5 @@
 import { $$ } from "../utilities/dom"
-import { buildHeaderMaps, getColIndex } from "./headerMaps.js"
+import { buildHeaderMaps } from "./headerMaps.js"
 import { parseSectionLinkString, guessClassCode } from "./sectionLinkInfo.js"
 import { extractMeetingLinesFromCell, extractMeetingLinesFromRow, formatMeetingLineForPanel, normalizeMeetingPatternsText, extractStartDate } from "./meetingPatternsInfo.js"
 import { extractInstructorNamesFromCell } from "./instructorInfo.js"

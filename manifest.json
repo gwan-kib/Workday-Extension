@@ -6,9 +6,7 @@
 
   "permissions": ["storage"],
 
-  "host_permissions": [
-    "https://*.myworkday.com/*"
-  ],
+  "host_permissions": ["https://*.myworkday.com/*"],
 
   "action": {
     "default_popup": "src/popup.html",
@@ -26,7 +24,7 @@
 
   "web_accessible_resources": [
     {
-      "resources": ["src/panel.css", "src/panel.html", "src/W.svg"],
+      "resources": ["src/css/*.css", "src/panel.html", "src/W.svg"],
       "matches": ["https://*.myworkday.com/*"]
     }
   ]
