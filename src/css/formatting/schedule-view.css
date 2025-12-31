@@ -24,8 +24,6 @@
 }
 
 .term-button {
-  background: #f3f4f6;
-
   padding: 4px 10px;
 
   border: 1px solid transparent;
@@ -77,7 +75,6 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  background: #f3f4f6;
 }
 
 .widget-panel[data-panel="schedule"] {
@@ -112,13 +109,10 @@
 }
 
 .schedule-table th {
-  background: #f3f4f6;
-
   font-weight: 700;
 }
 
 .schedule-time {
-  background: #fafafa;
   font-weight: 600;
   color: #374151;
 }

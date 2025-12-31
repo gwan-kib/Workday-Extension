@@ -5,66 +5,64 @@ table {
   width: 100%;
 
   border-collapse: collapse;
+  border-bottom: none;
 
   font-size: 12px;
+  font-weight: 500;
 }
 
-th, td {
+[data-panel="list"] th, [data-panel="list"] td {
   padding: 6px;
 
-  border-bottom: 1px solid #f3f4f6;
-  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid;
+  border-right: 1px solid;
 
   vertical-align: middle;
 }
 
-th:last-child,
-td:last-child {
+[data-panel="list"] th:last-child, [data-panel="list"] td:last-child {
   border-right: none;
 }
 
-th {
-  background: #f9fafb;
-
+[data-panel="list"] th {
   position: sticky;
   top: 0;
-
+  
   text-align: left;
   font-weight: 700;
 
   cursor: pointer;
 }
 
-#widget-tbody {
-  border-top: 0px solid #000;
-  border-bottom: 3px solid #000000;
-}
-
-#widget-tbody td {
-  border: 1px solid rgb(101, 101, 101);
-}
-
 [data-panel="list"] tr {
-  border-left: 1px solid #ffffff;
-  border-right: 1px solid #ffffff;
+  border-left: 1px solid;
+  border-right: 1px solid;
 }
 
 [data-panel="list"] th {
   font-size: 12px;
   text-align: center;
 
-  border-top: 2px solid #000;
-  border-left: 1px solid #000;
-  border-right: 1px solid #000;
-  border-bottom: 5px solid #000000;
+  border-left: 1px solid;
+  border-right: 1px solid;
+  border-top: 2px solid;
+  border-bottom: none;
 }
 
-tr td:nth-child(1) {
+[data-panel="list"] td:nth-child(5) {
+  padding-top: 9.5px;
+}
+
+[data-panel="list"] tr td:nth-child(1), tr th:nth-child(1) {
   border-left: none;
 }
 
-tr td:nth-child(6) {
+[data-panel="list"] tr td:nth-child(6), tr th:nth-child(6) {
   border-right: none;
+}
+
+[data-panel="list"] tr:last-child {
+  border-bottom: 3px solid;
 }
 
 tr td:nth-child(1), tr td:nth-child(2), tr td:nth-child(3), tr td:nth-child(4), tr td:nth-child(5), tr td:nth-child(6) {
@@ -107,14 +105,12 @@ tr td:nth-child(1), tr td:nth-child(2), tr td:nth-child(3), tr td:nth-child(4), 
 }
 
 .meeting-pill {
-  background: #eef2ff;
-
   display: inline-block;
 
   padding: 4px 10px;
   margin-bottom: 4px;
 
-  border: 1px solid #e0e7ff;
+  border: 1px solid;
   border-radius: 999px;
 
   font-size: 11px;
@@ -128,5 +124,4 @@ tr td:nth-child(1), tr td:nth-child(2), tr td:nth-child(3), tr td:nth-child(4), 
 
 .meeting-sub {
   font-size: 11px;
-  color: #374151;
 }

@@ -1,0 +1,13 @@
+.meeting-pill {
+    color: #401d81;
+    background: #e4d6ff;
+}
+
+[data-panel="list"] th {
+    color: #e4d6ff;
+    background: #401d81;
+}
+
+.muted {
+  color: #6b4fd6;
+}

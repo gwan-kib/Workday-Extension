@@ -1,0 +1,21 @@
+button {
+    color: #401d81;
+    background: #cdadff;
+}
+
+.btn {
+    border: none;
+}
+
+#widget-search {
+  background-color: #f7f2ff;
+  color: #401d81;
+
+  border: 1px solid #6b4fd6;
+  border-radius: 999px;
+}
+
+#widget-search::placeholder {
+  color: #401d81;
+  opacity: .65; /* Firefox */
+}

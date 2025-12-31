@@ -3,8 +3,6 @@
 /* -------------------------------------------------------------------------- */
 
 .widget {
-  background: #ffffff;
-
   display: flex;
   flex-direction: column;
 
@@ -16,8 +14,6 @@
 
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
 
   overflow: hidden;
 
@@ -86,8 +82,6 @@
 }
 
 #widget-course-count {
-  color: #4b5563;
-
   font-size: 12px;
 }
 
@@ -100,15 +94,9 @@
   gap: 10px;
 
   padding: 8px 12px;
-
-  border-bottom: 1px solid #e5e7eb;
-
-  background: #fafafa;
 }
 
 .tab-button {
-  background: #f3f4f6;
-
   padding: 6px 12px;
 
   border: 1px solid transparent;
@@ -117,17 +105,10 @@
   font-size: 12px;
   font-weight: 600;
 
-  color: #374151;
-
   cursor: pointer;
 }
 
 .tab-button.is-active {
-  background: #ffffff;
-
-  border-color: #d1d5db;
-
-  color: #111827;
 }
 
 .widget-panel {
@@ -139,7 +120,7 @@
 }
 
 #widget-search {
-  width: 270px;
+  width: 300px;
 
   padding: 6px 10px;
 
@@ -147,4 +128,5 @@
   border-radius: 999px;
 
   font-size: 12px;
+  font-weight: 600;
 }

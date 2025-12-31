@@ -4,8 +4,6 @@
 
 /* The event block (NOT a pill) */
 .schedule-entry {
-  background: #eef2ff;
-
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -19,7 +17,6 @@
   padding: 6px 6px;
 
   font-size: 11px;
-  color: #111827;
 }
 
 .schedule-entry-title {
@@ -27,7 +24,6 @@
 }
 
 .schedule-entry-time {
-  color: #000;
   white-space: nowrap;
 }
 
@@ -50,8 +46,6 @@
 /* -------------------------------------------------------------------------- */
 
 .schedule-entry-float {
-  background: #eef2ff;
-
   position: absolute;
   pointer-events: auto;
   z-index: 6;
@@ -80,7 +74,6 @@
 
 .schedule-entry-overlap-rect {
   position: absolute;
-  background: #ef4444;
   opacity: 0.85;
 }
 
@@ -93,5 +86,5 @@
 
 .schedule-entry-float.is-overlap .schedule-entry-title,
 .schedule-entry-float.is-overlap .schedule-entry-time {
-  color: #000000 !important;
+  
 }

@@ -1,0 +1,10 @@
+.widget {
+    color: #401d81;
+    background: #fbf9ff;
+    border-color: #401d81 !important;
+}
+
+.widget-header, .widget-tabs, #floating-button {
+    color: #e4d6ff;
+    background: #401d81;
+}
