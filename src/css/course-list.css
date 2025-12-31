@@ -9,9 +9,8 @@ table {
   font-size: 12px;
 }
 
-th,
-td {
-  padding: 8px 6px;
+th, td {
+  padding: 6px;
 
   border-bottom: 1px solid #f3f4f6;
   border-right: 1px solid #e5e7eb;
@@ -36,32 +35,39 @@ th {
   cursor: pointer;
 }
 
-tr th {
+#widget-tbody {
+  border-top: 0px solid #000;
+  border-bottom: 3px solid #000000;
+}
+
+#widget-tbody td {
+  border: 1px solid rgb(101, 101, 101);
+}
+
+[data-panel="list"] tr {
+  border-left: 1px solid #ffffff;
+  border-right: 1px solid #ffffff;
+}
+
+[data-panel="list"] th {
+  font-size: 12px;
   text-align: center;
-  font-size: 14px;
+
+  border-top: 2px solid #000;
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+  border-bottom: 5px solid #000000;
 }
 
-thead th {
-  box-shadow: inset 0 -3px 0 #d2d3d8;
-
-  font-size: 11px;
+tr td:nth-child(1) {
+  border-left: none;
 }
 
-th:nth-child(1),
-th:nth-child(2),
-th:nth-child(3),
-th:nth-child(4),
-th:nth-child(5),
-th:nth-child(6) {
-  text-align: center;
-}
-
-tr td:nth-child(1),
-tr td:nth-child(2),
-tr td:nth-child(3),
-tr td:nth-child(4),
-tr td:nth-child(5),
 tr td:nth-child(6) {
+  border-right: none;
+}
+
+tr td:nth-child(1), tr td:nth-child(2), tr td:nth-child(3), tr td:nth-child(4), tr td:nth-child(5), tr td:nth-child(6) {
   text-align: center;
 }
 
@@ -81,12 +87,8 @@ tr td:nth-child(6) {
   width: 450px;
 } /* Meeting */
 [data-panel="list"] th:nth-child(6) {
-  width: 80px;
+  width: 84px;
 } /* class-type */
-
-tr:hover td {
-  background: #fbfbfb;
-}
 
 /* -------------------------------------------------------------------------- */
 /* COURSE LIST VIEW: MEETING CELL CONTENT (PILLS + SUBTEXT)                    */
@@ -115,7 +117,7 @@ tr:hover td {
   border: 1px solid #e0e7ff;
   border-radius: 999px;
 
-  font-size: 12px;
+  font-size: 11px;
   white-space: nowrap;
 }
 

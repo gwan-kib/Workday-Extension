@@ -6,12 +6,8 @@
   font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial;
 }
 
-h1,
-h2,
-h3,
-.panel-title,
-.section-title,
-.table-header {
+h1, h2, h3,
+.panel-title, .section-title, .table-header {
   font-family: "Manrope", "Inter", system-ui;
   font-weight: 600;
 }
