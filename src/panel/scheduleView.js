@@ -238,7 +238,7 @@ function buildScheduleTable() {
   const headRow = document.createElement("tr");
 
   headRow.innerHTML = `
-    <th class="schedule-time">Time</th>
+    <th class="schedule-time"></th>
     ${DAYS.map(
       (day) => `<th class="schedule-day-head" data-day="${day}">${day}</th>`
     ).join("")}
@@ -451,10 +451,10 @@ function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
 
   // --- text placement: push down if text area overlaps already-placed text ---
   // We do this per-day so text collisions only matter inside a column.
-  const TEXT_STEP_PX = 36; // "preset amount" height of box
+  const TEXT_STEP_PX = 25; // "preset amount" height of box
   const MAX_TRIES = 30; // prevents infinite loops
   const H_PAD = 6; // match your block padding roughly
-  const V_PAD = 6;
+  const V_PAD = 0;
 
   DAYS.forEach((day) => {
     const blocks = placedBlocks
