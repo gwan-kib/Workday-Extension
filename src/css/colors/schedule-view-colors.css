@@ -1,0 +1,20 @@
+.schedule-table {
+    border-color: #401d81;
+}
+
+.schedule-table thead th {
+    color: #401d81;
+    background: #cdadff;
+
+    box-shadow: inset 0 3px #401d81, inset 0 -3px #401d81;
+    border-color: #401d81;
+}
+
+.schedule-table th, .schedule-table td {
+ border-color: #401d81;   
+}
+
+.schedule-table td, .schedule-time {
+    color: #401d81;
+    background: #fbf9ff;
+}
