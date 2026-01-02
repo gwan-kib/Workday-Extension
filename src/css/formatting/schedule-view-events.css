@@ -73,6 +73,14 @@
 .schedule-entry-overlap-rect {
   position: absolute;
   opacity: 0.85;
+
+    background: repeating-linear-gradient(
+    135deg,
+    rgba(185, 28, 28, 0.55),
+    rgba(185, 28, 28, 0.55) 6px,
+    transparent 6px,
+    transparent 12px
+  );
 }
 
 .schedule-entry-text {
