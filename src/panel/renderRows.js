@@ -26,6 +26,7 @@ export function renderRows(ctx, rows) {
     const badge =
       c.isLab ? "[Laboratory]" :
       c.isSeminar ? "[Seminar]" :
+       c.isDiscussion ? "[Discussion]" :
       "";
 
     tr.innerHTML = `
