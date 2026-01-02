@@ -105,6 +105,8 @@ function buildDayEvents(courses, term) {
 
     const lines = course.meetingLines?.length ? course.meetingLines : [];
 
+    const label = course.isLab ? "[Laboratory]" : course.isSeminar ? "[Seminar]" : course.isDiscussion ? "[Discussion]" : "";
+
     lines.forEach((line) => {
       const parsed = parseMeetingLine(line);
       if (!parsed) return;
@@ -141,6 +143,7 @@ function buildDayEvents(courses, term) {
           id: eventId++,
           code: course.code || "",
           title: course.title || "",
+          label,
           timeLabel: parsed.timeLabel,
 
           rowStart: startIdx,
@@ -375,9 +378,9 @@ function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
       block.className = "schedule-entry-float";
 
       // inset by borders so the block sits inside the cell gridlines
-      block.style.left   = `${left + borderLeft}px`;
-      block.style.top    = `${top + borderTop}px`;
-      block.style.width  = `${dayColWidth - borderX}px`;
+      block.style.left = `${left + borderLeft}px`;
+      block.style.top = `${top + borderTop}px`;
+      block.style.width = `${dayColWidth - borderX}px`;
       block.style.height = `${height - borderY}px`;
 
       // overlap layer (red rectangles go here)
@@ -388,8 +391,10 @@ function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
       // text wrapper (MUST be above overlap layer)
       const text = document.createElement("div");
       text.className = "schedule-entry-text";
+      const title = ev.code || ev.title;
+      const titleLabel = ev.label ? `${title} ${ev.label}` : title;
       text.innerHTML = `
-        <div class="schedule-entry-title">${ev.code || ev.title}</div>
+        <div class="schedule-entry-title">${titleLabel}</div>
         <div class="schedule-entry-time">${ev.timeLabel}</div>
       `;
       block.appendChild(text);

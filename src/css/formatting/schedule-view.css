@@ -104,7 +104,7 @@
   text-align: center;
   vertical-align: middle;
 
-  width: 120px; /* applies to all day columns unless overridden */
+  width: 130px; /* applies to all day columns unless overridden */
 }
 
 .schedule-table th.schedule-time,
