@@ -349,6 +349,17 @@ function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
     .getBoundingClientRect().height;
   const rowHeight = firstBodyRow.getBoundingClientRect().height;
 
+  // --- derive border from CSS (no magic numbers) ---
+  const cellStyles = getComputedStyle(firstDayCell);
+  const borderLeft = parseFloat(cellStyles.borderLeftWidth) || 0;
+  const borderTop = parseFloat(cellStyles.borderTopWidth) || 0;
+  const borderRight = parseFloat(cellStyles.borderRightWidth) || 0;
+  const borderBottom = parseFloat(cellStyles.borderBottomWidth) || 0;
+
+  // If borders are uniform, these will be the same; otherwise we keep X/Y separate.
+  const borderX = (borderLeft + borderRight) / 2;
+  const borderY = (borderTop + borderBottom) / 2;
+
   // --- build blocks first (one per event), store rects for overlap detection ---
   const placedBlocks = []; // { el, day, ev, rect, overlapLayerEl, overlaps: [] }
 
@@ -363,10 +374,11 @@ function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
       const block = document.createElement("div");
       block.className = "schedule-entry-float";
 
-      block.style.left = `${left}px`;
-      block.style.top = `${top}px`;
-      block.style.width = `${dayColWidth}px`;
-      block.style.height = `${height}px`;
+      // inset by borders so the block sits inside the cell gridlines
+      block.style.left   = `${left + borderLeft}px`;
+      block.style.top    = `${top + borderTop}px`;
+      block.style.width  = `${dayColWidth - borderX}px`;
+      block.style.height = `${height - borderY}px`;
 
       // overlap layer (red rectangles go here)
       const overlapLayer = document.createElement("div");

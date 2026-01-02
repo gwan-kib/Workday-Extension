@@ -1,4 +1,4 @@
-.schedule-table {
+.schedule-table-wrap {
     border-color: #401d81;
 }
 
@@ -17,4 +17,9 @@
 .schedule-table td, .schedule-time {
     color: #401d81;
     background: #fbf9ff;
+}
+
+.schedule-entry-float {
+    background: #e4d6ff;
+    color: #290068;
 }

@@ -54,6 +54,8 @@
   padding: 0 12px 12px;
   display: block;
 
+  justify-content: center;
+
   overflow: auto;         /* the scroll happens here */
   overscroll-behavior: contain;
 }
@@ -63,8 +65,7 @@
   width: max-content;
 
   border-collapse: collapse;
-  border: 3px solid;
-  border-top: none;
+
 
   font-size: 11px;
 
@@ -119,6 +120,16 @@
   vertical-align: top;
 }
 
+.schedule-table th,
+.schedule-table td {
+  box-sizing: border-box;
+}
+
+.schedule-table td.schedule-cell {
+  padding: 0; /* actually wins now */
+}
+
+
 .schedule-table th {
   font-weight: 700;
 }
@@ -143,6 +154,11 @@
 .schedule-table-wrap {
   position: relative;
   display: inline-block;
+
+  
+  border: 3px solid;
+  border-top: none;
+  overflow: visible;
 }
 
 .schedule-cell-inner {
@@ -163,12 +179,35 @@
   position: absolute;
   left: 0;
   right: 0;
+
   background: #fecaca;
   opacity: 0.95;
+
   pointer-events: none;
   z-index: 3;
+
+  overflow: hidden;     /* clip stripes */
 }
 
-.schedule-cell.has-conflict {
-  background: #fee2e2; /* light red */
+.schedule-conflict::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;           /* relative to this element */
+
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(185, 28, 28, 0.4),
+    rgba(185, 28, 28, 0.4) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+}
+
+
+
+/* Center the schedule table block inside the scroll area */
+.widget-panel[data-panel="schedule"] .schedule-grid {
+  text-align: center;
 }
