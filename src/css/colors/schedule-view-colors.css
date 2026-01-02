@@ -23,3 +23,18 @@
     background: #e4d6ff;
     color: #290068;
 }
+
+.term-button {
+    background: #cdaefc;
+    color: #401d81;
+
+    border-color: #401d81;
+
+    transition: all 0.3s ease;
+}
+
+
+.term-button.is-active {
+    background: #401d81;
+    color: #cdaefc;
+}

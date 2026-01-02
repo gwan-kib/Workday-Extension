@@ -17,15 +17,13 @@
 
   overflow: hidden;
 
-  opacity: 1;
-  transition: all 0.25s ease;
+  transition: all 0.25s ease-in-out;
 
   width: min(780px, 92vw);
   height: 85vh;
 }
 
 .widget.is-hidden {
-  opacity: 0;
   transform: translateX(110%) translateY(-50%);
   pointer-events: none;
 }
