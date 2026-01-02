@@ -18,17 +18,20 @@
 }
 
 .term-button {
-  padding: 2px 10px;
+  padding: 2px 20px;
 
+  border-radius: 999px;
   border: 2px solid;
-  border-radius: 8px;
 
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
 
   cursor: pointer;
 }
 
+.term-button.is-active {
+  border: 2px solid;
+}
 /* -------------------------------------------------------------------------- */
 /* SCHEDULE VIEW: GRID + TABLE (TIME GRID STRUCTURE)                           */
 /* -------------------------------------------------------------------------- */
@@ -42,16 +45,14 @@
 
   justify-content: center;
 
-  overflow: auto;         /* the scroll happens here */
+  overflow: auto; /* the scroll happens here */
   overscroll-behavior: contain;
 }
-
 
 .schedule-table {
   width: max-content;
 
   border-collapse: collapse;
-
 
   font-size: 11px;
 
@@ -62,18 +63,27 @@
 
 [data-panel="schedule"] .schedule-table thead th {
   position: sticky;
-  top: -1px;
+  top: 0;
   z-index: 50;
 
   height: 20px;
   font-size: 14px;
 
-    padding: 5px 6px;
+  padding: 5px 6px;
 
-      text-align: center;
+  text-align: center;
   vertical-align: middle;
 
-  border: 1px solid;
+    border:none;
+  border-top: 2px;
+}
+
+.schedule-table thead th:first-child {
+  border-left: 1px solid;
+}
+
+.schedule-table thead th:last-child {
+  border-right: 1px solid;
 }
 
 .widget-panel[data-panel="schedule"] {
@@ -115,7 +125,6 @@
   padding: 0; /* actually wins now */
 }
 
-
 .schedule-table th {
   font-weight: 700;
 }
@@ -141,7 +150,6 @@
   position: relative;
   display: inline-block;
 
-  
   border: 3px solid;
   border-top: none;
   overflow: visible;
@@ -161,18 +169,21 @@
   z-index: 5;
 }
 
+.schedule-entry-overlap-rect {
+  background: transparent;
+  opacity: 0.5;
+  fill: none;
+}
+
 .schedule-conflict {
   position: absolute;
   left: 0;
   right: 0;
 
-  background: #fecaca;
-  opacity: 0.95;
-
   pointer-events: none;
   z-index: 3;
 
-  overflow: hidden;     /* clip stripes */
+  overflow: hidden; /* clip stripes */
 }
 
 .schedule-conflict::after {
@@ -180,7 +191,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 1;           /* relative to this element */
+  z-index: 1; /* relative to this element */
 
   background: repeating-linear-gradient(
     135deg,
@@ -190,8 +201,6 @@
     transparent 16px
   ) !important;
 }
-
-
 
 /* Center the schedule table block inside the scroll area */
 .widget-panel[data-panel="schedule"] .schedule-grid {

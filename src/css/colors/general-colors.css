@@ -1,16 +1,41 @@
 .widget {
-    color: #401d81;
-    background: #fbf9ff;
-    border-color: #401d81 !important;
+  color: #401d81;
+  background: #fbf9ff;
+  border-color: #401d81 !important;
 }
 
-.widget, #floating-button {
-    filter: hue-rotate(0deg);
+.widget,
+#floating-button {
+  filter: hue-rotate(0deg);
 }
 
-.widget-header, .widget-tabs, #floating-button {
-    color: #e4d6ff;
-    background: #401d81;
+.widget-header,
+.widget-tabs,
+#floating-button {
+  color: #e4d6ff;
+  background: #401d81;
+}
+
+.tab-button:hover:not(.is-active) {
+  box-shadow: 0 0 8px #ae7aff;
+
+  transition: all 0.2s ease;
+}
+
+.tab-button {
+  color: #401d81;
+  background: #cdadff;
+
+  border-color: #cdadff;
+}
+
+.tab-button.is-active {
+  box-shadow: inset 0 0 10px #e4d6ff;
+
+  color: #cdadff;
+  background: #401d81;
+
+  transition: all 0.3s ease;
 }
 
 .muted {

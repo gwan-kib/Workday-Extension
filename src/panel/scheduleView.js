@@ -423,8 +423,8 @@ function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
       if (!inter) continue;
 
       // mark both as conflicted
-      A.el.style.opacity = "0.6";
-      B.el.style.opacity = "0.6";
+      A.el.style.opacity = "0.75";
+      B.el.style.opacity = "0.75";
 
       A.el.classList.add("is-overlap");
       B.el.classList.add("is-overlap");
