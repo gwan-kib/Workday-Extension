@@ -8,7 +8,7 @@ button {
 }
 
 #widget-search {
-  background-color: #f7f2ff;
+  background-color: #ac8ae1;
   color: #401d81;
 
   border: 1px solid #6b4fd6;
@@ -18,4 +18,12 @@ button {
 #widget-search::placeholder {
   color: #401d81;
   opacity: .65; /* Firefox */
+}
+
+#widget-search:hover:not(:focus-visible) {
+  box-shadow: 0 0 6px #ede2ff;
+}
+
+#widget-search:focus-visible {
+  background: #ede2ff;
 }

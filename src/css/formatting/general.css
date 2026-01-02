@@ -27,6 +27,17 @@ h1, h2, h3, .panel-title, .section-title, .table-header {
   font-weight: 600;
 }
 
+input, input:focus, input:focus-visible {
+  outline: none;
+}
+
+#widget-search {
+  transition: box-shadow 150ms ease, background-color 150ms ease;
+}
+
+
+
+
 /* -------------------------------------------------------------------------- */
 /* SHADOW DOM RESET / HOST RESET                                               */
 /* -------------------------------------------------------------------------- */

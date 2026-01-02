@@ -7,3 +7,26 @@
     color: #e4d6ff;
     background: #401d81;
 }
+
+.tab-button:hover:not(.is-active) {
+    box-shadow: 0 0 6px #ae7aff;
+
+    transition: all 0.2s ease;
+}
+
+.tab-button {
+  
+    color: #cdadff;
+    background: #401d81;
+
+    border-color: #cdadff;
+}
+
+.tab-button.is-active {
+    box-shadow: inset 0 0 3px #e4d6ff;
+
+        color: #401d81;
+    background: #cdadff;
+
+    transition: all 0.3s ease;
+}
