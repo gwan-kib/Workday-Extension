@@ -10,7 +10,7 @@ import {
 } from "./panel/panelInteractions.js";
 import { renderRows } from "./panel/renderRows.js";
 import { renderSchedule } from "./panel/scheduleView.js";
-import { exportCSV } from "./exporting/cvs.js";
+import { exportCSV } from "./exporting/csv.js";
 
 (() => {
   console.log("[WD] content script loaded");
@@ -92,7 +92,7 @@ import { exportCSV } from "./exporting/cvs.js";
     setActivePanel(STATE.view.panel);
   }
 
-  if (document.readyState === "complete") {
+  if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot, { once: true });
   } else {
     boot();

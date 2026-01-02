@@ -12,7 +12,8 @@
   border: none;
 }
 
-.widget-body, .widget-footer {
+.widget-body,
+.widget-footer {
   border: 2px solid;
   border-top: none;
 }
@@ -22,12 +23,19 @@
   border-bottom-right-radius: inherit;
 }
 
-h1, h2, h3, .panel-title, .section-title, .table-header {
+h1,
+h2,
+h3,
+.panel-title,
+.section-title,
+.table-header {
   font-family: "Manrope", "Inter", system-ui;
   font-weight: 600;
 }
 
-input, input:focus, input:focus-visible {
+input,
+input:focus,
+input:focus-visible {
   outline: none;
 }
 
@@ -35,8 +43,22 @@ input, input:focus, input:focus-visible {
   transition: box-shadow 150ms ease, background-color 150ms ease;
 }
 
+.material-symbols-rounded {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
 
+.settings .material-symbols-rounded {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
 
+.settings:active .material-symbols-rounded { 
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.settings.btn {
+  background: none;
+  padding: 0;
+}
 
 /* -------------------------------------------------------------------------- */
 /* SHADOW DOM RESET / HOST RESET                                               */

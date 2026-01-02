@@ -38,6 +38,16 @@
   transition: all 0.3s ease;
 }
 
+.settings .material-symbols-rounded {
+  color: #cdadff;
+}
+
+.settings:hover .material-symbols-rounded {
+  text-shadow: 0 0 10px #ae7aff;
+
+  transition: all .3s ease;
+}
+
 .muted {
   color: #9583d0;
 }
