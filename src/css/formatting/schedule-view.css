@@ -1,0 +1,199 @@
+/* -------------------------------------------------------------------------- */
+/* SCHEDULE VIEW: TOP CONTROLS (TERM TOGGLES)                                  */
+/* -------------------------------------------------------------------------- */
+
+.schedule-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 8px 12px;
+}
+
+.schedule-term-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.term-button {
+  padding: 2px 10px;
+
+  border: 2px solid;
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+/* -------------------------------------------------------------------------- */
+/* SCHEDULE VIEW: GRID + TABLE (TIME GRID STRUCTURE)                           */
+/* -------------------------------------------------------------------------- */
+
+.schedule-grid {
+  flex: 1;
+  min-height: 0;
+
+  padding: 0 12px 12px;
+  display: block;
+
+  justify-content: center;
+
+  overflow: auto;         /* the scroll happens here */
+  overscroll-behavior: contain;
+}
+
+
+.schedule-table {
+  width: max-content;
+
+  border-collapse: collapse;
+
+
+  font-size: 11px;
+
+  table-layout: fixed;
+
+  position: relative;
+}
+
+[data-panel="schedule"] .schedule-table thead th {
+  position: sticky;
+  top: -1px;
+  z-index: 50;
+
+  height: 20px;
+  font-size: 14px;
+
+    padding: 5px 6px;
+
+      text-align: center;
+  vertical-align: middle;
+
+  border: 1px solid;
+}
+
+.widget-panel[data-panel="schedule"] {
+  height: 100%;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.widget-panel[data-panel="schedule"].is-active {
+  display: flex; /* override your display:block */
+}
+
+.schedule-table td {
+  border: 1px solid;
+
+  padding: 2px 6px;
+
+  text-align: center;
+  vertical-align: middle;
+
+  width: 120px; /* applies to all day columns unless overridden */
+}
+
+.schedule-table th.schedule-time,
+.schedule-table td.schedule-time {
+  width: 40px; /* pick a value */
+}
+
+.schedule-table td {
+  vertical-align: top;
+}
+
+.schedule-table th,
+.schedule-table td {
+  box-sizing: border-box;
+}
+
+.schedule-table td.schedule-cell {
+  padding: 0; /* actually wins now */
+}
+
+
+.schedule-table th {
+  font-weight: 700;
+}
+
+.schedule-time {
+  font-weight: 600;
+}
+
+.schedule-table tbody tr {
+  height: 25px; /* tweak this */
+}
+
+.schedule-cell {
+  padding: 0; /* important */
+  vertical-align: top; /* keep rowspan behaving predictably */
+}
+
+/* -------------------------------------------------------------------------- */
+/* SCHEDULE VIEW: CONFLICT OVERLAYS + LAYERING                                 */
+/* -------------------------------------------------------------------------- */
+
+.schedule-table-wrap {
+  position: relative;
+  display: inline-block;
+
+  
+  border: 3px solid;
+  border-top: none;
+  overflow: visible;
+}
+
+.schedule-cell-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.schedule-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.schedule-conflict {
+  position: absolute;
+  left: 0;
+  right: 0;
+
+  background: #fecaca;
+  opacity: 0.95;
+
+  pointer-events: none;
+  z-index: 3;
+
+  overflow: hidden;     /* clip stripes */
+}
+
+.schedule-conflict::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;           /* relative to this element */
+
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(185, 28, 28, 0.4),
+    rgba(185, 28, 28, 0.4) 8px,
+    transparent 8px,
+    transparent 16px
+  ) !important;
+}
+
+
+
+/* Center the schedule table block inside the scroll area */
+.widget-panel[data-panel="schedule"] .schedule-grid {
+  text-align: center;
+}

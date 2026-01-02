@@ -38,6 +38,7 @@ export function buildHeaderMaps(gridRoot) {
     title: ["title", "course listing"],
     section: ["section"],
     instructionalFormat: ["instructional format"],
+     startDate: ["start date", "start"],
   };
 
   const colMap = {};

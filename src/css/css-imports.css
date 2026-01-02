@@ -1,0 +1,12 @@
+@import "./formatting/general.css";
+@import "./formatting/widget-shell.css";
+@import "./formatting/widget-buttons.css";
+@import "./formatting/floating-button.css";
+@import "./formatting/course-list.css";
+@import "./formatting/schedule-view.css";
+@import "./formatting/schedule-view-events.css";
+
+@import "./colors/course-list-colors.css";
+@import "./colors/general-colors.css";
+@import "./colors/schedule-view-colors.css";
+@import "./colors/widget-functionality-colors.css";

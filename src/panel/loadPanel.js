@@ -1,11 +1,26 @@
 export async function loadPanel(shadow) {
   const htmlUrl = chrome.runtime.getURL("src/panel.html");
-  const cssUrl = chrome.runtime.getURL("src/panel.css");
+   const cssFiles = [
+    "formatting/general.css",
+    "formatting/widget-shell.css",
+    "formatting/widget-buttons.css",
+    "formatting/floating-button.css",
+    "formatting/course-list.css",
+    "formatting/schedule-view.css",
+    "formatting/schedule-view-events.css",
 
-  const [html, css] = await Promise.all([
+    "colors/course-list-colors.css",
+    "colors/general-colors.css",
+    "colors/schedule-view-colors.css",
+    "colors/widget-functionality-colors.css"
+  ];
+  const [html, ...cssParts] = await Promise.all([
     fetch(htmlUrl).then((r) => r.text()),
-    fetch(cssUrl).then((r) => r.text()),
+    ...cssFiles.map((file) =>
+      fetch(chrome.runtime.getURL(`src/css/${file}`)).then((r) => r.text())
+    ),
   ]);
+  const css = cssParts.join("\n");
 
   shadow.innerHTML = "";
 
@@ -17,10 +32,6 @@ export async function loadPanel(shadow) {
   wrap.innerHTML = html;
   shadow.appendChild(wrap);
 
-  const logoImg = shadow.querySelector("#wd-logo");
-  if (logoImg)
-    logoImg.src = chrome.runtime.getURL("src/W.svg");
-
   return {
     button: shadow.querySelector("#floating-button"),
     widget: shadow.querySelector(".widget"),
@@ -29,5 +40,9 @@ export async function loadPanel(shadow) {
     exportBtn: shadow.querySelector("#widget-export"),
     tableBody: shadow.querySelector("tbody"),
     tableHead: shadow.querySelector("thead"),
+    tabButtons: shadow.querySelectorAll(".tab-button"),
+    panels: shadow.querySelectorAll(".widget-panel"),
+    scheduleGrid: shadow.querySelector("#schedule-grid"),
+    termButtons: shadow.querySelectorAll(".term-button"),
   };
 }

@@ -1,6 +1,5 @@
 export function extractMeetingLinesFromCell(meetingEl) {
     if (!meetingEl) {
-      console.log("extractMeetingLinesFromCell failed 1");
       return [];
     }
 
@@ -63,25 +62,37 @@ export function extractMeetingLinesFromRow(rowEl) {
 }
 
 export function formatMeetingLineForPanel(line) {
-    const parts = String(line || "")
-      .split("|")
-      .map((p) => p.trim())
-      .filter(Boolean);
+  const raw = String(line || "");
 
-    const dayPartRaw = parts.find((p) => /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/.test(p)) || "";
-    const dayPart = dayPartRaw.split(/\s+/).join(" / ");
+  const parts = raw
+    .split("|")
+    .map((p) => p.trim())
+    .filter(Boolean);
 
-    const timePart = parts.find((p) => /\d{1,2}:\d{2}/.test(p) && /-/.test(p)) || "";
-    const buildingPart = parts.find((p) => /\([A-Z]{2,}\)/.test(p)) || ""; // "Library (LIB)"
-    const floorPart = parts.find((p) => /^Floor:/i.test(p)) || "";
-    const roomPart = parts.find((p) => /^Room:/i.test(p)) || "";
+  const dayPartRaw = parts.find((p) => /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/.test(p)) || "";
+  const dayPart = dayPartRaw.split(/\s+/).join(" / ");
 
-    return {
-      days: dayPart,
-      time: timePart,
-      location: [buildingPart, floorPart, roomPart].filter(Boolean).join(" | "),
-    };
+  const timePart = parts.find((p) => /\d{1,2}:\d{2}/.test(p) && /-/.test(p)) || "";
+
+  const buildingPart = parts.find((p) => /\([A-Z]{2,}\)/.test(p)) || "";
+
+  // ✅ find Floor/Room anywhere in the full string (handles "Floor 3", "Floor: 3", "Rm 210", etc.)
+  const floorMatch = raw.match(/\bfloor\b\s*[:\-]?\s*(-?[A-Za-z0-9]+)/i);
+  const roomMatch  = raw.match(/\b(room|rm)\b\s*[:\-]?\s*([A-Za-z0-9]+)/i);
+
+  const floorPart = floorMatch ? `Floor: ${floorMatch[1]}` : "";
+  const roomPart  = roomMatch  ? `Room: ${roomMatch[2]}`  : "";
+
+  return {
+    days: dayPart,
+    time: timePart,
+    location: [
+      buildingPart,
+      [floorPart, roomPart].filter(Boolean).join(" | "),
+    ].filter(Boolean).join("\n"),
+  };
 }
+
 
 export function normalizeMeetingPatternsText(text) {
     // preserve line breaks, normalize each line
@@ -90,4 +101,9 @@ export function normalizeMeetingPatternsText(text) {
       .map((line) => line.replace(/\s+/g, " ").trim())
       .filter(Boolean)
       .join("\n");
+}
+
+export function extractStartDate(line) {
+    const match = String(line || "").match(/\b(\d{4}-\d{2}-\d{2})\b/);
+    return match ? match[1] : "";
 }

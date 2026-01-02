@@ -1,0 +1,29 @@
+button {
+    color: #401d81;
+    background: #cdadff;
+}
+
+.btn {
+    border: none;
+}
+
+#widget-search {
+  background-color: #ac8ae1;
+  color: #401d81;
+
+  border: 1px solid #6b4fd6;
+  border-radius: 999px;
+}
+
+#widget-search::placeholder {
+  color: #401d81;
+  opacity: .65; /* Firefox */
+}
+
+#widget-search:hover:not(:focus-visible) {
+  box-shadow: 0 0 6px #ede2ff;
+}
+
+#widget-search:focus-visible {
+  background: #ede2ff;
+}

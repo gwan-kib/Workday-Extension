@@ -1,6 +1,5 @@
 export function extractInstructorNamesFromCell(instructorEl) {
     if (!instructorEl) {
-      console.log("failed extracting instuctor name:", instructorEl);
       return "";
     }
     
@@ -8,6 +7,5 @@ export function extractInstructorNamesFromCell(instructorEl) {
     const txt = (
       (prompt && (prompt.getAttribute("data-automation-label") || prompt.getAttribute("title") || prompt.textContent)) ||
       instructorEl.textContent || "").trim();
-      console.log("sucsessfully extracted instuctor name:", instructorEl, txt);
     return txt;
 }

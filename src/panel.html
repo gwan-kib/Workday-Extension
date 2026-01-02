@@ -1,33 +1,59 @@
 <button id="floating-button" type="button">
-   <span id="logo"><img id="wd-logo" alt="Logo"></span>
+  <span class="floating-button__icon" aria-hidden="true">▶</span>
+  <span class="floating-button__label">[Extension Name]</span>
 </button>
 
 <div class="widget is-hidden">
   <div class="widget-header">
-    <span id="widget-title">Captured Courses</span>
-
-    <input id="widget-search" placeholder="Search by Course Name/Course code/Instructor…" />
+    <span id="widget-title">Course Schedule Viewer</span>
 
     <span class="spacer"></span>
 
     <button id="widget-refresh" class="btn" type="button">Refresh</button>
     <button id="widget-export" class="btn" type="button">Export CSV</button>
   </div>
+  <div class="widget-tabs">
+    <button class="tab-button is-active" type="button" data-panel="list">
+      Course List
+    </button>
+    <button class="tab-button" type="button" data-panel="schedule">
+      Schedule View
+    </button>
+    <input
+      id="widget-search"
+      placeholder="Search by Course Name/Instructor/Week Day…"
+    />
+  </div>
   <div class="widget-body">
-    <table>
-      <thead>
-        <tr>
-          <th data-key="title">Title</th>
-          <th data-key="code">Class Code</th>
-          <th data-key="section">Section</th>
-          <th data-key="instructor">Instructor</th>
-          <th data-key="meeting">Meeting Times</th>
-          <th data-key="instructionalFormat">Class Type</th>
-        </tr>
-      </thead>
+    <div class="widget-panel is-active" data-panel="list">
+      <table>
+        <thead>
+          <tr>
+            <th data-key="title">Title</th>
+            <th data-key="code">Class Code</th>
+            <th data-key="section">Section</th>
+            <th data-key="instructor">Instructor</th>
+            <th data-key="meeting">Meeting Times</th>
+            <th data-key="instructionalFormat">Class Type</th>
+          </tr>
+        </thead>
 
-      <tbody id="widget-tbody"></tbody>
-    </table>
+        <tbody id="widget-tbody"></tbody>
+      </table>
+    </div>
+    <div class="widget-panel" data-panel="schedule">
+      <div class="schedule-controls">
+        <div class="schedule-term-buttons">
+          <button class="term-button is-active" type="button" data-term="first">
+            Term 1
+          </button>
+          <button class="term-button" type="button" data-term="second">
+            Term 2
+          </button>
+        </div>
+      </div>
+      <div class="schedule-grid" id="schedule-grid"></div>
+    </div>
   </div>
   <div class="widget-footer">
     <span id="widget-course-count"></span>

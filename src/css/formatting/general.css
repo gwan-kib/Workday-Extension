@@ -1,0 +1,62 @@
+/* -------------------------------------------------------------------------- */
+/* GLOBAL FONT STACKS + TYPOGRAPHY                                             */
+/* -------------------------------------------------------------------------- */
+
+.widget {
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial;
+
+  border: none;
+}
+
+.widget-tabs {
+  border: none;
+}
+
+.widget-body, .widget-footer {
+  border: 2px solid;
+  border-top: none;
+}
+
+.widget-footer {
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+
+h1, h2, h3, .panel-title, .section-title, .table-header {
+  font-family: "Manrope", "Inter", system-ui;
+  font-weight: 600;
+}
+
+input, input:focus, input:focus-visible {
+  outline: none;
+}
+
+#widget-search {
+  transition: box-shadow 150ms ease, background-color 150ms ease;
+}
+
+
+
+
+/* -------------------------------------------------------------------------- */
+/* SHADOW DOM RESET / HOST RESET                                               */
+/* -------------------------------------------------------------------------- */
+
+:host {
+  all: initial;
+}
+
+/* -------------------------------------------------------------------------- */
+/* GENERIC UI HELPERS (MUTED TEXT, GENERIC PILL)                               */
+/* -------------------------------------------------------------------------- */
+
+.pill {
+  display: inline-block;
+
+  padding: 2px 6px;
+
+  border: 1px solid #e0e7ff;
+  border-radius: 999px;
+
+  font-size: 11px;
+}

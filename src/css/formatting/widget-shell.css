@@ -1,0 +1,125 @@
+/* -------------------------------------------------------------------------- */
+/* MAIN WIDGET SHELL (POSITIONING + VISIBILITY)                                */
+/* -------------------------------------------------------------------------- */
+
+.widget {
+  display: flex;
+  flex-direction: column;
+
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) translateX(0);
+  z-index: 999999;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  transition: all 0.25s ease-in-out;
+
+  width: min(780px, 92vw);
+  height: 85vh;
+}
+
+.widget.is-hidden {
+  transform: translateX(110%) translateY(-50%);
+  pointer-events: none;
+}
+
+/* -------------------------------------------------------------------------- */
+/* WIDGET HEADER (TITLE + ACTION BUTTONS)                             */
+/* -------------------------------------------------------------------------- */
+
+.widget-header {
+  display: flex;
+  align-items: center;
+
+  padding: 10px 12px;
+
+  gap: 10px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+#widget-title {
+  font-weight: 700;
+  font-size: 25px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* -------------------------------------------------------------------------- */
+/* WIDGET BODY (SCROLL CONTAINER)                                              */
+/* -------------------------------------------------------------------------- */
+
+.widget-body {
+  flex: 1;
+  min-height: 0;
+
+  overflow: auto;
+}
+
+/* -------------------------------------------------------------------------- */
+/* WIDGET FOOTER                                                              */
+/* -------------------------------------------------------------------------- */
+
+.widget-footer {
+  display: flex;
+  align-items: center;
+  
+  flex-shrink: 0;
+
+  gap: 8px;
+
+  padding: 8px 12px;
+  border-top: 1px solid #e5e7eb;
+
+  font-size: 14px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* TABS (COURSE LIST + SCHEDULE VIEW SWITCHER + SEARCH)                                 */
+/* -------------------------------------------------------------------------- */
+
+.widget-tabs {
+  display: flex;
+  gap: 10px;
+
+  padding: 8px 12px;
+}
+
+.tab-button {
+  padding: 6px 12px;
+
+  border: 1px solid transparent;
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.widget-panel {
+  display: none;
+}
+
+.widget-panel.is-active {
+  display: block;
+}
+
+#widget-search {
+  width: 300px;
+
+  padding: 6px 10px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 600;
+}
