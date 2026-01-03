@@ -16,7 +16,6 @@
 }
 
 #floating-button {
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -27,14 +26,15 @@
   transform: translateY(-50%);
   z-index: 999999;
 
-  width: 44px;
+  gap: 2px;
+
+  width: 60px;
   height: 130px;
 
   padding: 10px 6px;
 
-  border-radius: 12px 0 0 12px;
-  border: 1px solid #d1d5db;
-  border-right: none;
+  border-radius: 20px 0 0 20px;
+  border: none;
 
   cursor: pointer;
 
@@ -51,8 +51,8 @@
   right: 0;
 }
 
-#floating-button:hover {
-  background: #f8fafc;
+#floating-button:hover .floating-button__label, #floating-button:hover .floating-button__icon{
+  opacity: 1;
 }
 
 .floating-button__icon {
@@ -66,6 +66,10 @@
   transform: rotate(180deg);
   letter-spacing: 0.4px;
   font-weight: 600;
+
+  opacity: 0.75;
+
+  transition: all 0.2s ease;
 }
 
 #floating-button.is-collapsed .floating-button__icon {

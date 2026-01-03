@@ -17,16 +17,18 @@
 }
 
 .tab-button {
-  color: #cdadff;
+  color: #fbf8ff;
   background: #401d81;
+  opacity: .5;
 }
 
 .tab-button:hover {
   background: #916ccc;
+  opacity: .75;
 }
 
 .tab-button.is-active {
-  color: #fbf8ff;
+  opacity: 1;
   background: #916ccc;
 }
 

@@ -39,13 +39,13 @@
   padding: 10px 12px;
 
   gap: 10px;
-
-  border-bottom: 1px solid #e5e7eb;
 }
 
 #widget-title {
   font-weight: 700;
   font-size: 25px;
+
+  color: #fbf8ff;
 }
 
 .spacer {
@@ -97,6 +97,9 @@
   height: 30px;
 
   padding: 8px 12px;
+
+  border-bottom: 2px solid #fbf8ff;
+  border-top: 1px solid #fbf8ff;
 }
 
 .tab-button {

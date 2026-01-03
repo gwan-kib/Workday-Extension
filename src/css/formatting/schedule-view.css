@@ -91,7 +91,6 @@ transition: all 0.1s ease;
   vertical-align: middle;
 
     border:none;
-  border-top: 2px;
 }
 
 .schedule-table thead th:first-child {
