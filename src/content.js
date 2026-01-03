@@ -22,7 +22,7 @@ import { exportCSV } from "./exporting/csv.js";
       ctx.widget.classList.contains("is-hidden")
     );
     const updateSchedule = () => {
-      renderSchedule(ctx, STATE.filtered, STATE.view.term);
+      renderSchedule(ctx, STATE.filtered, STATE.view.semester);
     };
 
     const setActivePanel = (panel) => {
@@ -43,13 +43,13 @@ import { exportCSV } from "./exporting/csv.js";
       });
     });
 
-    ctx.termButtons.forEach((btn) => {
+    ctx.semesterButtons.forEach((btn) => {
       on(btn, "click", () => {
-        STATE.view.term = btn.dataset.term;
-        ctx.termButtons.forEach((termBtn) => {
-          termBtn.classList.toggle(
+        STATE.view.semester = btn.dataset.semester;
+        ctx.semesterButtons.forEach((semesterBtn) => {
+          semesterBtn.classList.toggle(
             "is-active",
-            termBtn.dataset.term === STATE.view.term
+            semesterBtn.dataset.semester === STATE.view.semester
           );
         });
         updateSchedule();

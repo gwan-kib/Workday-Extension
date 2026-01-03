@@ -4,6 +4,6 @@ export const STATE = {
     sort: { key: null, dir: 1 }, // 1 asc, -1 desc
     view: {
             panel: "list",
-            term: "first",
+            semester: "first",
         },
 };

@@ -1,10 +1,17 @@
 button {
-    color: #401d81;
-    background: #cdadff;
+  color: #401d81;
+  background: #cdadff;
 }
 
 .btn {
-    border: none;
+  border: none;
+
+  color: #cdadff;
+  background: #401d81;
+}
+
+.btn:hover {
+  background: #916ccc;
 }
 
 #widget-search {

@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- */
-/* SCHEDULE VIEW: TOP CONTROLS (TERM TOGGLES)                                  */
+/* SCHEDULE VIEW: TOP CONTROLS (SEMESTER TOGGLES)                                  */
 /* -------------------------------------------------------------------------- */
 
 .schedule-controls {
@@ -12,12 +12,12 @@
   padding: 8px 12px;
 }
 
-.schedule-term-buttons {
+.schedule-semester-buttons {
   display: flex;
   gap: 10px;
 }
 
-.term-button {
+.semester-button {
   padding: 2px 16px;
   height: 30px;
 
@@ -32,18 +32,19 @@
   transition: all 0.3s ease;
 }
 
-.term-button .text {
+.semester-button .text {
 display: inline-block;
 opacity: .5;
 
 transition: all 0.1s ease;
 }
 
-.term-button:hover .text {
+.semester-button:hover:not(.is-active) .text {
   translate: 0 -.5px;
+  opacity: .75;
 }
 
-.term-button.is-active .text {
+.semester-button.is-active .text {
   opacity: 1;
 }
 

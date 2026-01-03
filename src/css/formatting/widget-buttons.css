@@ -1,11 +1,14 @@
 .btn {
   padding: 6px 10px;
 
-  border-radius: 8px;
+  border-radius: 999px;
 
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 600;
 
   cursor: pointer;
+
+  transition: all 0.3s ease;
 }
 
 .tab-button {
@@ -16,9 +19,9 @@
 
 .tab-button .text {
   display: inline-block; 
-  transition: all 0.1s ease;
+  transition: all 0.3s ease;
 }
 
-.tab-button:hover .text {
-  translate: 0 -1px;
+.tab-button:hover:not(.is-active) .text {
+  opacity: 1;
 }

@@ -89,7 +89,7 @@ function slotIndexOf(minutes) {
   return SLOTS.indexOf(minutes);
 }
 
-function buildDayEvents(courses, term) {
+function buildDayEvents(courses, semester) {
   const eventsByDay = new Map();
   DAYS.forEach((d) => eventsByDay.set(d, []));
 
@@ -101,7 +101,7 @@ function buildDayEvents(courses, term) {
       course.startDate || extractStartDate(course.meetingLines?.[0]) || "";
     const semester = getSemester(startDate);
 
-    if (semester !== term) return;
+    if (semester !== semester) return;
 
     const lines = course.meetingLines?.length ? course.meetingLines : [];
 
@@ -577,12 +577,12 @@ function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
   });
 }
 
-export function renderSchedule(ctx, courses, term) {
+export function renderSchedule(ctx, courses, semester) {
   if (!ctx.scheduleGrid) return;
 
   ctx.scheduleGrid.innerHTML = "";
 
-  const eventsByDay = buildDayEvents(courses, term);
+  const eventsByDay = buildDayEvents(courses, semester);
   const groupedByDay = addConflicts(eventsByDay);
   const conflicts = getConflictSummaries(groupedByDay);
 

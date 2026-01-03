@@ -29,16 +29,16 @@
 }
 
 .schedule-entry-float {
-  background: #d6e0ff;
-  color: #001554;
+  background: #e5d6fd;
+  color: #401d81;
 }
 
-.term-button {
-  background: #cdaefc;
+.semester-button {
+  background: #fbf8ff;
   color: #401d81; 
 }
 
-.term-button.is-active {
-  background: #401d81;
-  color: #cdaefc;
+.semester-button.is-active {
+  background: #cdaefc;
+  color: #401d81;
 }
