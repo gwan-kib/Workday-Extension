@@ -34,11 +34,17 @@
 
 .term-button .text {
 display: inline-block;
+opacity: .5;
+
 transition: all 0.1s ease;
 }
 
 .term-button:hover .text {
   translate: 0 -.5px;
+}
+
+.term-button.is-active .text {
+  opacity: 1;
 }
 
 /* -------------------------------------------------------------------------- */

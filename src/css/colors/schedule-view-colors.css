@@ -35,17 +35,10 @@
 
 .term-button {
   background: #cdaefc;
-  color: #401d81;
-
-  box-shadow: inset 0 -3px 8px #401d81;
-
-  
+  color: #401d81; 
 }
 
 .term-button.is-active {
   background: #401d81;
   color: #cdaefc;
-
-  
-  box-shadow: inset 0 -3px 8px #e4d6ff;
 }

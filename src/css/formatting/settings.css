@@ -1,13 +1,63 @@
-.settings-panel {
-  padding: 24px;
+.settings-box {
+  display: flex;
+  gap: 6px;              /* space between GitHub + LinkedIn */
+  align-items: center;
 }
 
-.settings-panel h2 {
-  font-size: 20px;
-  margin: 0 0 8px;
+/* Links row styling inside your existing settings-box */
+.settings-field {
+  /* keep your spacing but make the label behave like a row */
+  display: block;
 }
 
-.settings-panel p {
-  margin: 0;
-  font-size: 14px;
+/* Make the <a> look like a nice “card button” */
+.settings-field .link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: fit-content;
+
+  padding: 10px 12px;
+
+  border: 1px solid #cfd6e4;
+  border-radius: 10px;
+
+  background: #f7f2ff;              /* matches your extension vibe */
+  color: #401d81;
+
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+/* Icon spacing + size */
+.settings-field .link .material-symbols-rounded {
+  font-size: 18px;
+  line-height: 1;
+  opacity: 0.85;
+
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+/* Hover polish */
+.settings-field .link:hover {
+  background: #ffffff;
+  border-color: #cdadff;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  transform: translateY(-1px);
+}
+
+.settings-field .link:hover .material-symbols-rounded {
+  transform: translateX(2px);
+  opacity: 1;
+}
+
+/* Keyboard focus (important for accessibility) */
+.settings-field .link:focus-visible {
+  outline: 2px solid #cdadff;
+  outline-offset: 2px;
 }
