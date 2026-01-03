@@ -11,8 +11,12 @@ button {
 }
 
 .btn:hover {
-  opacity: 1;
+  opacity: .75;
   background: #916ccc;
+}
+
+.btn:active {
+  opacity: 1;
 }
 
 #widget-search {
