@@ -55,5 +55,6 @@ export async function loadPanel(shadow) {
     panels: shadow.querySelectorAll(".widget-panel"),
     scheduleGrid: shadow.querySelector("#schedule-grid"),
     termButtons: shadow.querySelectorAll(".term-button"),
+    footerConflicts: shadow.querySelector("#widget-conflicts"),
   };
 }

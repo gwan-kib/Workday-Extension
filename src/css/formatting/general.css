@@ -19,8 +19,13 @@
 }
 
 .widget-footer {
+  display: flex;
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
+}
+
+.footer-tip {
+  margin-left: auto;
 }
 
 h1,

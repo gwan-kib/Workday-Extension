@@ -105,7 +105,13 @@ function buildDayEvents(courses, term) {
 
     const lines = course.meetingLines?.length ? course.meetingLines : [];
 
-    const label = course.isLab ? "[Laboratory]" : course.isSeminar ? "[Seminar]" : course.isDiscussion ? "[Discussion]" : "";
+    const label = course.isLab
+      ? "[Laboratory]"
+      : course.isSeminar
+      ? "[Seminar]"
+      : course.isDiscussion
+      ? "[Discussion]"
+      : "";
 
     lines.forEach((line) => {
       const parsed = parseMeetingLine(line);
@@ -218,6 +224,49 @@ function addConflicts(eventsByDay) {
   });
 
   return groupedByDay;
+}
+
+function getConflictSummaries(groupedByDay) {
+  const seen = new Set();
+  const conflicts = [];
+
+  groupedByDay.forEach((groups) => {
+    groups.forEach((group) => {
+      if (!group.hasConflict) return;
+
+      const codes = [
+        ...new Set(
+          group.events.map((ev) => ev.code || ev.title).filter(Boolean)
+        ),
+      ];
+
+      if (codes.length < 2) return;
+
+      codes.sort((a, b) => a.localeCompare(b));
+
+      const key = codes.join("|");
+      if (seen.has(key)) return;
+      seen.add(key);
+      conflicts.push(codes);
+    });
+  });
+
+  return conflicts;
+}
+
+function updateConflictFooter(ctx, conflicts) {
+  if (!ctx?.footerConflicts) return;
+
+  if (!conflicts.length) {
+    ctx.footerConflicts.textContent = "";
+    return;
+  }
+
+  const conflictList = conflicts
+    .map((codes) => `[${codes.join(", ")}]`)
+    .join(" ");
+
+  ctx.footerConflicts.textContent = `⚠️ The following classes are in conflict: ${conflictList}`;
 }
 
 function formatSlotLabel(minutes) {
@@ -535,10 +584,12 @@ export function renderSchedule(ctx, courses, term) {
 
   const eventsByDay = buildDayEvents(courses, term);
   const groupedByDay = addConflicts(eventsByDay);
+  const conflicts = getConflictSummaries(groupedByDay);
 
   const wrap = buildScheduleTable();
   ctx.scheduleGrid.appendChild(wrap);
 
   // overlay needs DOM measurements, so do it after append
   renderOverlayBlocks(wrap, eventsByDay, groupedByDay);
+  updateConflictFooter(ctx, conflicts);
 }
