@@ -58,7 +58,10 @@ import { exportCSV } from "./exporting/csv.js";
 
     on(ctx.button, "click", () => {
       ctx.widget.classList.toggle("is-hidden");
-      ctx.button.classList.toggle("is-collapsed", ctx.widget.classList.contains("is-hidden"));
+      ctx.button.classList.toggle(
+        "is-collapsed",
+        ctx.widget.classList.contains("is-hidden")
+      );
     });
 
     on(ctx.refresh, "click", async () => {
@@ -70,6 +73,12 @@ import { exportCSV } from "./exporting/csv.js";
     });
 
     on(ctx.exportBtn, "click", exportCSV);
+
+    on(ctx.settingsBtn, "click", () => {
+      ctx.widget.classList.remove("is-hidden");
+      ctx.button.classList.remove("is-collapsed");
+      setActivePanel("settings");
+    });
 
     on(
       ctx.search,

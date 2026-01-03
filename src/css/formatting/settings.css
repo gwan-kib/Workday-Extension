@@ -1,0 +1,13 @@
+.settings-panel {
+  padding: 24px;
+}
+
+.settings-panel h2 {
+  font-size: 20px;
+  margin: 0 0 8px;
+}
+
+.settings-panel p {
+  margin: 0;
+  font-size: 14px;
+}

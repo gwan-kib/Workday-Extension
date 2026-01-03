@@ -8,11 +8,13 @@ export async function loadPanel(shadow) {
     "formatting/course-list.css",
     "formatting/schedule-view.css",
     "formatting/schedule-view-events.css",
+    "formatting/settings.css",
 
     "colors/course-list-colors.css",
     "colors/general-colors.css",
     "colors/schedule-view-colors.css",
-    "colors/widget-functionality-colors.css"
+    "colors/widget-functionality-colors.css",
+    "colors/settings-colors.css"
   ];
   const [html, ...cssParts] = await Promise.all([
     fetch(htmlUrl).then((r) => r.text()),
@@ -46,6 +48,7 @@ export async function loadPanel(shadow) {
     search: shadow.querySelector("#widget-search"),
     refresh: shadow.querySelector("#widget-refresh"),
     exportBtn: shadow.querySelector("#widget-export"),
+     settingsBtn: shadow.querySelector(".settings"),
     tableBody: shadow.querySelector("tbody"),
     tableHead: shadow.querySelector("thead"),
     tabButtons: shadow.querySelectorAll(".tab-button"),

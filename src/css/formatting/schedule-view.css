@@ -18,20 +18,29 @@
 }
 
 .term-button {
-  padding: 2px 20px;
+  padding: 2px 16px;
+  height: 30px;
 
   border-radius: 999px;
-  border: 2px solid;
+  border: none;
 
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
 
   cursor: pointer;
+
+  transition: all 0.3s ease;
 }
 
-.term-button.is-active {
-  border: 2px solid;
+.term-button .text {
+display: inline-block;
+transition: all 0.1s ease;
 }
+
+.term-button:hover .text {
+  translate: 0 -.5px;
+}
+
 /* -------------------------------------------------------------------------- */
 /* SCHEDULE VIEW: GRID + TABLE (TIME GRID STRUCTURE)                           */
 /* -------------------------------------------------------------------------- */

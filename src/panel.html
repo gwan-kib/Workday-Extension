@@ -24,10 +24,10 @@
   </div>
   <div class="widget-tabs">
     <button class="tab-button is-active" type="button" data-panel="list">
-      Course List
+      <span class="text">Course List</span>
     </button>
     <button class="tab-button" type="button" data-panel="schedule">
-      Schedule View
+      <span class="text">Schedule View</span>
     </button>
     <input
       id="widget-search"
@@ -55,14 +55,20 @@
       <div class="schedule-controls">
         <div class="schedule-term-buttons">
           <button class="term-button is-active" type="button" data-term="first">
-            Term 1
+            <span class="text">Term 1</span>
           </button>
           <button class="term-button" type="button" data-term="second">
-            Term 2
+            <span class="text">Term 2</span>
           </button>
         </div>
       </div>
       <div class="schedule-grid" id="schedule-grid"></div>
+    </div>
+    <div class="widget-panel" data-panel="settings">
+      <div class="settings-panel">
+        <h2>Settings</h2>
+        <p>Customize your experience here. More options coming soon.</p>
+      </div>
     </div>
   </div>
   <div class="widget-footer">
