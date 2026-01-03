@@ -5,19 +5,22 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
+    sourcemap: true,
+    cssCodeSplit: false,
 
-    // Content scripts must be classic scripts → output IIFE (no ESM import/export)
     rollupOptions: {
-      input: resolve(__dirname, "src/content.js"),
+      input: {
+        content: resolve(__dirname, "src/content.js"),
+        background: resolve(__dirname, "src/background.js"),
+      },
       output: {
-        format: "iife",
-        entryFileNames: "content.js",
-        inlineDynamicImports: true,
+        // Leave format alone (Vite defaults to ESM)
+        entryFileNames: "[name].js",
+        chunkFileNames: "chunks/[name].js",
+
+        // Key: stop shared chunks
+        manualChunks: () => null,
       },
     },
-
-    // avoids Vite trying to split chunks (content script can’t import chunks)
-    cssCodeSplit: false,
-    sourcemap: true,
   },
 });

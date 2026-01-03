@@ -9,8 +9,11 @@
   "host_permissions": ["https://*.myworkday.com/*"],
 
   "action": {
-    "default_popup": "src/popup.html",
     "default_title": "Workday Course Extractor"
+  },
+
+  "background": {
+    "service_worker": "dist/background.js"
   },
 
   "content_scripts": [

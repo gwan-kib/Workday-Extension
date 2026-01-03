@@ -36,6 +36,14 @@ import { exportCSV } from "./exporting/csv.js";
       ctx.widget.classList.toggle("is-schedule-view", panel === "schedule");
     };
 
+    const toggleWidget = () => {
+      ctx.widget.classList.toggle("is-hidden");
+      ctx.button.classList.toggle(
+        "is-collapsed",
+        ctx.widget.classList.contains("is-hidden")
+      );
+    };
+
     ctx.tabButtons.forEach((btn) => {
       on(btn, "click", () => {
         setActivePanel(btn.dataset.panel);
@@ -56,12 +64,12 @@ import { exportCSV } from "./exporting/csv.js";
       });
     });
 
-    on(ctx.button, "click", () => {
-      ctx.widget.classList.toggle("is-hidden");
-      ctx.button.classList.toggle(
-        "is-collapsed",
-        ctx.widget.classList.contains("is-hidden")
-      );
+    on(ctx.button, "click", toggleWidget);
+
+    chrome.runtime.onMessage.addListener((message) => {
+      if (message?.type === "TOGGLE_WIDGET") {
+        toggleWidget();
+      }
     });
 
     on(ctx.refresh, "click", async () => {
