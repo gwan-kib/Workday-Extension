@@ -1,6 +1,6 @@
 export async function loadPanel(shadow) {
   const htmlUrl = chrome.runtime.getURL("src/panel.html");
-   const cssFiles = [
+  const cssFiles = [
     "formatting/general.css",
     "formatting/widget-shell.css",
     "formatting/widget-buttons.css",
@@ -14,7 +14,7 @@ export async function loadPanel(shadow) {
     "colors/general-colors.css",
     "colors/schedule-view-colors.css",
     "colors/widget-functionality-colors.css",
-    "colors/settings-colors.css"
+    "colors/settings-colors.css",
   ];
   const [html, ...cssParts] = await Promise.all([
     fetch(htmlUrl).then((r) => r.text()),
@@ -31,12 +31,12 @@ export async function loadPanel(shadow) {
   shadow.appendChild(style);
 
   if (!document.querySelector('link[href*="Material+Symbols"]')) {
-  const link = document.createElement("link");
-  link.rel = "stylesheet";
-  link.href =
-    "https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200";
-  document.head.appendChild(link);
-}
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200";
+    document.head.appendChild(link);
+  }
 
   const wrap = document.createElement("div");
   wrap.innerHTML = html;
@@ -46,15 +46,18 @@ export async function loadPanel(shadow) {
     button: shadow.querySelector("#floating-button"),
     widget: shadow.querySelector(".widget"),
     search: shadow.querySelector("#widget-search"),
+    saveScheduleBtn: shadow.querySelector("#widget-save-schedule"),
     refresh: shadow.querySelector("#widget-refresh"),
     exportBtn: shadow.querySelector("#widget-export"),
-     settingsBtn: shadow.querySelector(".settings"),
+    settingsBtn: shadow.querySelector(".settings"),
     tableBody: shadow.querySelector("tbody"),
     tableHead: shadow.querySelector("thead"),
     tabButtons: shadow.querySelectorAll(".tab-button"),
     panels: shadow.querySelectorAll(".widget-panel"),
     scheduleGrid: shadow.querySelector("#schedule-grid"),
     semesterButtons: shadow.querySelectorAll(".semester-button"),
+    savedDropdown: shadow.querySelector("#schedule-saved-dropdown"),
+    savedMenu: shadow.querySelector("#schedule-saved-menu"),
     footerConflicts: shadow.querySelector("#widget-conflicts"),
   };
 }

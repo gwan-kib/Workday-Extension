@@ -11,6 +11,14 @@ import {
 import { renderRows } from "./panel/renderRows.js";
 import { renderSchedule } from "./panel/scheduleView.js";
 import { exportCSV } from "./exporting/csv.js";
+import {
+  canSaveMoreSchedules,
+  createScheduleSnapshot,
+  getMaxScheduleCount,
+  loadSavedSchedules,
+  persistSavedSchedules,
+  renderSavedSchedules,
+} from "./panel/scheduleStorage.js";
 
 (() => {
   console.log("[WD] content script loaded");
@@ -82,6 +90,56 @@ import { exportCSV } from "./exporting/csv.js";
 
     on(ctx.exportBtn, "click", exportCSV);
 
+    on(ctx.saveScheduleBtn, "click", async () => {
+      if (!canSaveMoreSchedules(STATE.savedSchedules)) {
+        alert(
+          `You can only save up to ${getMaxScheduleCount()} schedules. Delete one to save another.`
+        );
+        return;
+      }
+
+      const name = window.prompt("Name this schedule:")?.trim();
+      if (!name) return;
+
+      const snapshot = createScheduleSnapshot(name, STATE.filtered);
+      STATE.savedSchedules = [snapshot, ...STATE.savedSchedules];
+      await persistSavedSchedules(STATE.savedSchedules);
+      renderSavedSchedules(ctx, STATE.savedSchedules);
+      if (ctx.savedDropdown) ctx.savedDropdown.open = true;
+    });
+
+    on(ctx.savedMenu, "click", async (event) => {
+      const actionButton = event.target.closest("[data-action]");
+      if (!actionButton) return;
+
+      const card = actionButton.closest(".schedule-saved-card");
+      const scheduleId = card?.dataset.id;
+      if (!scheduleId) return;
+
+      if (actionButton.dataset.action === "delete") {
+        STATE.savedSchedules = STATE.savedSchedules.filter(
+          (schedule) => schedule.id !== scheduleId
+        );
+        await persistSavedSchedules(STATE.savedSchedules);
+        renderSavedSchedules(ctx, STATE.savedSchedules);
+        return;
+      }
+
+      const selected = STATE.savedSchedules.find(
+        (schedule) => schedule.id === scheduleId
+      );
+      if (!selected) return;
+
+      STATE.courses = [...selected.courses];
+      STATE.filtered = [...selected.courses];
+      ctx.search.value = "";
+      sortBy(STATE.sort.key || "code");
+      renderRows(ctx, STATE.filtered);
+      updateSchedule();
+      setActivePanel("schedule");
+      if (ctx.savedDropdown) ctx.savedDropdown.open = false;
+    });
+
     on(ctx.settingsBtn, "click", () => {
       ctx.widget.classList.remove("is-hidden");
       ctx.button.classList.remove("is-collapsed");
@@ -100,6 +158,9 @@ import { exportCSV } from "./exporting/csv.js";
     );
 
     wireSorting(ctx);
+
+    STATE.savedSchedules = await loadSavedSchedules();
+    renderSavedSchedules(ctx, STATE.savedSchedules);
 
     STATE.courses = await extractAllCourses();
     STATE.filtered = [...STATE.courses];

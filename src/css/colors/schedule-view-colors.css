@@ -42,3 +42,40 @@
   background: #cdaefc;
   color: #401d81;
 }
+
+.schedule-saved-summary {
+  background: #906acc;
+  color: #fbf8ff;
+  opacity: .5;
+
+  transition: all .2s ease;
+}
+
+.schedule-saved-summary:hover {
+  opacity: .75;
+}
+
+.schedule-saved-menu {
+  background: #fbf8ff;
+  border: 1px solid #6b4fd6;
+  box-shadow: 0 12px 24px rgba(64, 29, 129, 0.2);
+}
+
+.schedule-saved-card {
+  background: #ede2ff;
+  color: #401d81;
+}
+
+.schedule-saved-action {
+  background: #401d81;
+  color: #fbf8ff;
+}
+
+.schedule-saved-action.delete {
+  background: #b91c1c;
+}
+
+.schedule-saved-empty {
+  background: #ede2ff;
+  color: #401d81;
+}

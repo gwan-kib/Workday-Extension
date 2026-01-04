@@ -29,10 +29,32 @@
     <button class="tab-button" type="button" data-panel="schedule">
       <span class="text">Schedule View</span>
     </button>
-    <input
-      id="widget-search"
-      placeholder="Search by Course Name/Instructor/Week Day…"
-    />
+    <div class="widget-search-wrap">
+      <span class="material-symbols-rounded search-icon" aria-hidden="true">
+        search
+      </span>
+      <input
+        id="widget-search"
+        placeholder="Course Name / Instructor / Week Day…"
+      />
+    </div>
+    <span class="spacer"></span>
+    <button
+      id="widget-save-schedule"
+      class="btn schedule-save-button"
+      type="button"
+    >
+      <span class="material-symbols-rounded save-icon"> save_as </span>
+    </button>
+    <details class="schedule-saved-dropdown" id="schedule-saved-dropdown">
+      <summary class="schedule-saved-summary">
+        <span class="text">Schedules</span>
+        <span class="material-symbols-rounded" aria-hidden="true"
+          >expand_more</span
+        >
+      </summary>
+      <div class="schedule-saved-menu" id="schedule-saved-menu"></div>
+    </details>
   </div>
   <div class="widget-body">
     <div class="widget-panel is-active" data-panel="list">
@@ -54,7 +76,11 @@
     <div class="widget-panel" data-panel="schedule">
       <div class="schedule-controls">
         <div class="schedule-semester-buttons">
-          <button class="semester-button is-active" type="button" data-semester="first">
+          <button
+            class="semester-button is-active"
+            type="button"
+            data-semester="first"
+          >
             <span class="text">Semester 1</span>
           </button>
           <button class="semester-button" type="button" data-semester="second">
@@ -75,7 +101,9 @@
               href="https://github.com/gwan-kib/Workday-Extension"
               target="_blank"
               rel="noopener noreferrer"
-              >GitHub Repo<span class="material-symbols-rounded">arrow_outward</span></a
+              >GitHub Repo<span class="material-symbols-rounded"
+                >arrow_outward</span
+              ></a
             >
           </label>
           <label class="settings-field">
@@ -84,7 +112,9 @@
               href="https://www.linkedin.com/in/gwantanakiboigo/"
               target="_blank"
               rel="noopener noreferrer"
-              >LinkedIn<span class="material-symbols-rounded">arrow_outward</span></a
+              >LinkedIn<span class="material-symbols-rounded"
+                >arrow_outward</span
+              ></a
             >
           </label>
         </div>
@@ -94,6 +124,8 @@
   <div class="widget-footer">
     <span class="spacer"></span>
     <span id="widget-conflicts" class="widget-conflicts"></span>
-    <span class="footer-tip"><span class="muted">Tip: Click headers to sort</span></span>
+    <span class="footer-tip"
+      ><span class="muted">Tip: Click headers to sort</span></span
+    >
   </div>
 </div>
