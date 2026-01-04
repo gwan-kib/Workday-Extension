@@ -13,7 +13,7 @@
 }
 
 .schedule-semester-buttons {
-  position: flex;
+  display: flex;
   left: 50%;
   display: flex;
   gap: 8px;
@@ -123,14 +123,23 @@
 }
 
 .schedule-modal {
-  position: fixed;
+  position: absolute;
   inset: 0;
-  display: none;
+
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  z-index: 1000000;
+
+  background: rgba(64, 29, 129, 0.35);
+  backdrop-filter: blur(2px);
+
+  z-index: 200;
 }
+
+.schedule-modal.is-hidden {
+  display: none;
+}
+
 
 .schedule-modal.is-open {
   display: flex;
@@ -143,14 +152,18 @@
 
 .schedule-modal-dialog {
   position: relative;
+
   display: flex;
   flex-direction: column;
   gap: 12px;
-  width: min(420px, 92vw);
-  border-radius: 16px;
+
+  width: min(420px, 92%);
   padding: 16px;
+
+  border-radius: 16px;
   z-index: 1;
 }
+
 
 .schedule-modal-header {
   display: flex;

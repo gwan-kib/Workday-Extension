@@ -55,8 +55,9 @@ import {
     let resolveScheduleModal = null;
     const closeScheduleModal = (value) => {
       if (!ctx.saveModal) return;
-      ctx.saveModal.classList.remove("is-open");
+      ctx.saveModal.classList.add("is-hidden");
       ctx.saveModal.setAttribute("aria-hidden", "true");
+
       if (resolveScheduleModal) {
         resolveScheduleModal(value);
         resolveScheduleModal = null;
@@ -78,7 +79,7 @@ import {
       ctx.saveModalCancel.classList.toggle("is-hidden", !showCancel);
       ctx.saveModalInput.value = "";
       ctx.saveModalInput.classList.remove("is-invalid");
-      ctx.saveModal.classList.add("is-open");
+      ctx.saveModal.classList.remove("is-hidden");
       ctx.saveModal.setAttribute("aria-hidden", "false");
       if (showInput) {
         ctx.saveModalInput.focus();
@@ -92,6 +93,10 @@ import {
 
     if (ctx.saveModal) {
       on(ctx.saveModal, "click", (event) => {
+        if (event.target === ctx.saveModal) {
+          closeScheduleModal(null);
+          return;
+        }
         const action = event.target.closest("[data-action]")?.dataset.action;
         if (!action) return;
         if (action === "close" || action === "cancel") {
@@ -123,8 +128,12 @@ import {
         }
       });
 
-      on(ctx.saveModal, "keydown", (event) => {
-        if (event.key === "Escape") {
+      on(document, "keydown", (event) => {
+        if (
+          event.key === "Escape" &&
+          ctx.saveModal &&
+          !ctx.saveModal.classList.contains("is-hidden")
+        ) {
           closeScheduleModal(null);
         }
       });
