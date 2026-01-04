@@ -52,3 +52,33 @@ button {
 .widget-search-wrap:focus-within .search-icon {
   opacity: 1;
 }
+
+.schedule-modal-backdrop {
+  background: rgba(64, 29, 129, 0.4);
+}
+
+.schedule-modal-dialog {
+  background: #fbf8ff;
+  color: #401d81;
+  box-shadow: 0 18px 30px rgba(64, 29, 129, 0.25);
+}
+
+.schedule-modal-close {
+  background: #ede2ff;
+  color: #401d81;
+}
+
+.schedule-modal-input {
+  background: #ede2ff;
+  color: #401d81;
+  border-color: #cdaefc;
+}
+
+.schedule-modal-input::placeholder {
+  color: #401d81;
+  opacity: 0.6;
+}
+
+.schedule-modal-input.is-invalid {
+  border-color: #b91c1c;
+}

@@ -122,6 +122,103 @@
   opacity: 0.7;
 }
 
+.schedule-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1000000;
+}
+
+.schedule-modal.is-open {
+  display: flex;
+}
+
+.schedule-modal-backdrop {
+  position: absolute;
+  inset: 0;
+}
+
+.schedule-modal-dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(420px, 92vw);
+  border-radius: 16px;
+  padding: 16px;
+  z-index: 1;
+}
+
+.schedule-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.schedule-modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.schedule-modal-close {
+  border: none;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.schedule-modal-message {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.schedule-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.schedule-modal-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.schedule-modal-input {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-size: 13px;
+}
+
+.schedule-modal-input.is-invalid {
+  border-style: dashed;
+}
+
+.schedule-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.schedule-modal-cancel {
+  opacity: 0.6;
+}
+
+.schedule-modal-field.is-hidden,
+.schedule-modal-cancel.is-hidden {
+  display: none;
+}
+
 .semester-button {
   padding: 2px 16px;
   height: 30px;

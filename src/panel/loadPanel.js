@@ -59,5 +59,12 @@ export async function loadPanel(shadow) {
     savedDropdown: shadow.querySelector("#schedule-saved-dropdown"),
     savedMenu: shadow.querySelector("#schedule-saved-menu"),
     footerConflicts: shadow.querySelector("#widget-conflicts"),
+    saveModal: shadow.querySelector("#schedule-save-modal"),
+    saveModalTitle: shadow.querySelector("#schedule-modal-title"),
+    saveModalMessage: shadow.querySelector("#schedule-modal-message"),
+    saveModalField: shadow.querySelector("#schedule-modal-field"),
+    saveModalInput: shadow.querySelector("#schedule-modal-input"),
+    saveModalCancel: shadow.querySelector(".schedule-modal-cancel"),
+    saveModalConfirm: shadow.querySelector(".schedule-modal-confirm"),
   };
 }

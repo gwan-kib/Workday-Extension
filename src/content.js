@@ -52,6 +52,84 @@ import {
       );
     };
 
+    let resolveScheduleModal = null;
+    const closeScheduleModal = (value) => {
+      if (!ctx.saveModal) return;
+      ctx.saveModal.classList.remove("is-open");
+      ctx.saveModal.setAttribute("aria-hidden", "true");
+      if (resolveScheduleModal) {
+        resolveScheduleModal(value);
+        resolveScheduleModal = null;
+      }
+    };
+
+    const openScheduleModal = ({
+      title,
+      message,
+      confirmLabel = "Save",
+      showInput = true,
+      showCancel = true,
+    }) => {
+      if (!ctx.saveModal) return Promise.resolve(null);
+      ctx.saveModalTitle.textContent = title;
+      ctx.saveModalMessage.textContent = message;
+      ctx.saveModalConfirm.textContent = confirmLabel;
+      ctx.saveModalField.classList.toggle("is-hidden", !showInput);
+      ctx.saveModalCancel.classList.toggle("is-hidden", !showCancel);
+      ctx.saveModalInput.value = "";
+      ctx.saveModalInput.classList.remove("is-invalid");
+      ctx.saveModal.classList.add("is-open");
+      ctx.saveModal.setAttribute("aria-hidden", "false");
+      if (showInput) {
+        ctx.saveModalInput.focus();
+      } else {
+        ctx.saveModalConfirm.focus();
+      }
+      return new Promise((resolve) => {
+        resolveScheduleModal = resolve;
+      });
+    };
+
+    if (ctx.saveModal) {
+      on(ctx.saveModal, "click", (event) => {
+        const action = event.target.closest("[data-action]")?.dataset.action;
+        if (!action) return;
+        if (action === "close" || action === "cancel") {
+          closeScheduleModal(null);
+          return;
+        }
+        if (action === "confirm") {
+          if (!ctx.saveModalField.classList.contains("is-hidden")) {
+            const value = ctx.saveModalInput.value.trim();
+            if (!value) {
+              ctx.saveModalInput.classList.add("is-invalid");
+              ctx.saveModalInput.focus();
+              return;
+            }
+            closeScheduleModal(value);
+            return;
+          }
+          closeScheduleModal(true);
+        }
+      });
+
+      on(ctx.saveModalInput, "input", () => {
+        ctx.saveModalInput.classList.remove("is-invalid");
+      });
+
+      on(ctx.saveModalInput, "keydown", (event) => {
+        if (event.key === "Enter") {
+          ctx.saveModalConfirm.click();
+        }
+      });
+
+      on(ctx.saveModal, "keydown", (event) => {
+        if (event.key === "Escape") {
+          closeScheduleModal(null);
+        }
+      });
+    }
+
     ctx.tabButtons.forEach((btn) => {
       on(btn, "click", () => {
         setActivePanel(btn.dataset.panel);
@@ -92,13 +170,23 @@ import {
 
     on(ctx.saveScheduleBtn, "click", async () => {
       if (!canSaveMoreSchedules(STATE.savedSchedules)) {
-        alert(
-          `You can only save up to ${getMaxScheduleCount()} schedules. Delete one to save another.`
-        );
+        await openScheduleModal({
+          title: "Schedule limit reached",
+          message: `You can only save up to ${getMaxScheduleCount()} schedules. Delete one to save another.`,
+          confirmLabel: "Got it",
+          showInput: false,
+          showCancel: false,
+        });
         return;
       }
 
-      const name = window.prompt("Name this schedule:")?.trim();
+      const name = await openScheduleModal({
+        title: "Save schedule",
+        message: "Name this schedule so you can find it later.",
+        confirmLabel: "Save",
+        showInput: true,
+        showCancel: true,
+      });
       if (!name) return;
 
       const snapshot = createScheduleSnapshot(name, STATE.filtered);
