@@ -15,12 +15,25 @@
     <span id="widget-title">Workday - Schedule Tool</span>
 
     <span class="spacer"></span>
-    <button id="widget-export" class="btn" type="button">
-      <span class="material-symbols-rounded export-icon" aria-hidden="true">
-        ios_share
-      </span>
-      <span class="text">Export</span>
-    </button>
+    <details class="export-dropdown" id="widget-export">
+      <summary class="btn export-summary" type="button">
+        <span class="material-symbols-rounded export-icon" aria-hidden="true">
+          ios_share
+        </span>
+        <span class="text">Export</span>
+        <span class="material-symbols-rounded" aria-hidden="true"
+          >expand_more</span
+        >
+      </summary>
+      <div class="export-menu" id="widget-export-menu">
+        <button class="export-option" type="button" data-export="ics">
+          Download .ics
+        </button>
+        <button class="export-option" type="button" data-export="png">
+          Download PNG
+        </button>
+      </div>
+    </details>
     <button class="btn settings" type="button" aria-label="Settings">
       <span class="material-symbols-rounded">settings</span>
     </button>

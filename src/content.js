@@ -11,6 +11,7 @@ import {
 import { renderRows } from "./panel/renderRows.js";
 import { renderSchedule } from "./panel/scheduleView.js";
 import { exportICS } from "./exporting/ics.js";
+import { exportSchedulePNG } from "./exporting/png.js";
 import {
   canSaveMoreSchedules,
   createScheduleSnapshot,
@@ -169,6 +170,14 @@ import {
       ctx.savedDropdown.open = false;
     });
 
+    on(document, "click", (event) => {
+      if (!ctx.exportDropdown?.open) return;
+      const path = event.composedPath ? event.composedPath() : [];
+      if (path.includes(ctx.exportDropdown)) return;
+      if (!path.length && ctx.exportDropdown.contains(event.target)) return;
+      ctx.exportDropdown.open = false;
+    });
+
     chrome.runtime.onMessage.addListener((message) => {
       if (message?.type === "TOGGLE_WIDGET") {
         toggleWidget();
@@ -183,7 +192,21 @@ import {
       updateSchedule();
     });
 
-    on(ctx.exportBtn, "click", exportICS);
+const handleExport = async (type) => {
+      if (type === "ics") {
+        exportICS();
+      }
+      if (type === "png") {
+        await exportSchedulePNG(ctx);
+      }
+    };
+
+    on(ctx.exportMenu, "click", async (event) => {
+      const action = event.target.closest("[data-export]");
+      if (!action) return;
+      if (ctx.exportDropdown) ctx.exportDropdown.open = false;
+      await handleExport(action.dataset.export);
+    });
 
     on(ctx.saveScheduleBtn, "click", async () => {
       if (!canSaveMoreSchedules(STATE.savedSchedules)) {
