@@ -91,13 +91,18 @@
 /* TABS (COURSE LIST + SCHEDULE VIEW SWITCHER + SEARCH)                                 */
 /* -------------------------------------------------------------------------- */
 
+.widget-conflicts.is-hover {
+  font-weight: 800;
+}
+
+
 .widget-tabs {
   display: flex;
   gap: 10px;
   height: 30px;
 
   align-items: center;
-  padding: 8px 12px;
+  padding: 10px 12px;
 
   border-bottom: 2px solid #fbf8ff;
   border-top: 1px solid #fbf8ff;

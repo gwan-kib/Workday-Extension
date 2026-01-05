@@ -380,7 +380,7 @@ function textBoxOverlapsAny(candidate, existing) {
   return false;
 }
 
-function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
+function renderOverlayBlocks(wrap, eventsByDay, groupedByDay, ctx) {
   const overlay = wrap.querySelector(".schedule-overlay");
   overlay.innerHTML = "";
 
@@ -462,6 +462,28 @@ function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
     });
   });
 
+  const footerConflicts = ctx?.footerConflicts;
+  let conflictHoverCount = 0;
+  const updateFooterConflictHover = () => {
+    if (!footerConflicts) return;
+    footerConflicts.classList.toggle("is-hover", conflictHoverCount > 0);
+  };
+  const attachConflictHover = (blockEl) => {
+    if (!footerConflicts || blockEl.dataset.conflictHoverBound === "true") {
+      return;
+    }
+
+    blockEl.dataset.conflictHoverBound = "true";
+    blockEl.addEventListener("mouseenter", () => {
+      conflictHoverCount += 1;
+      updateFooterConflictHover();
+    });
+    blockEl.addEventListener("mouseleave", () => {
+      conflictHoverCount = Math.max(0, conflictHoverCount - 1);
+      updateFooterConflictHover();
+    });
+  };
+
   // --- detect overlaps + apply opacity + add red intersection rects ---
   for (let i = 0; i < placedBlocks.length; i++) {
     for (let j = i + 1; j < placedBlocks.length; j++) {
@@ -482,6 +504,9 @@ function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
 
       A.el.classList.add("is-overlap");
       B.el.classList.add("is-overlap");
+
+      attachConflictHover(A.el);
+attachConflictHover(B.el);
 
       // intersection rect coordinates relative to each block
       const aLocal = {

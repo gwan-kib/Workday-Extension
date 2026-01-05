@@ -433,8 +433,12 @@ border: 2px solid #401d81;
   pointer-events: none;
   z-index: 3;
 
+      font-weight: 600;
+
   overflow: hidden; /* clip stripes */
 }
+
+
 
 .schedule-conflict::after {
   content: "";
