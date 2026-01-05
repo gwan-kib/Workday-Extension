@@ -36,3 +36,18 @@
       height: 34px;
       width: 34px;
 }
+
+#widget-export {
+  width: 88px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  font-size: 14px;
+}
+
+
+.export-icon {
+
+}

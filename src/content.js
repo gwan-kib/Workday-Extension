@@ -10,7 +10,7 @@ import {
 } from "./panel/panelInteractions.js";
 import { renderRows } from "./panel/renderRows.js";
 import { renderSchedule } from "./panel/scheduleView.js";
-import { exportCSV } from "./exporting/csv.js";
+import { exportICS } from "./exporting/ics.js";
 import {
   canSaveMoreSchedules,
   createScheduleSnapshot,
@@ -183,7 +183,7 @@ import {
       updateSchedule();
     });
 
-    on(ctx.exportBtn, "click", exportCSV);
+    on(ctx.exportBtn, "click", exportICS);
 
     on(ctx.saveScheduleBtn, "click", async () => {
       if (!canSaveMoreSchedules(STATE.savedSchedules)) {
@@ -222,6 +222,18 @@ import {
       if (!scheduleId) return;
 
       if (actionButton.dataset.action === "delete") {
+        const selected = STATE.savedSchedules.find(
+          (schedule) => schedule.id === scheduleId
+        );
+        if (!selected) return;
+        const confirmed = await openScheduleModal({
+          title: "Permanently Delete Schedule?",
+          message: `This action will permanently delete "${selected.name}".`,
+          confirmLabel: "Delete",
+          showInput: false,
+          showCancel: true,
+        });
+        if (!confirmed) return;
         STATE.savedSchedules = STATE.savedSchedules.filter(
           (schedule) => schedule.id !== scheduleId
         );
