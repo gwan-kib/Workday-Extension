@@ -161,6 +161,14 @@ import {
 
     on(ctx.button, "click", toggleWidget);
 
+    on(document, "click", (event) => {
+      if (!ctx.savedDropdown?.open) return;
+      const path = event.composedPath ? event.composedPath() : [];
+      if (path.includes(ctx.savedDropdown)) return;
+      if (!path.length && ctx.savedDropdown.contains(event.target)) return;
+      ctx.savedDropdown.open = false;
+    });
+
     chrome.runtime.onMessage.addListener((message) => {
       if (message?.type === "TOGGLE_WIDGET") {
         toggleWidget();
