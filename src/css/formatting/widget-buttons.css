@@ -1,5 +1,5 @@
 .btn {
-  padding: 6px 10px;
+  padding: 6px 8px;
 
   border-radius: 999px;
 
@@ -7,23 +7,32 @@
   font-weight: 600;
 
   cursor: pointer;
-  
-  opacity: .60;
+
+  opacity: 0.6;
 
   transition: all 0.3s ease;
 }
 
 .tab-button {
   border: none;
+  height: 28px;
 
   transition: all 0.3s ease;
 }
 
 .tab-button .text {
-  display: inline-block; 
+  display: inline-block;
   transition: all 0.3s ease;
 }
 
 .tab-button:hover:not(.is-active) .text {
   opacity: 1;
+}
+
+#widget-refresh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+      height: 34px;
+      width: 34px;
 }

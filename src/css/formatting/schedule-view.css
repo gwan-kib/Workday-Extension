@@ -28,7 +28,7 @@
   display: inline-flex;
   align-items: center;
   padding: 0px 10px;
-  height: 30px;
+  height: 28px;
 
   border-radius: 999px;
   border: none;
@@ -56,10 +56,11 @@
 
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 
-  padding: 10px;
+  padding: 7px;
   border-radius: 12px;
+  border: 2px;
   z-index: 100;
 }
 
@@ -80,6 +81,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 34px;
+  width: 34px;
 }
 
 .schedule-saved-card-header {
@@ -148,11 +151,28 @@
 .schedule-modal-backdrop {
   position: absolute;
   inset: 0;
+  padding: 10px;
+}
+
+.dialog-container {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: min(420px, 92%);
+  padding: 14px;
+
+  border-radius: 16px;
+  
+  z-index: 1;
+  background: #ede2ff;
 }
 
 .schedule-modal-dialog {
   position: relative;
-
+border: 2px solid #401d81;
   display: flex;
   flex-direction: column;
   gap: 12px;

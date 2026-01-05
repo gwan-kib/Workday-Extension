@@ -57,7 +57,7 @@
 
 .schedule-saved-menu {
   background: #fbf8ff;
-  border: 1px solid #6b4fd6;
+  border: 2px solid #6b4fd6;
   box-shadow: 0 12px 24px rgba(64, 29, 129, 0.2);
 }
 
@@ -67,12 +67,12 @@
 }
 
 .schedule-saved-action {
-  background: #401d81;
+  background: #8f6bce;
   color: #fbf8ff;
 }
 
 .schedule-saved-action.delete {
-  background: #b91c1c;
+  background: #ff6666;
 }
 
 .schedule-saved-empty {

@@ -61,3 +61,11 @@
   outline: 2px solid #cdadff;
   outline-offset: 2px;
 }
+
+.settings {
+  display: inline-flex;
+  height: 32px;
+  width: 32px;
+  justify-content: center;
+  align-items: center;
+}

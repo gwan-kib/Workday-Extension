@@ -45,3 +45,8 @@
 .muted {
   color: #9583d0;
 }
+
+.widget :focus-visible {
+  outline: none;
+  box-shadow: none;
+}

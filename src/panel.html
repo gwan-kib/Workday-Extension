@@ -15,8 +15,6 @@
     <span id="widget-title">Workday - Schedule Tool</span>
 
     <span class="spacer"></span>
-
-    <button id="widget-refresh" class="btn" type="button">Refresh</button>
     <button id="widget-export" class="btn" type="button">Export CSV</button>
     <button class="btn settings" type="button" aria-label="Settings">
       <span class="material-symbols-rounded">settings</span>
@@ -39,6 +37,9 @@
       />
     </div>
     <span class="spacer"></span>
+    <button id="widget-refresh" class="btn" type="button">
+      <span class="material-symbols-rounded"> refresh </span>
+    </button>
     <button
       id="widget-save-schedule"
       class="btn schedule-save-button"
@@ -120,52 +121,64 @@
         </div>
       </div>
     </div>
-    <div class="schedule-modal is-hidden" id="schedule-save-modal" aria-hidden="true">
-  <div class="schedule-modal-backdrop" data-action="close"></div>
-  <div
-    class="schedule-modal-dialog"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="schedule-modal-title"
-  >
-    <div class="schedule-modal-header">
-      <h3 class="schedule-modal-title" id="schedule-modal-title">
-        Save schedule
-      </h3>
-      <button class="schedule-modal-close" type="button" data-action="close">
-        <span class="material-symbols-rounded" aria-hidden="true">close</span>
-      </button>
+    <div
+      class="schedule-modal is-hidden"
+      id="schedule-save-modal"
+      aria-hidden="true"
+    >
+      <div class="schedule-modal-backdrop" data-action="close"></div>
+      <div class="dialog-container">
+        <div
+          class="schedule-modal-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="schedule-modal-title"
+        >
+          <div class="schedule-modal-header">
+            <h3 class="schedule-modal-title" id="schedule-modal-title">
+              Save Schedule
+            </h3>
+            <button
+              class="schedule-modal-close"
+              type="button"
+              data-action="close"
+            >
+              <span class="material-symbols-rounded" aria-hidden="true"
+                >close</span
+              >
+            </button>
+          </div>
+          <p class="schedule-modal-message" id="schedule-modal-message">
+            Name this schedule so you can find it later.
+          </p>
+          <label class="schedule-modal-field" id="schedule-modal-field">
+            <span class="schedule-modal-label">Schedule name</span>
+            <input
+              id="schedule-modal-input"
+              class="schedule-modal-input"
+              type="text"
+              placeholder="e.g. Fall semester plan"
+            />
+          </label>
+          <div class="schedule-modal-actions">
+            <button
+              class="btn schedule-modal-cancel"
+              type="button"
+              data-action="cancel"
+            >
+              Cancel
+            </button>
+            <button
+              class="btn schedule-modal-confirm"
+              type="button"
+              data-action="confirm"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-    <p class="schedule-modal-message" id="schedule-modal-message">
-      Name this schedule so you can find it later.
-    </p>
-    <label class="schedule-modal-field" id="schedule-modal-field">
-      <span class="schedule-modal-label">Schedule name</span>
-      <input
-        id="schedule-modal-input"
-        class="schedule-modal-input"
-        type="text"
-        placeholder="e.g. Fall semester plan"
-      />
-    </label>
-    <div class="schedule-modal-actions">
-      <button
-        class="btn schedule-modal-cancel"
-        type="button"
-        data-action="cancel"
-      >
-        Cancel
-      </button>
-      <button
-        class="btn schedule-modal-confirm"
-        type="button"
-        data-action="confirm"
-      >
-        Save
-      </button>
-    </div>
-  </div>
-</div>
   </div>
   <div class="widget-footer">
     <span class="spacer"></span>
@@ -175,5 +188,3 @@
     >
   </div>
 </div>
-
-
