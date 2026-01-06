@@ -51,6 +51,7 @@ export async function loadPanel(shadow) {
     refresh: shadow.querySelector("#widget-refresh"),
     exportDropdown: shadow.querySelector("#widget-export"),
     exportMenu: shadow.querySelector("#widget-export-menu"),
+      helpBtn: shadow.querySelector(".help"),
     settingsBtn: shadow.querySelector(".settings"),
     tableBody: shadow.querySelector("tbody"),
     tableHead: shadow.querySelector("thead"),

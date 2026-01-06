@@ -79,3 +79,15 @@
   cursor: pointer;
   text-align: left;
 }
+
+.help.btn {
+  height: 32px;
+  padding: 6px 12px;
+  font-size: 12px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  gap: 3px;
+}

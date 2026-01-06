@@ -192,7 +192,7 @@ import {
       updateSchedule();
     });
 
-const handleExport = async (type) => {
+    const handleExport = async (type) => {
       if (type === "ics") {
         exportICS();
       }
@@ -284,6 +284,12 @@ const handleExport = async (type) => {
       ctx.widget.classList.remove("is-hidden");
       ctx.button.classList.remove("is-collapsed");
       setActivePanel("settings");
+    });
+
+    on(ctx.helpBtn, "click", () => {
+      ctx.widget.classList.remove("is-hidden");
+      ctx.button.classList.remove("is-collapsed");
+      setActivePanel("help");
     });
 
     on(
