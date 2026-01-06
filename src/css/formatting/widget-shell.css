@@ -32,10 +32,23 @@
 /* WIDGET HEADER (TITLE + ACTION BUTTONS)                             */
 /* -------------------------------------------------------------------------- */
 
+.widget-header .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 32px;          /* pick ONE height */
+  padding: 0 12px;       /* horizontal only */
+  line-height: 1;        /* kill text offset */
+}
+
+.widget-header .text {
+  font-size: 14;
+}
+
 .widget-header {
   display: flex;
   align-items: center;
-
   padding: 10px 12px;
   gap: 6px;
 }

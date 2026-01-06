@@ -38,19 +38,10 @@
 }
 
 .export-dropdown {
-  position: relative;
+  height: 32px;
 }
 
-.export-summary {
-  width: 104px;
-  height: 36px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 3px;
-  font-size: 14px;
-  list-style: none;
-}
+
 
 .export-summary::-webkit-details-marker {
   display: none;
@@ -85,9 +76,20 @@
   padding: 6px 12px;
   font-size: 12px;
   letter-spacing: 0.6px;
-  text-transform: uppercase;
   justify-content: center;
   align-items: center;
   display: flex;
   gap: 3px;
+}
+
+.export-summary {
+  height: 25px;
+  width: 90px;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  font-size: 13px;
+  list-style: none;
 }

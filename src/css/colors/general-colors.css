@@ -33,7 +33,13 @@
 }
 
 .settings .material-symbols-rounded {
-  color: #cdadff;
+  color: #e6d3f5;
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+.help .material-symbols-rounded {
+  color: #e6d3f5;
+  font-variation-settings: "FILL" 1, "wght" 800, "GRAD" 0, "opsz" 24;
 }
 
 .settings:hover .material-symbols-rounded {

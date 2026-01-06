@@ -43,6 +43,8 @@ import {
         btn.classList.toggle("is-active", btn.dataset.panel === panel);
       });
       ctx.widget.classList.toggle("is-schedule-view", panel === "schedule");
+      ctx.widget.classList.toggle("is-settings-view", panel === "settings");
+      ctx.widget.classList.toggle("is-help-view", panel === "help");
     };
 
     const toggleWidget = () => {

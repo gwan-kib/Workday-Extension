@@ -1,3 +1,9 @@
-.settings {
-    color: #e6d3f5;
+.widget.is-settings-view .settings {
+    opacity: 1;
+    background: #916ccc;
+}
+
+.widget.is-help-view .help {
+    background: #916ccc;
+    opacity: 1;
 }

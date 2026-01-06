@@ -82,3 +82,8 @@
   flex-direction: column;
   gap: 4px;
 }
+
+.settings-panel {
+  padding: 10px 30px;
+}
+
