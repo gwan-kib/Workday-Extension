@@ -39,19 +39,16 @@
 
 .export-dropdown {
   height: 32px;
-}
-
-
-
-.export-summary::-webkit-details-marker {
-  display: none;
+position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 
 .export-menu {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 6px;
   min-width: 160px;
@@ -60,6 +57,11 @@
   border: 2px;
   z-index: 120;
 }
+
+.export-dropdown.is-open .export-menu {
+  display: flex;
+}
+
 
 .export-option {
   padding: 8px 10px;

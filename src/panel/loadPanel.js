@@ -50,6 +50,7 @@ export async function loadPanel(shadow) {
     saveScheduleBtn: shadow.querySelector("#widget-save-schedule"),
     refresh: shadow.querySelector("#widget-refresh"),
     exportDropdown: shadow.querySelector("#widget-export"),
+    exportButton: shadow.querySelector("#widget-export-button"),
     exportMenu: shadow.querySelector("#widget-export-menu"),
     helpBtn: shadow.querySelector(".help"),
     settingsBtn: shadow.querySelector(".settings"),

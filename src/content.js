@@ -164,12 +164,22 @@ import {
 
     on(ctx.button, "click", toggleWidget);
 
+    const setExportOpen = (isOpen) => {
+      if (!ctx.exportDropdown || !ctx.exportButton) return;
+      ctx.exportDropdown.classList.toggle("is-open", isOpen);
+      ctx.exportButton.setAttribute("aria-expanded", String(isOpen));
+    };
+
+    on(ctx.exportButton, "click", () => {
+      const isOpen = ctx.exportDropdown?.classList.contains("is-open");
+      setExportOpen(!isOpen);
+    });
+
     on(document, "click", (event) => {
-      if (!ctx.savedDropdown?.open) return;
+      if (!ctx.exportDropdown?.classList.contains("is-open")) return;
       const path = event.composedPath ? event.composedPath() : [];
-      if (path.includes(ctx.savedDropdown)) return;
-      if (!path.length && ctx.savedDropdown.contains(event.target)) return;
-      ctx.savedDropdown.open = false;
+      if (path.includes(ctx.exportDropdown)) return;
+      setExportOpen(false);
     });
 
     on(ctx.root, "click", (event) => {
@@ -208,7 +218,7 @@ import {
     on(ctx.exportMenu, "click", async (event) => {
       const action = event.target.closest("[data-export]");
       if (!action) return;
-      if (ctx.exportDropdown) ctx.exportDropdown.open = false;
+       setExportOpen(false);
       await handleExport(action.dataset.export);
     });
 

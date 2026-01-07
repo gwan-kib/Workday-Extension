@@ -15,8 +15,14 @@
     <span id="widget-title">Workday - Schedule Tool</span>
 
     <span class="spacer"></span>
-    <details class="export-dropdown" id="widget-export">
-      <summary class="btn export-summary" type="button">
+    <div class="export-dropdown" id="widget-export">
+      <button
+        class="btn export-summary"
+        id="widget-export-button"
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded="false"
+      >
         <span class="material-symbols-rounded export-icon" aria-hidden="true">
           ios_share
         </span>
@@ -24,8 +30,8 @@
         <span class="material-symbols-rounded" aria-hidden="true"
           >expand_more</span
         >
-      </summary>
-      <div class="export-menu" id="widget-export-menu">
+      </button>
+      <div class="export-menu" id="widget-export-menu" role="menu">
         <button class="export-option" type="button" data-export="ics">
           Download .ics
         </button>
@@ -33,11 +39,10 @@
           Download PNG
         </button>
       </div>
-    </details>
+    </div>
     <button class="btn help" type="button" aria-label="Help">
-      <span class="material-symbols-rounded">
-help
-</span><span class="text">Help</span>
+      <span class="material-symbols-rounded"> help </span
+      ><span class="text">Help</span>
     </button>
     <button class="btn settings" type="button" aria-label="Settings">
       <span class="material-symbols-rounded">settings</span>
@@ -151,7 +156,9 @@ help
         <div class="help-box">
           <div class="help-item">
             <strong>Getting started</strong>
-            <span class="muted">Quick walkthroughs and FAQs will live here.</span>
+            <span class="muted"
+              >Quick walkthroughs and FAQs will live here.</span
+            >
           </div>
           <div class="help-item">
             <strong>Keyboard shortcuts</strong>
@@ -159,7 +166,9 @@ help
           </div>
           <div class="help-item">
             <strong>Support</strong>
-            <span class="muted">Add contact info or links to help resources.</span>
+            <span class="muted"
+              >Add contact info or links to help resources.</span
+            >
           </div>
         </div>
       </div>
@@ -224,7 +233,6 @@ help
     </div>
   </div>
   <div class="widget-footer">
-    
     <span id="widget-conflicts" class="widget-conflicts"></span>
     <span class="spacer"></span>
     <span class="footer-tip"
