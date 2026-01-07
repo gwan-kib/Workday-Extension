@@ -36,8 +36,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  height: 32px;          /* pick ONE height */
+/* pick ONE height */
   padding: 0 12px;       /* horizontal only */
   line-height: 1;        /* kill text offset */
 }

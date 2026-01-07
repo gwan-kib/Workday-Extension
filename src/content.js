@@ -11,7 +11,6 @@ import {
 import { renderRows } from "./panel/renderRows.js";
 import { renderSchedule } from "./panel/scheduleView.js";
 import { exportICS } from "./exporting/ics.js";
-import { exportSchedulePNG } from "./exporting/png.js";
 import {
   canSaveMoreSchedules,
   createScheduleSnapshot,
@@ -182,6 +181,16 @@ import {
       setExportOpen(false);
     });
 
+    // Close Saved Schedules dropdown if user clicks outside
+    on(document, "click", (event) => {
+      if (!ctx.savedDropdown?.open) return;
+
+      const path = event.composedPath ? event.composedPath() : [];
+      if (path.includes(ctx.savedDropdown)) return;
+
+      ctx.savedDropdown.open = false;
+    });
+
     on(ctx.root, "click", (event) => {
       if (!ctx.exportDropdown?.open) return;
 
@@ -190,7 +199,6 @@ import {
 
       ctx.exportDropdown.open = false;
     });
-
 
     chrome.runtime.onMessage.addListener((message) => {
       if (message?.type === "TOGGLE_WIDGET") {
@@ -210,15 +218,12 @@ import {
       if (type === "ics") {
         exportICS();
       }
-      if (type === "png") {
-        await exportSchedulePNG(ctx);
-      }
     };
 
     on(ctx.exportMenu, "click", async (event) => {
       const action = event.target.closest("[data-export]");
       if (!action) return;
-       setExportOpen(false);
+      setExportOpen(false);
       await handleExport(action.dataset.export);
     });
 
