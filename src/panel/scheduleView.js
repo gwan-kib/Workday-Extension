@@ -99,9 +99,10 @@ function buildDayEvents(courses, semester) {
   courses.forEach((course) => {
     const startDate =
       course.startDate || extractStartDate(course.meetingLines?.[0]) || "";
-    const semester = getSemester(startDate);
 
-    if (semester !== semester) return;
+    const courseSemester = getSemester(startDate);
+
+    if (courseSemester !== semester) return;
 
     const lines = course.meetingLines?.length ? course.meetingLines : [];
 
@@ -506,7 +507,7 @@ function renderOverlayBlocks(wrap, eventsByDay, groupedByDay, ctx) {
       B.el.classList.add("is-overlap");
 
       attachConflictHover(A.el);
-attachConflictHover(B.el);
+      attachConflictHover(B.el);
 
       // intersection rect coordinates relative to each block
       const aLocal = {
