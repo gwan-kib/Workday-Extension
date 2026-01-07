@@ -1,5 +1,19 @@
 import { STATE } from "../core/state";
 
+// add near the top (after imports)
+const TZID = "America/Vancouver";
+
+const formatDateTimeUTC = (date) => {
+  const y = date.getUTCFullYear();
+  const m = pad(date.getUTCMonth() + 1);
+  const d = pad(date.getUTCDate());
+  const hh = pad(date.getUTCHours());
+  const mm = pad(date.getUTCMinutes());
+  const ss = pad(date.getUTCSeconds());
+  return `${y}${m}${d}T${hh}${mm}${ss}Z`;
+};
+
+// maps ui's day labels to iCalendar day codes
 const DAY_CODES = {
   Mon: "MO",
   Tue: "TU",
@@ -10,26 +24,34 @@ const DAY_CODES = {
   Sun: "SU",
 };
 
-const DATE_RANGE_REGEX = /(\d{4}-\d{2}-\d{2})\s*-\s*(\d{4}-\d{2}-\d{2})/;
-const TIME_RANGE_REGEX = /(\d{1,2}):(\d{2})\s*([ap])\.?m\.?\s*-\s*(\d{1,2}):(\d{2})\s*([ap])\.?m\.?/i;
-const DAY_REGEX = /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/g;
+// used to extract dates, times, and days from a meeting line string
+const date_range_REGEX = /(\d{4}-\d{2}-\d{2})\s*-\s*(\d{4}-\d{2}-\d{2})/;
+const time_range_REGEX = /(\d{1,2}):(\d{2})\s*([ap])\.?m\.?\s*-\s*(\d{1,2}):(\d{2})\s*([ap])\.?m\.?/i;
+const days_REGEX = /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/g;
 
-const pad = (value) => String(value).padStart(2, "0");
+// forces numbers to two digits
+const padNumbers = (value) => String(value).padStart(2, "0");
 
+// formats date into .ics format
 const formatDate = (date) => {
   const year = date.getFullYear();
-  const month = pad(date.getMonth() + 1);
-  const day = pad(date.getDate());
+  const month = padNumbers(date.getMonth() + 1);
+  const day = padNumbers(date.getDate());
+
   return `${year}${month}${day}`;
 };
 
+// formats times into .ics format
 const formatDateTime = (date) => {
   const datePart = formatDate(date);
-  const hours = pad(date.getHours());
-  const minutes = pad(date.getMinutes());
+  const hours = padNumbers(date.getHours());
+  const minutes = padNumbers(date.getMinutes());
+
   return `${datePart}T${hours}${minutes}00`;
 };
 
+// “p” adds 12, unless it’s 12pm already, “a” turns 12am into 0
+// eg. parseTime("11","30","p") -> { hours: 23, minutes: 30 }
 const parseTime = (hoursToken, minutesToken, periodToken) => {
   let hours = Number.parseInt(hoursToken, 10);
   const minutes = Number.parseInt(minutesToken, 10);
@@ -41,10 +63,11 @@ const parseTime = (hoursToken, minutesToken, periodToken) => {
   return { hours, minutes };
 };
 
+// parses meeting line into structured data
 const parseMeetingLine = (line) => {
-  const dateMatch = String(line || "").match(DATE_RANGE_REGEX);
-  const timeMatch = String(line || "").match(TIME_RANGE_REGEX);
-  const days = String(line || "").match(DAY_REGEX) || [];
+  const dateMatch = String(line || "").match(date_range_REGEX);
+  const timeMatch = String(line || "").match(time_range_REGEX);
+  const days = String(line || "").match(days_REGEX) || [];
 
   if (!dateMatch || !timeMatch || !days.length) return null;
 
@@ -65,6 +88,7 @@ const parseMeetingLine = (line) => {
   };
 };
 
+// finds location from meeting line
 const extractLocation = (line) => {
   const parts = String(line || "")
     .split("|")
@@ -80,18 +104,22 @@ const extractLocation = (line) => {
   return "";
 };
 
+// starts at startDate, checks the next 0–6 days, returns the first date whose weekday is one of the meeting day codes
 const findFirstOccurrence = (startDate, dayCodes) => {
   const start = new Date(`${startDate}T00:00:00`);
+
   for (let offset = 0; offset < 7; offset += 1) {
     const date = new Date(start);
     date.setDate(start.getDate() + offset);
     const code = Object.values(DAY_CODES)[date.getDay() === 0 ? 6 : date.getDay() - 1];
     if (dayCodes.includes(code)) return date;
   }
+
   return start;
 };
 
-const buildEvent = (course, line) => {
+// builds an event object from course and meeting line data
+const buildClassEvent = (course, line) => {
   const parsed = parseMeetingLine(line);
   if (!parsed) return null;
 
@@ -112,7 +140,8 @@ const buildEvent = (course, line) => {
     course.meeting ? `Meeting: ${course.meeting}` : null,
   ].filter(Boolean);
 
-  const untilDate = `${parsed.endDate.replace(/-/g, "")}T235959`;
+  const untilLocal = new Date(`${parsed.endDate}T23:59:59`);
+  const untilDate = formatDateTimeUTC(untilLocal);
 
   return {
     uid: `${course.code || "course"}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
@@ -125,13 +154,14 @@ const buildEvent = (course, line) => {
   };
 };
 
-const buildICS = (courses) => {
+// loops through every course in the scheduale and builds the full ICS file
+const buildICSFile = (courses) => {
   const events = [];
 
   courses.forEach((course) => {
     const lines = course.meetingLines?.length ? course.meetingLines : [];
     lines.forEach((line) => {
-      const event = buildEvent(course, line);
+      const event = buildClassEvent(course, line);
       if (event) events.push(event);
     });
   });
@@ -141,6 +171,7 @@ const buildICS = (courses) => {
     "VERSION:2.0",
     "PRODID:-//Workday Extension//Schedule Export//EN",
     "CALSCALE:GREGORIAN",
+    `X-WR-TIMEZONE:${TZID}`,
   ];
 
   events.forEach((event) => {
@@ -149,8 +180,8 @@ const buildICS = (courses) => {
     lines.push(`SUMMARY:${event.summary}`);
     if (event.description) lines.push(`DESCRIPTION:${event.description}`);
     if (event.location) lines.push(`LOCATION:${event.location}`);
-    lines.push(`DTSTART:${event.dtstart}`);
-    lines.push(`DTEND:${event.dtend}`);
+    lines.push(`DTSTART;TZID=${TZID}:${event.dtstart}`);
+    lines.push(`DTEND;TZID=${TZID}:${event.dtend}`);
     lines.push(`RRULE:${event.rrule}`);
     lines.push("END:VEVENT");
   });
@@ -159,8 +190,11 @@ const buildICS = (courses) => {
   return lines.join("\r\n");
 };
 
+// generates the ICS string from the current filtered courses, wraps it in a Blob (file-like object)
+// creates a temporary URL for it and a hidden <a> then “clicks” it to download
+// cleans up the URL + anchor afterward
 export function exportICS() {
-  const ics = buildICS(STATE.filtered || []);
+  const ics = buildICSFile(STATE.filtered || []);
   const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
   const url = URL.createObjectURL(blob);
 

@@ -10,7 +10,7 @@ import {
 } from "./panel/panelInteractions.js";
 import { renderRows } from "./panel/renderRows.js";
 import { renderSchedule } from "./panel/scheduleView.js";
-import { exportICS } from "./exporting/ics.js";
+import { exportICS } from "./export-logic/export-ics.js";
 import {
   canSaveMoreSchedules,
   createScheduleSnapshot,
