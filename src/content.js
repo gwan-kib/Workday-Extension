@@ -172,13 +172,15 @@ import {
       ctx.savedDropdown.open = false;
     });
 
-    on(document, "click", (event) => {
+    on(ctx.root, "click", (event) => {
       if (!ctx.exportDropdown?.open) return;
+
       const path = event.composedPath ? event.composedPath() : [];
       if (path.includes(ctx.exportDropdown)) return;
-      if (!path.length && ctx.exportDropdown.contains(event.target)) return;
+
       ctx.exportDropdown.open = false;
     });
+
 
     chrome.runtime.onMessage.addListener((message) => {
       if (message?.type === "TOGGLE_WIDGET") {

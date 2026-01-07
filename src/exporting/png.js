@@ -65,7 +65,16 @@ const createPNGFromNode = async ({ wrapper, container }) => {
   const width = Math.ceil(container.scrollWidth);
   const height = Math.ceil(container.scrollHeight);
 
+    // IMPORTANT:
+  // Remove Material Symbols nodes before SVG->canvas export.
+  // They rely on a cross-origin Google Fonts stylesheet (panel.html),
+  // which taints the canvas and breaks toDataURL().
+  wrapper.querySelectorAll(".material-symbols-rounded").forEach((el) => {
+    el.remove();
+  });
+
   const serialized = new XMLSerializer().serializeToString(wrapper);
+
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
       <foreignObject width="100%" height="100%">
