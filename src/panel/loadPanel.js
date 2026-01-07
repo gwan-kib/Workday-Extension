@@ -18,9 +18,7 @@ export async function loadPanel(shadow) {
   ];
   const [html, ...cssParts] = await Promise.all([
     fetch(htmlUrl).then((r) => r.text()),
-    ...cssFiles.map((file) =>
-      fetch(chrome.runtime.getURL(`src/css/${file}`)).then((r) => r.text())
-    ),
+    ...cssFiles.map((file) => fetch(chrome.runtime.getURL(`src/css/${file}`)).then((r) => r.text())),
   ]);
   const css = cssParts.join("\n");
 

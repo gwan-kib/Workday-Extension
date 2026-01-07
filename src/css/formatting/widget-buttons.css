@@ -33,13 +33,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-      height: 34px;
-      width: 34px;
+  height: 34px;
+  width: 34px;
 }
 
 .export-dropdown {
   height: 32px;
-position: relative;
+  position: relative;
   display: inline-flex;
   align-items: center;
 }
@@ -64,7 +64,6 @@ position: relative;
 .export-dropdown.is-open .export-menu {
   display: flex;
 }
-
 
 .export-option {
   padding: 8px 10px;
@@ -92,7 +91,7 @@ position: relative;
 .export-summary {
   height: 34px;
   width: 115px;
-  
+
   display: flex;
   justify-content: center;
   align-items: center;
