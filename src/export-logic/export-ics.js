@@ -1,8 +1,9 @@
 import { STATE } from "../core/state";
 
-// add near the top (after imports)
+// Calendar timezone for DTSTART/DTEND (local class times) and RRULE UNTIL (UTC "Z" per spec)
 const TZID = "America/Vancouver";
 
+// converts a Date object into this format: YYYYMMDDTHHMMSSZ
 const formatDateTimeUTC = (date) => {
   const y = date.getUTCFullYear();
   const m = pad(date.getUTCMonth() + 1);
@@ -32,7 +33,7 @@ const days_REGEX = /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/g;
 // forces numbers to two digits
 const padNumbers = (value) => String(value).padStart(2, "0");
 
-// formats date into .ics format
+// ICS date format: YYYYMMDD
 const formatDate = (date) => {
   const year = date.getFullYear();
   const month = padNumbers(date.getMonth() + 1);
@@ -41,7 +42,7 @@ const formatDate = (date) => {
   return `${year}${month}${day}`;
 };
 
-// formats times into .ics format
+// ICS datetime format (local): YYYYMMDDTHHMMSS
 const formatDateTime = (date) => {
   const datePart = formatDate(date);
   const hours = padNumbers(date.getHours());
@@ -104,8 +105,8 @@ const extractLocation = (line) => {
   return "";
 };
 
-// starts at startDate, checks the next 0–6 days, returns the first date whose weekday is one of the meeting day codes
-const findFirstOccurrence = (startDate, dayCodes) => {
+// finds the first calendar date on/after startDate that matches one of the meeting days
+const findFirstValidDate = (startDate, dayCodes) => {
   const start = new Date(`${startDate}T00:00:00`);
 
   for (let offset = 0; offset < 7; offset += 1) {
@@ -123,7 +124,7 @@ const buildClassEvent = (course, line) => {
   const parsed = parseMeetingLine(line);
   if (!parsed) return null;
 
-  const firstDate = findFirstOccurrence(parsed.startDate, parsed.days);
+  const firstDate = findFirstValidDate(parsed.startDate, parsed.days);
   const startDate = new Date(firstDate);
   startDate.setHours(parsed.startTime.hours, parsed.startTime.minutes, 0, 0);
 
