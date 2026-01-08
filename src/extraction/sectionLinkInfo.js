@@ -1,42 +1,66 @@
+import { debugFor } from "../utilities/debugTool.js";
+
+const debug = debugFor("sectionLinkInfo");
+
 /* Parse the Workday "promptOption" section link string. */
 export function parseSectionLinkString(input) {
-    let str = String(input || "").replace(/\u00A0/g, " ").trim();
+  let str = String(input || "")
+    .replace(/\u00A0/g, " ")
+    .trim();
 
-    if (!str)
-        return null;
+  debug.log({ id: "parseSectionLinkString.input" }, "Raw input:", input);
 
-    // keep ALL lines; Workday wraps titles with \n
-    str = str.replace(/\s*\n\s*/g, " ").trim();
+  if (!str) return null;
 
-    // REQUIRED pattern:
-    const m = str.match(/^\s*([A-Z][A-Z0-9_]*\s*\d{3}[A-Z]?)\s*-\s*(.+?)\s*$/);
-    if (!m)
-        return null;
+  // keep ALL lines; Workday wraps titles with \n
+  str = str.replace(/\s*\n\s*/g, " ").trim();
 
-    const baseCode = m[1].trim(); // "COSC_O 222"
-    const rest = m[2].trim();     // "L2D - Data Structures" or "101 - Data Structures"
+  debug.log({ id: "parseSectionLinkString.normalized" }, "Normalized string:", str);
 
-    // Split rest into section token + title
-    const parts = rest.split(/\s*[-–—]\s*/).map((p) => p.trim()).filter(Boolean);
+  // REQUIRED pattern:
+  const m = str.match(/^\s*([A-Z][A-Z0-9_]*\s*\d{3}[A-Z]?)\s*-\s*(.+?)\s*$/);
+  if (!m) {
+    debug.log({ id: "parseSectionLinkString.noMatch" }, "String did not match expected pattern");
+    return null;
+  }
 
-    let sectionToken = "";
-    let parsedTitle = "";
+  const baseCode = m[1].trim(); // "COSC_O 222"
+  const rest = m[2].trim(); // "L2D - Data Structures" or "101 - Data Structures"
 
-    sectionToken = parts[0];
-    parsedTitle = parts.slice(1).join(" - ").trim();
+  debug.log({ id: "parseSectionLinkString.match" }, "Regex match:", { baseCode, rest });
 
-    parsedTitle = parsedTitle.replace(/\s*:\s*/g, ":\n");
+  // Split rest into section token + title
+  const parts = rest
+    .split(/\s*[-–—]\s*/)
+    .map((p) => p.trim())
+    .filter(Boolean);
 
-    return {
-      code: baseCode,
-      section_number: sectionToken,
-      title: parsedTitle,
-      full: str,
-    };
+  let sectionToken = "";
+  let parsedTitle = "";
+
+  sectionToken = parts[0];
+  parsedTitle = parts.slice(1).join(" - ").trim();
+
+  parsedTitle = parsedTitle.replace(/\s*:\s*/g, ":\n");
+
+  const result = {
+    code: baseCode,
+    section_number: sectionToken,
+    title: parsedTitle,
+    full: str,
+  };
+
+  debug.log({ id: "parseSectionLinkString.result" }, "Parsed section link result:", result);
+
+  return result;
 }
 
 export function guessClassCode(text) {
-    const m = String(text || "").match(/[A-Z][A-Z0-9_]*\s*\d{2,3}[A-Z]?/);
-    
-    return m ? m[0].replace(/\s+/g, " ").trim() : "";
+  const m = String(text || "").match(/[A-Z][A-Z0-9_]*\s*\d{2,3}[A-Z]?/);
+
+  const out = m ? m[0].replace(/\s+/g, " ").trim() : "";
+
+  debug.log({ id: "guessClassCode" }, "Guessed class code:", { input: text, out });
+
+  return out;
 }

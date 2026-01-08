@@ -3,11 +3,7 @@ import { STATE } from "./core/state.js";
 import { ensureMount } from "./utilities/shadowMount.js";
 import { loadPanel } from "./panel/loadPanel.js";
 import { extractAllCourses } from "./extraction/courseExtraction.js";
-import {
-  applySearchFilter,
-  sortBy,
-  wireSorting,
-} from "./panel/panelInteractions.js";
+import { applySearchFilter, sortBy, wireSorting } from "./panel/panelInteractions.js";
 import { renderRows } from "./panel/renderRows.js";
 import { renderSchedule } from "./panel/scheduleView.js";
 import { exportICS } from "./export-logic/export-ics.js";
@@ -19,22 +15,23 @@ import {
   persistSavedSchedules,
   renderSavedSchedules,
 } from "./panel/scheduleStorage.js";
+import { debugFor } from "./utilities/debugTool";
+const debug = debugFor("content");
 
 (() => {
-  console.log("[WD] content script loaded");
   async function boot() {
     const shadow = ensureMount();
     const ctx = await loadPanel(shadow);
-    ctx.button.classList.toggle(
-      "is-collapsed",
-      ctx.widget.classList.contains("is-hidden")
-    );
+    debug.log("Loaded panel context:", ctx);
+    ctx.button.classList.toggle("is-collapsed", ctx.widget.classList.contains("is-hidden"));
     const updateSchedule = () => {
       renderSchedule(ctx, STATE.filtered, STATE.view.semester);
+      debug.log("Schedule updated with filtered data:", STATE.filtered);
     };
 
     const setActivePanel = (panel) => {
       STATE.view.panel = panel;
+      debug.log("Panel state changed:", panel);
       ctx.panels.forEach((el) => {
         el.classList.toggle("is-active", el.dataset.panel === panel);
       });
@@ -48,10 +45,8 @@ import {
 
     const toggleWidget = () => {
       ctx.widget.classList.toggle("is-hidden");
-      ctx.button.classList.toggle(
-        "is-collapsed",
-        ctx.widget.classList.contains("is-hidden")
-      );
+      debug.log("Widget visibility toggled:", ctx.widget.classList.contains("is-hidden"));
+      ctx.button.classList.toggle("is-collapsed", ctx.widget.classList.contains("is-hidden"));
     };
 
     let resolveScheduleModal = null;
@@ -64,15 +59,10 @@ import {
         resolveScheduleModal(value);
         resolveScheduleModal = null;
       }
+      debug.log("Schedule modal closed with value:", value);
     };
 
-    const openScheduleModal = ({
-      title,
-      message,
-      confirmLabel = "Save",
-      showInput = true,
-      showCancel = true,
-    }) => {
+    const openScheduleModal = ({ title, message, confirmLabel = "Save", showInput = true, showCancel = true }) => {
       if (!ctx.saveModal) return Promise.resolve(null);
       ctx.saveModalTitle.textContent = title;
       ctx.saveModalMessage.textContent = message;
@@ -88,6 +78,7 @@ import {
       } else {
         ctx.saveModalConfirm.focus();
       }
+      debug.log("Opened schedule modal with title:", title);
       return new Promise((resolve) => {
         resolveScheduleModal = resolve;
       });
@@ -131,11 +122,7 @@ import {
       });
 
       on(document, "keydown", (event) => {
-        if (
-          event.key === "Escape" &&
-          ctx.saveModal &&
-          !ctx.saveModal.classList.contains("is-hidden")
-        ) {
+        if (event.key === "Escape" && ctx.saveModal && !ctx.saveModal.classList.contains("is-hidden")) {
           closeScheduleModal(null);
         }
       });
@@ -151,11 +138,9 @@ import {
     ctx.semesterButtons.forEach((btn) => {
       on(btn, "click", () => {
         STATE.view.semester = btn.dataset.semester;
+        debug.log("Semester state changed:", STATE.view.semester);
         ctx.semesterButtons.forEach((semesterBtn) => {
-          semesterBtn.classList.toggle(
-            "is-active",
-            semesterBtn.dataset.semester === STATE.view.semester
-          );
+          semesterBtn.classList.toggle("is-active", semesterBtn.dataset.semester === STATE.view.semester);
         });
         updateSchedule();
       });
@@ -167,6 +152,7 @@ import {
       if (!ctx.exportDropdown || !ctx.exportButton) return;
       ctx.exportDropdown.classList.toggle("is-open", isOpen);
       ctx.exportButton.setAttribute("aria-expanded", String(isOpen));
+      debug.log("Export dropdown state changed:", isOpen);
     };
 
     on(ctx.exportButton, "click", () => {
@@ -203,6 +189,7 @@ import {
     chrome.runtime.onMessage.addListener((message) => {
       if (message?.type === "TOGGLE_WIDGET") {
         toggleWidget();
+        debug.log("Widget toggled by runtime message");
       }
     });
 
@@ -212,11 +199,13 @@ import {
       sortBy(STATE.sort.key || "code");
       renderRows(ctx, STATE.filtered);
       updateSchedule();
+      debug.log("Courses refreshed and schedule updated");
     });
 
     const handleExport = async (type) => {
       if (type === "ics") {
         exportICS();
+        debug.log("Export triggered for ICS file");
       }
     };
 
@@ -264,9 +253,7 @@ import {
       if (!scheduleId) return;
 
       if (actionButton.dataset.action === "delete") {
-        const selected = STATE.savedSchedules.find(
-          (schedule) => schedule.id === scheduleId
-        );
+        const selected = STATE.savedSchedules.find((schedule) => schedule.id === scheduleId);
         if (!selected) return;
         const confirmed = await openScheduleModal({
           title: "Permanently Delete Schedule?",
@@ -276,17 +263,13 @@ import {
           showCancel: true,
         });
         if (!confirmed) return;
-        STATE.savedSchedules = STATE.savedSchedules.filter(
-          (schedule) => schedule.id !== scheduleId
-        );
+        STATE.savedSchedules = STATE.savedSchedules.filter((schedule) => schedule.id !== scheduleId);
         await persistSavedSchedules(STATE.savedSchedules);
         renderSavedSchedules(ctx, STATE.savedSchedules);
         return;
       }
 
-      const selected = STATE.savedSchedules.find(
-        (schedule) => schedule.id === scheduleId
-      );
+      const selected = STATE.savedSchedules.find((schedule) => schedule.id === scheduleId);
       if (!selected) return;
 
       STATE.courses = [...selected.courses];

@@ -1,8 +1,12 @@
+import { debugFor } from "../utilities/debugTool";
+
+const debug = debugFor("state");
+
 export const STATE = {
   // list of courses extracted from workday
   courses: [],
 
-  // list of filtered courses, used for seaching and sorting
+  // list of filtered courses, used for searching and sorting
   filtered: [],
 
   // list of user saved schedules
@@ -15,5 +19,30 @@ export const STATE = {
   view: {
     panel: "list",
     semester: "first",
+  },
+
+  setCourses(newCourses) {
+    this.courses = newCourses;
+    debug.log("Courses updated:", newCourses);
+  },
+
+  setFiltered(filteredCourses) {
+    this.filtered = filteredCourses;
+    debug.log("Filtered courses updated:", filteredCourses);
+  },
+
+  setSavedSchedules(saved) {
+    this.savedSchedules = saved;
+    debug.log("Saved schedules updated:", saved);
+  },
+
+  setSort(sortState) {
+    this.sort = sortState;
+    debug.log("Sorting state updated:", sortState);
+  },
+
+  setView(viewState) {
+    this.view = viewState;
+    debug.log("View state updated:", viewState);
   },
 };

@@ -1,8 +1,8 @@
 import { extractStartDate } from "../extraction/meetingPatternsInfo.js";
+import { debugFor } from "../utilities/debugTool";
+const debug = debugFor("scheduleView");
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
-
-// 30-min grid so 12:30 fits naturally
 const START_HOUR = 8;
 const END_HOUR = 21; // last visible hour (exclusive end)
 const SLOT_MINUTES = 30;
@@ -52,6 +52,8 @@ function parseMeetingLine(line) {
 
   if (endMinutes <= startMinutes) return null;
 
+  debug.log("Parsed meeting line:", { days, timeTokens, startMinutes, endMinutes });
+
   return {
     days: [...new Set(days)],
     startMinutes,
@@ -65,10 +67,14 @@ function getSemester(startDate) {
 
   const month = startDate.split("-")[1];
 
-  if (SEMESTER_MONTHS.first.includes(month)) return "first";
-  if (SEMESTER_MONTHS.second.includes(month)) return "second";
+  const semester = SEMESTER_MONTHS.first.includes(month)
+    ? "first"
+    : SEMESTER_MONTHS.second.includes(month)
+    ? "second"
+    : null;
 
-  return null;
+  debug.log("Determined semester for startDate:", { startDate, semester });
+  return semester;
 }
 
 function clampToGrid(minutes) {
@@ -90,6 +96,7 @@ function slotIndexOf(minutes) {
 }
 
 function buildDayEvents(courses, semester) {
+  debug.log("Building day events for semester:", semester);
   const eventsByDay = new Map();
   DAYS.forEach((d) => eventsByDay.set(d, []));
 
@@ -97,8 +104,7 @@ function buildDayEvents(courses, semester) {
   let eventId = 0;
 
   courses.forEach((course) => {
-    const startDate =
-      course.startDate || extractStartDate(course.meetingLines?.[0]) || "";
+    const startDate = course.startDate || extractStartDate(course.meetingLines?.[0]) || "";
 
     const courseSemester = getSemester(startDate);
 
@@ -134,14 +140,7 @@ function buildDayEvents(courses, semester) {
       parsed.days.forEach((day) => {
         if (!eventsByDay.has(day)) return;
 
-        const key = [
-          day,
-          course.code || "",
-          course.title || "",
-          parsed.timeLabel,
-          startIdx,
-          rowSpan,
-        ].join("|");
+        const key = [day, course.code || "", course.title || "", parsed.timeLabel, startIdx, rowSpan].join("|");
 
         if (seen.has(key)) return;
         seen.add(key);
@@ -164,23 +163,19 @@ function buildDayEvents(courses, semester) {
   });
 
   DAYS.forEach((day) => {
-    eventsByDay
-      .get(day)
-      .sort((a, b) => a.startIdx - b.startIdx || a.endIdx - b.endIdx);
+    eventsByDay.get(day).sort((a, b) => a.startIdx - b.startIdx || a.endIdx - b.endIdx);
   });
 
+  debug.log("Built day events:", eventsByDay);
   return eventsByDay;
 }
 
-// Build overlap groups per DAY column.
-// Each group becomes ONE rowspan cell; if group has 2+ events, it’s a conflict cluster.
 function addConflicts(eventsByDay) {
+  debug.log("Adding conflicts to events...");
   const groupedByDay = new Map();
 
   DAYS.forEach((day) => {
-    const events = (eventsByDay.get(day) || [])
-      .slice()
-      .sort((a, b) => a.startIdx - b.startIdx || a.endIdx - b.endIdx);
+    const events = (eventsByDay.get(day) || []).slice().sort((a, b) => a.startIdx - b.startIdx || a.endIdx - b.endIdx);
 
     const groups = [];
 
@@ -224,6 +219,7 @@ function addConflicts(eventsByDay) {
     groupedByDay.set(day, groups);
   });
 
+  debug.log("Grouped events with conflicts:", groupedByDay);
   return groupedByDay;
 }
 
@@ -235,11 +231,7 @@ function getConflictSummaries(groupedByDay) {
     groups.forEach((group) => {
       if (!group.hasConflict) return;
 
-      const codes = [
-        ...new Set(
-          group.events.map((ev) => ev.code || ev.title).filter(Boolean)
-        ),
-      ];
+      const codes = [...new Set(group.events.map((ev) => ev.code || ev.title).filter(Boolean))];
 
       if (codes.length < 2) return;
 
@@ -252,6 +244,7 @@ function getConflictSummaries(groupedByDay) {
     });
   });
 
+  debug.log("Conflict summaries:", conflicts);
   return conflicts;
 }
 
@@ -263,9 +256,7 @@ function updateConflictFooter(ctx, conflicts) {
     return;
   }
 
-  const conflictList = conflicts
-    .map((codes) => `[${codes.join(", ")}]`)
-    .join(" ");
+  const conflictList = conflicts.map((codes) => `[${codes.join(", ")}]`).join(" ");
 
   ctx.footerConflicts.textContent = `⚠️ The following classes are in conflict: ${conflictList}`;
 }
@@ -292,9 +283,7 @@ function buildScheduleTable() {
 
   headRow.innerHTML = `
     <th class="schedule-time"></th>
-    ${DAYS.map(
-      (day) => `<th class="schedule-day-head" data-day="${day}">${day}</th>`
-    ).join("")}
+    ${DAYS.map((day) => `<th class="schedule-day-head" data-day="${day}">${day}</th>`).join("")}
   `;
 
   thead.appendChild(headRow);
@@ -340,66 +329,21 @@ function buildScheduleTable() {
   return wrap;
 }
 
-function rectsOverlap(a, b) {
-  return !(
-    a.right <= b.left ||
-    a.left >= b.right ||
-    a.bottom <= b.top ||
-    a.top >= b.bottom
-  );
-}
-
-function rectIntersection(a, b) {
-  const left = Math.max(a.left, b.left);
-  const right = Math.min(a.right, b.right);
-  const top = Math.max(a.top, b.top);
-  const bottom = Math.min(a.bottom, b.bottom);
-  if (right <= left || bottom <= top) return null;
-  return {
-    left,
-    right,
-    top,
-    bottom,
-    width: right - left,
-    height: bottom - top,
-  };
-}
-
-function rectFromBlock(block) {
-  const x = parseFloat(block.style.left) || 0;
-  const y = parseFloat(block.style.top) || 0;
-  const w = parseFloat(block.style.width) || 0;
-  const h = parseFloat(block.style.height) || 0;
-  return { left: x, top: y, right: x + w, bottom: y + h, width: w, height: h };
-}
-
-// text collision check (within overlay coordinate space)
-function textBoxOverlapsAny(candidate, existing) {
-  for (const r of existing) {
-    if (rectsOverlap(candidate, r)) return true;
-  }
-  return false;
-}
-
-function renderOverlayBlocks(wrap, eventsByDay, groupedByDay, ctx) {
+function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
   const overlay = wrap.querySelector(".schedule-overlay");
   overlay.innerHTML = "";
 
   const table = wrap.querySelector(".schedule-table");
 
   const firstBodyRow = table.querySelector("tbody tr");
-  const firstDayCell = table.querySelector(
-    'tbody tr td.schedule-cell[data-day="Mon"]'
-  );
+  const firstDayCell = table.querySelector('tbody tr td.schedule-cell[data-day="Mon"]');
   const timeTh = table.querySelector("thead th.schedule-time");
 
   if (!firstBodyRow || !firstDayCell || !timeTh) return;
 
   const timeColWidth = timeTh.getBoundingClientRect().width;
   const dayColWidth = firstDayCell.getBoundingClientRect().width;
-  const headerHeight = table
-    .querySelector("thead")
-    .getBoundingClientRect().height;
+  const headerHeight = table.querySelector("thead").getBoundingClientRect().height;
   const rowHeight = firstBodyRow.getBoundingClientRect().height;
 
   // --- derive border from CSS (no magic numbers) ---
@@ -463,159 +407,5 @@ function renderOverlayBlocks(wrap, eventsByDay, groupedByDay, ctx) {
     });
   });
 
-  const footerConflicts = ctx?.footerConflicts;
-  let conflictHoverCount = 0;
-  const updateFooterConflictHover = () => {
-    if (!footerConflicts) return;
-    footerConflicts.classList.toggle("is-hover", conflictHoverCount > 0);
-  };
-  const attachConflictHover = (blockEl) => {
-    if (!footerConflicts || blockEl.dataset.conflictHoverBound === "true") {
-      return;
-    }
-
-    blockEl.dataset.conflictHoverBound = "true";
-    blockEl.addEventListener("mouseenter", () => {
-      conflictHoverCount += 1;
-      updateFooterConflictHover();
-    });
-    blockEl.addEventListener("mouseleave", () => {
-      conflictHoverCount = Math.max(0, conflictHoverCount - 1);
-      updateFooterConflictHover();
-    });
-  };
-
-  // --- detect overlaps + apply opacity + add red intersection rects ---
-  for (let i = 0; i < placedBlocks.length; i++) {
-    for (let j = i + 1; j < placedBlocks.length; j++) {
-      const A = placedBlocks[i];
-      const B = placedBlocks[j];
-
-      // only compare blocks in same day column (since different columns can't overlap)
-      if (A.day !== B.day) continue;
-
-      if (!rectsOverlap(A.rect, B.rect)) continue;
-
-      const inter = rectIntersection(A.rect, B.rect);
-      if (!inter) continue;
-
-      // mark both as conflicted
-      A.el.style.opacity = "0.75";
-      B.el.style.opacity = "0.75";
-
-      A.el.classList.add("is-overlap");
-      B.el.classList.add("is-overlap");
-
-      attachConflictHover(A.el);
-      attachConflictHover(B.el);
-
-      // intersection rect coordinates relative to each block
-      const aLocal = {
-        left: inter.left - A.rect.left,
-        top: inter.top - A.rect.top,
-        width: inter.width,
-        height: inter.height,
-      };
-      const bLocal = {
-        left: inter.left - B.rect.left,
-        top: inter.top - B.rect.top,
-        width: inter.width,
-        height: inter.height,
-      };
-
-      const aRed = document.createElement("div");
-      aRed.className = "schedule-entry-overlap-rect";
-      aRed.style.left = `${aLocal.left}px`;
-      aRed.style.top = `${aLocal.top}px`;
-      aRed.style.width = `${aLocal.width}px`;
-      aRed.style.height = `${aLocal.height}px`;
-      A.overlapLayerEl.appendChild(aRed);
-
-      const bRed = document.createElement("div");
-      bRed.className = "schedule-entry-overlap-rect";
-      bRed.style.left = `${bLocal.left}px`;
-      bRed.style.top = `${bLocal.top}px`;
-      bRed.style.width = `${bLocal.width}px`;
-      bRed.style.height = `${bLocal.height}px`;
-      B.overlapLayerEl.appendChild(bRed);
-    }
-  }
-
-  // --- text placement: push down if text area overlaps already-placed text ---
-  // We do this per-day so text collisions only matter inside a column.
-  const TEXT_STEP_PX = 25; // "preset amount" height of box
-  const MAX_TRIES = 30; // prevents infinite loops
-  const H_PAD = 6; // match your block padding roughly
-  const V_PAD = 0;
-
-  DAYS.forEach((day) => {
-    const blocks = placedBlocks
-      .filter((b) => b.day === day)
-      .sort((a, b) => a.rect.top - b.rect.top);
-
-    const usedTextRects = []; // in overlay coords
-
-    blocks.forEach((b) => {
-      // base text box estimate (good enough without measuring)
-      const baseX = b.rect.left + H_PAD;
-      let y = b.rect.top + V_PAD;
-
-      // We will position the text wrapper inside the block by translateY
-      // but collision checking is in absolute overlay coords.
-      let tries = 0;
-
-      // Estimate width/height of text area; if you want exact, swap to getBoundingClientRect after layout.
-      const estW = b.rect.width - H_PAD * 2;
-      const estH = 26; // title + time on 10px font
-
-      while (tries < MAX_TRIES) {
-        const candidate = {
-          left: baseX,
-          top: y,
-          right: baseX + estW,
-          bottom: y + estH,
-        };
-
-        // must also stay inside the block vertically
-        if (candidate.bottom > b.rect.bottom - V_PAD) break;
-
-        if (!textBoxOverlapsAny(candidate, usedTextRects)) {
-          // place it: move text wrapper down inside the block
-          const localY = y - b.rect.top;
-          b.textEl.style.transform = `translateY(${localY}px)`;
-          usedTextRects.push(candidate);
-          return;
-        }
-
-        y += TEXT_STEP_PX;
-        tries++;
-      }
-
-      // fallback: just keep at top if no free spot found
-      b.textEl.style.transform = `translateY(${V_PAD}px)`;
-      usedTextRects.push({
-        left: baseX,
-        top: b.rect.top + V_PAD,
-        right: baseX + estW,
-        bottom: b.rect.top + V_PAD + estH,
-      });
-    });
-  });
-}
-
-export function renderSchedule(ctx, courses, semester) {
-  if (!ctx.scheduleGrid) return;
-
-  ctx.scheduleGrid.innerHTML = "";
-
-  const eventsByDay = buildDayEvents(courses, semester);
-  const groupedByDay = addConflicts(eventsByDay);
-  const conflicts = getConflictSummaries(groupedByDay);
-
-  const wrap = buildScheduleTable();
-  ctx.scheduleGrid.appendChild(wrap);
-
-  // overlay needs DOM measurements, so do it after append
-  renderOverlayBlocks(wrap, eventsByDay, groupedByDay);
-  updateConflictFooter(ctx, conflicts);
+  debug.log("Rendered overlay blocks:", placedBlocks);
 }

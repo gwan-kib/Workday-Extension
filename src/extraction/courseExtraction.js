@@ -1,4 +1,5 @@
 import { $$ } from "../utilities/dom";
+import { debugFor } from "../utilities/debugTool.js";
 import { buildHeaderMaps } from "./headerMaps.js";
 import { parseSectionLinkString, guessClassCode } from "./sectionLinkInfo.js";
 import {
@@ -12,26 +13,47 @@ import { extractInstructorNamesFromCell } from "./instructorInfo.js";
 import { onlineClassCheck } from "./onlineClassCheck.js";
 import { findingTables } from "./findingTables.js";
 
+const debug = debugFor("courseExtraction");
+
 export async function extractAllCourses() {
+  debug.log({ id: "extractAllCourses.start" }, "Starting course extraction");
+
   const found = findingTables();
   let courses = [];
+
+  debug.log(
+    { id: "extractAllCourses.tables" },
+    "findingTables() result:",
+    found
+      ? {
+          hasRoot: !!found.root,
+          rowCount: found.rows?.length || 0,
+        }
+      : null
+  );
 
   if (found) {
     const headerMaps = buildHeaderMaps(found.root);
 
+    debug.log({ id: "extractAllCourses.headerMaps" }, "Built header maps:", headerMaps);
+
     for (const row of found.rows) {
       const c = extractFromRow(row, headerMaps);
-      if ((c.code || c.title) && Object.values(c).join("").trim())
-        courses.push(c);
+      if ((c.code || c.title) && Object.values(c).join("").trim()) courses.push(c);
     }
   }
 
-  return findUniqueCourses(courses);
+  const unique = findUniqueCourses(courses);
+  debug.log({ id: "extractAllCourses.done" }, "Extraction complete:", {
+    total: courses.length,
+    unique: unique.length,
+  });
+
+  return unique;
 }
 
 function findUniqueCourses(list) {
-  const key = (c) =>
-    [c.code, c.title, c.section_number].join("|").toLowerCase();
+  const key = (c) => [c.code, c.title, c.section_number].join("|").toLowerCase();
   const seen = new Set();
   const out = [];
 
@@ -43,6 +65,12 @@ function findUniqueCourses(list) {
     }
   }
 
+  debug.log({ id: "findUniqueCourses" }, "Deduped courses:", {
+    in: list.length,
+    out: out.length,
+    removed: list.length - out.length,
+  });
+
   return out;
 }
 
@@ -51,6 +79,11 @@ export function extractFromRow(row, headerMaps) {
 
   const cells = $$(row, "td, [role='gridcell']");
   const allText = (row.innerText || "").trim();
+
+  debug.log({ id: "extractFromRow.start" }, "Extracting row:", {
+    cellCount: cells.length,
+    textLen: allText.length,
+  });
 
   // map row cells by position (1-based)
   function getCellKey(cell) {
@@ -120,6 +153,12 @@ export function extractFromRow(row, headerMaps) {
         sectionLinkEl.textContent)) ||
     "";
 
+  debug.log({ id: "extractFromRow.sectionLink" }, "Section link:", {
+    promptOptions: allPromptOptions.length,
+    hasMatch: !!sectionLinkEl,
+    sectionLinkString,
+  });
+
   const titleCell = readByKey("title");
   const codeCell = readByKey("code");
   const sectCell = readByKey("section");
@@ -139,16 +178,19 @@ export function extractFromRow(row, headerMaps) {
     title = parsed.title;
   }
 
-  if (!code)
-    code =
-      guessClassCode(codeCell) ||
-      guessClassCode(titleCell) ||
-      guessClassCode(allText) ||
-      "";
+  if (!code) code = guessClassCode(codeCell) || guessClassCode(titleCell) || guessClassCode(allText) || "";
+
+  debug.log({ id: "extractFromRow.coreParse" }, "Core parse result:", {
+    code,
+    title,
+    section_number,
+    titleCell,
+    codeCell,
+    sectCell,
+  });
 
   // ---------- Lab / Seminar detection ----------
-  const labLike = (s) =>
-    /\b(lab|laboratory|labratory)\b/i.test(String(s || ""));
+  const labLike = (s) => /\b(lab|laboratory|labratory)\b/i.test(String(s || ""));
   const seminarLike = (s) => /\bseminar\b/i.test(String(s || ""));
   const discussionLike = (s) => /\bdiscussion\b/i.test(String(s || ""));
 
@@ -166,12 +208,19 @@ export function extractFromRow(row, headerMaps) {
     seminarLike(sectionLinkString) ||
     seminarLike(allText);
 
-    const isDiscussion =
-      discussionLike(instructionalFormatCell) ||
-      discussionLike(sectCell) ||
-      discussionLike(title) ||
-      discussionLike(sectionLinkString) ||
-      discussionLike(allText)
+  const isDiscussion =
+    discussionLike(instructionalFormatCell) ||
+    discussionLike(sectCell) ||
+    discussionLike(title) ||
+    discussionLike(sectionLinkString) ||
+    discussionLike(allText);
+
+  debug.log({ id: "extractFromRow.typeDetection" }, "Type flags:", {
+    isLab,
+    isSeminar,
+    isDiscussion,
+    instructionalFormatCell,
+  });
 
   // ---------- Instructor ----------
 
@@ -182,9 +231,7 @@ export function extractFromRow(row, headerMaps) {
   if (isLab || isSeminar) {
     instructor = "N/A";
   } else {
-    instructor =
-      extractInstructorNamesFromCell(instructorEl) ||
-      (readByKey("instructor") || "").trim();
+    instructor = extractInstructorNamesFromCell(instructorEl) || (readByKey("instructor") || "").trim();
   }
 
   // ---------- Meeting ----------
@@ -195,11 +242,7 @@ export function extractFromRow(row, headerMaps) {
 
   if (meetingCol != null && cellByCol.has(meetingCol)) {
     meetingEl = cellByCol.get(meetingCol);
-  } else if (
-    posMap.meeting != null &&
-    posMap.meeting >= 0 &&
-    posMap.meeting < cells.length
-  ) {
+  } else if (posMap.meeting != null && posMap.meeting >= 0 && posMap.meeting < cells.length) {
     meetingEl = cells[posMap.meeting];
   }
 
@@ -231,20 +274,44 @@ export function extractFromRow(row, headerMaps) {
     meeting = (meetingCell || "").trim();
   }
 
+  debug.log({ id: "extractFromRow.meeting" }, "Meeting parse:", {
+    startDateCell,
+    startDate,
+    linesCount: lines.length,
+    isOnlineDelivery,
+    meetingObj,
+    meeting,
+  });
+
   // ---------- Instructional Format (was "status") ----------
   const instructionalFormat = (instructionalFormatCell || "").trim();
 
-  return {
+  const result = {
     code,
     title,
     section_number,
     instructor,
     meeting: normalizeMeetingPatternsText(meeting),
-    instructionalFormat, // ✅ renamed field
+    instructionalFormat,
     startDate,
     meetingLines: lines,
     isLab,
     isSeminar,
     isDiscussion,
   };
+
+  debug.log({ id: "extractFromRow.result" }, "Extracted course:", {
+    code: result.code,
+    title: result.title,
+    section_number: result.section_number,
+    instructor: result.instructor,
+    instructionalFormat: result.instructionalFormat,
+    startDate: result.startDate,
+    meetingLines: result.meetingLines?.length || 0,
+    isLab: result.isLab,
+    isSeminar: result.isSeminar,
+    isDiscussion: result.isDiscussion,
+  });
+
+  return result;
 }

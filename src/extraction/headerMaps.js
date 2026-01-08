@@ -1,8 +1,13 @@
-export const normalizeText = (s) => String(s || "")
-      .replace(/\u00A0/g, " ")
-      .replace(/\s+/g, " ")
-      .trim()
-      .toLowerCase();
+import { debugFor } from "../utilities/debugTool.js";
+
+const debug = debugFor("headerMaps");
+
+export const normalizeText = (s) =>
+  String(s || "")
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
 
 function getHeaderKey(el) {
   const a = el?.getAttribute?.("data-automation-id") || "";
@@ -11,9 +16,9 @@ function getHeaderKey(el) {
 }
 
 export function buildHeaderMaps(gridRoot) {
-  const headerEls = Array.from(
-    gridRoot.querySelectorAll('th[data-automation-id^="columnHeader"]')
-  );
+  const headerEls = Array.from(gridRoot.querySelectorAll('th[data-automation-id^="columnHeader"]'));
+
+  debug.log({ id: "buildHeaderMaps.headers" }, "Header elements found:", headerEls.length);
 
   const headers = headerEls
     .map((el, pos) => {
@@ -23,11 +28,17 @@ export function buildHeaderMaps(gridRoot) {
     })
     .filter((h) => h.text);
 
+  debug.log(
+    { id: "buildHeaderMaps.parsedHeaders" },
+    "Parsed headers:",
+    headers.map((h) => ({ pos: h.pos, key: h.key, text: h.text, norm: h.norm }))
+  );
+
   function findHeader(needles) {
     const ns = needles.map(normalizeText);
-    let hit = headers.find(h => ns.includes(h.norm));
+    let hit = headers.find((h) => ns.includes(h.norm));
     if (hit) return hit;
-    hit = headers.find(h => ns.some(n => h.norm.includes(n)));
+    hit = headers.find((h) => ns.some((n) => h.norm.includes(n)));
     return hit || null;
   }
 
@@ -38,7 +49,7 @@ export function buildHeaderMaps(gridRoot) {
     title: ["title", "course listing"],
     section: ["section"],
     instructionalFormat: ["instructional format"],
-     startDate: ["start date", "start"],
+    startDate: ["start date", "start"],
   };
 
   const colMap = {};
@@ -48,6 +59,12 @@ export function buildHeaderMaps(gridRoot) {
     const hit = findHeader(needles);
     colMap[key] = hit ? hit.key : null; // <-- store "252.9"
     posMap[key] = hit ? hit.pos : -1;
+
+    debug.log({ id: "buildHeaderMaps.map" }, "Mapped header:", {
+      key,
+      needles,
+      hit: hit ? { pos: hit.pos, colKey: hit.key, text: hit.text } : null,
+    });
   }
 
   return { colMap, posMap };

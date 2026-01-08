@@ -1,6 +1,9 @@
 import { STATE } from "../core/state";
+import { debugFor } from "../utilities/debugTool"; 
 
-// Calendar timezone for DTSTART/DTEND (local class times) and RRULE UNTIL (UTC "Z" per spec)
+const debug = debugFor("export-ics");
+
+// calendar timezone for DTSTART/DTEND (local class times) and RRULE UNTIL (UTC "Z" per spec)
 const TZID = "America/Vancouver";
 
 // converts a Date object into this format: YYYYMMDDTHHMMSSZ
@@ -11,6 +14,7 @@ const formatDateTimeUTC = (date) => {
   const hh = pad(date.getUTCHours());
   const mm = pad(date.getUTCMinutes());
   const ss = pad(date.getUTCSeconds());
+  debug.log("Formatting UTC Date:", { y, m, d, hh, mm, ss }); 
   return `${y}${m}${d}T${hh}${mm}${ss}Z`;
 };
 
@@ -38,7 +42,7 @@ const formatDate = (date) => {
   const year = date.getFullYear();
   const month = padNumbers(date.getMonth() + 1);
   const day = padNumbers(date.getDate());
-
+  debug.log("Formatted Date:", { year, month, day }); 
   return `${year}${month}${day}`;
 };
 
@@ -48,6 +52,7 @@ const formatDateTime = (date) => {
   const hours = padNumbers(date.getHours());
   const minutes = padNumbers(date.getMinutes());
 
+  debug.log("Formatted DateTime:", { datePart, hours, minutes }); 
   return `${datePart}T${hours}${minutes}00`;
 };
 
@@ -57,6 +62,8 @@ const parseTime = (hoursToken, minutesToken, periodToken) => {
   let hours = Number.parseInt(hoursToken, 10);
   const minutes = Number.parseInt(minutesToken, 10);
   const period = periodToken.toLowerCase();
+
+  debug.log("Parsing Time:", { hours, minutes, period }); 
 
   if (period === "p" && hours !== 12) hours += 12;
   if (period === "a" && hours === 12) hours = 0;
@@ -71,6 +78,8 @@ const parseMeetingLine = (line) => {
   const days = String(line || "").match(days_REGEX) || [];
 
   if (!dateMatch || !timeMatch || !days.length) return null;
+
+  debug.log("Parsed Meeting Line:", { dateMatch, timeMatch, days }); 
 
   const startDate = dateMatch[1];
   const endDate = dateMatch[2];
@@ -144,6 +153,8 @@ const buildClassEvent = (course, line) => {
   const untilLocal = new Date(`${parsed.endDate}T23:59:59`);
   const untilDate = formatDateTimeUTC(untilLocal);
 
+  debug.log("Built Class Event:", { course, parsed, startDate, endDate, summaryParts, descriptionLines, untilDate }); 
+
   return {
     uid: `${course.code || "course"}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
     summary: summaryParts.join(" - ") || "Scheduled Course",
@@ -155,7 +166,7 @@ const buildClassEvent = (course, line) => {
   };
 };
 
-// loops through every course in the scheduale and builds the full ICS file
+// loops through every course in the schedule and builds the full ICS file
 const buildICSFile = (courses) => {
   const events = [];
 
@@ -188,6 +199,7 @@ const buildICSFile = (courses) => {
   });
 
   lines.push("END:VCALENDAR");
+  debug.log("ICS File Generated:", lines); 
   return lines.join("\r\n");
 };
 
@@ -204,6 +216,8 @@ export function exportICS() {
   a.download = "workday-schedule.ics";
   document.body.appendChild(a);
   a.click();
+
+  debug.log("Download Triggered for ICS file"); 
 
   setTimeout(() => {
     URL.revokeObjectURL(url);

@@ -1,3 +1,6 @@
+import { debugFor } from "../utilities/debugTool";
+const debug = debugFor("scheduleStorage");
+
 const STORAGE_KEY = "wdSavedSchedules";
 const MAX_SCHEDULES = 6;
 
@@ -20,40 +23,54 @@ const sanitizeSchedules = (schedules) => {
     }));
 };
 
-const useChromeStorage =
-  typeof chrome !== "undefined" && chrome.storage && chrome.storage.local;
+const useChromeStorage = typeof chrome !== "undefined" && chrome.storage && chrome.storage.local;
 
 export async function loadSavedSchedules() {
+  debug.log("Loading saved schedules...");
   if (useChromeStorage) {
     return new Promise((resolve) => {
       chrome.storage.local.get([STORAGE_KEY], (result) => {
-        resolve(sanitizeSchedules(result?.[STORAGE_KEY] || []));
+        const sanitized = sanitizeSchedules(result?.[STORAGE_KEY] || []);
+        debug.log("Schedules loaded from Chrome Storage:", sanitized);
+        resolve(sanitized);
       });
     });
   }
 
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    return sanitizeSchedules(JSON.parse(raw));
+    if (!raw) {
+      debug.log("No schedules found in localStorage.");
+      return [];
+    }
+    const sanitized = sanitizeSchedules(JSON.parse(raw));
+    debug.log("Schedules loaded from localStorage:", sanitized);
+    return sanitized;
   } catch (error) {
     console.warn("[WD] Failed to load saved schedules", error);
+    debug.error("Error loading schedules from localStorage:", error);
     return [];
   }
 }
 
 export async function persistSavedSchedules(schedules) {
   const sanitized = sanitizeSchedules(schedules);
+  debug.log("Persisting saved schedules:", sanitized);
   if (useChromeStorage) {
     return new Promise((resolve) => {
-      chrome.storage.local.set({ [STORAGE_KEY]: sanitized }, resolve);
+      chrome.storage.local.set({ [STORAGE_KEY]: sanitized }, () => {
+        debug.log("Schedules saved to Chrome Storage.");
+        resolve();
+      });
     });
   }
 
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
+    debug.log("Schedules saved to localStorage.");
   } catch (error) {
     console.warn("[WD] Failed to save schedules", error);
+    debug.error("Error saving schedules to localStorage:", error);
   }
 }
 
@@ -63,12 +80,14 @@ export function createScheduleSnapshot(name, courses) {
       ? crypto.randomUUID()
       : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
-  return {
+  const snapshot = {
     id,
     name: name || "Untitled",
     savedAt: new Date().toISOString(),
     courses: cloneCourses(courses || []),
   };
+  debug.log("Created schedule snapshot:", snapshot);
+  return snapshot;
 }
 
 export function formatScheduleMeta(schedule) {
@@ -85,6 +104,7 @@ export function formatScheduleMeta(schedule) {
 }
 
 export function renderSavedSchedules(ctx, schedules) {
+  debug.log("Rendering saved schedules:", schedules);
   if (!ctx.savedMenu) return;
   ctx.savedMenu.innerHTML = "";
 
@@ -93,6 +113,7 @@ export function renderSavedSchedules(ctx, schedules) {
     empty.className = "schedule-saved-empty";
     empty.textContent = "No saved schedules yet.";
     ctx.savedMenu.appendChild(empty);
+    debug.log("No saved schedules to render.");
     return;
   }
 
@@ -138,10 +159,12 @@ export function renderSavedSchedules(ctx, schedules) {
     card.appendChild(header);
     card.appendChild(actions);
     ctx.savedMenu.appendChild(card);
+    debug.log("Rendered schedule card:", schedule);
   });
 }
 
 export function canSaveMoreSchedules(schedules) {
+  debug.log("Checking if more schedules can be saved. Current count:", schedules.length);
   return schedules.length < MAX_SCHEDULES;
 }
 

@@ -1,3 +1,7 @@
+import { debugFor } from "../utilities/debugTool";
+
+const debug = debugFor("loadPanel");
+
 export async function loadPanel(shadow) {
   const htmlUrl = chrome.runtime.getURL("src/panel.html");
   const cssFiles = [
@@ -9,38 +13,47 @@ export async function loadPanel(shadow) {
     "formatting/schedule-view.css",
     "formatting/schedule-view-events.css",
     "formatting/settings.css",
-
     "colors/course-list-colors.css",
     "colors/general-colors.css",
     "colors/schedule-view-colors.css",
     "colors/widget-functionality-colors.css",
     "colors/settings-colors.css",
   ];
+
+  debug.log("Fetching HTML and CSS files...");
+
   const [html, ...cssParts] = await Promise.all([
     fetch(htmlUrl).then((r) => r.text()),
     ...cssFiles.map((file) => fetch(chrome.runtime.getURL(`src/css/${file}`)).then((r) => r.text())),
   ]);
-  const css = cssParts.join("\n");
 
-  shadow.innerHTML = "";
+  const css = cssParts.join("\n");
+  debug.log("CSS files fetched and concatenated:", { cssParts });
+
+  shadow.innerHTML = ""; // Clear previous content
 
   const style = document.createElement("style");
   style.textContent = css;
   shadow.appendChild(style);
+  debug.log("Appended styles to shadow DOM.");
 
+  // Check if Material Symbols font is already included, if not, append it
   if (!document.querySelector('link[href*="Material+Symbols"]')) {
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href =
       "https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200";
     document.head.appendChild(link);
+    debug.log("Appended Material Symbols font to document head.");
   }
 
   const wrap = document.createElement("div");
   wrap.innerHTML = html;
   shadow.appendChild(wrap);
+  debug.log("Appended HTML content to shadow DOM.");
 
-  return {
+  // Return an object with all the necessary DOM elements from the shadow root
+  const elements = {
     button: shadow.querySelector("#floating-button"),
     widget: shadow.querySelector(".widget"),
     root: shadow,
@@ -69,4 +82,8 @@ export async function loadPanel(shadow) {
     saveModalCancel: shadow.querySelector(".schedule-modal-cancel"),
     saveModalConfirm: shadow.querySelector(".schedule-modal-confirm"),
   };
+
+  debug.log("DOM elements loaded:", elements);
+
+  return elements;
 }
