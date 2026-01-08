@@ -418,6 +418,7 @@ export function renderSchedule(ctx, courses, semester) {
   // pick the container in your panel where the schedule should render
   const host =
     ctx?.scheduleRoot ||
+    ctx?.scheduleGrid ||
     ctx?.schedulePanel ||
     ctx?.scheduleContainer ||
     ctx?.scheduleView ||
