@@ -1,4 +1,4 @@
-import { debugFor } from "../utilities/debugTool.js";
+import { debugFor } from "./debugTool.js";
 const debug = debugFor("dom");
 
 // shortcut for querySelector in shadowDom

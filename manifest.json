@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Workday Course Extractor",
+  "name": "Workday - Schedule Tool",
   "version": "1.0",
   "description": "Extract your registered courses from the Workday View My Courses page.",
 

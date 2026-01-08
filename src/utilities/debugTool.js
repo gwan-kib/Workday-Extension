@@ -1,5 +1,5 @@
 const logConfiguration = {
-  global: false, // master switch (all logs everywhere)
+  global: true, // master switch (all logs everywhere)
   local: {}, // per-scope switch: { "schedule": true/false, ... }
   log: {}, // per-log switch: { "schedule.render": true/false, ... }
 };
