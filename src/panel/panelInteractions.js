@@ -1,7 +1,7 @@
 import { $$, on } from "../utilities/dom.js";
 import { STATE } from "../core/state.js";
 import { renderRows } from "./renderRows.js";
-import { debugFor } from "../utilities/debugTool";
+import { debugFor } from "../utilities/debugTool.js";
 
 const debug = debugFor("panelInteractions");
 

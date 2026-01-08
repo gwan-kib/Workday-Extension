@@ -1,5 +1,5 @@
 import { extractStartDate } from "../extraction/meetingPatternsInfo.js";
-import { debugFor } from "../utilities/debugTool";
+import { debugFor } from "../utilities/debugTool.js";
 const debug = debugFor("scheduleView");
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
@@ -329,6 +329,10 @@ function buildScheduleTable() {
   return wrap;
 }
 
+function rectFromBlock(el) {
+  return el.getBoundingClientRect();
+}
+
 function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
   const overlay = wrap.querySelector(".schedule-overlay");
   overlay.innerHTML = "";
@@ -408,4 +412,30 @@ function renderOverlayBlocks(wrap, eventsByDay, groupedByDay) {
   });
 
   debug.log("Rendered overlay blocks:", placedBlocks);
+}
+
+export function renderSchedule(ctx, courses, semester) {
+  // pick the container in your panel where the schedule should render
+  const host =
+    ctx?.scheduleRoot ||
+    ctx?.schedulePanel ||
+    ctx?.scheduleContainer ||
+    ctx?.scheduleView ||
+    ctx?.schedule;
+
+  if (!host) {
+    debug.warn("renderSchedule: no schedule host found on ctx");
+    return;
+  }
+
+  const eventsByDay = buildDayEvents(courses || [], semester);
+  const groupedByDay = addConflicts(eventsByDay);
+  const conflicts = getConflictSummaries(groupedByDay);
+
+  host.innerHTML = "";
+  const tableWrap = buildScheduleTable();
+  host.appendChild(tableWrap);
+
+  renderOverlayBlocks(tableWrap, eventsByDay, groupedByDay);
+  updateConflictFooter(ctx, conflicts);
 }

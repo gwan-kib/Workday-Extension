@@ -1,2 +1,2 @@
-chrome.action.onClicked.addListener(e=>{e?.id&&chrome.tabs.sendMessage(e.id,{type:"TOGGLE_WIDGET"},()=>{chrome.runtime.lastError})});
+import{d as o}from"./chunks/debugTool.js";const r=o("background");chrome.action.onClicked.addListener(e=>{e?.id&&(r.log("Action button clicked, sending message to tab:",{tabId:e.id}),chrome.tabs.sendMessage(e.id,{type:"TOGGLE_WIDGET"},()=>{chrome.runtime.lastError?r.error("Error sending message to tab:",chrome.runtime.lastError):r.log("Message successfully sent to toggle widget.")}))});
 //# sourceMappingURL=background.js.map

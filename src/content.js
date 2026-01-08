@@ -15,7 +15,7 @@ import {
   persistSavedSchedules,
   renderSavedSchedules,
 } from "./panel/scheduleStorage.js";
-import { debugFor } from "./utilities/debugTool";
+import { debugFor } from "./utilities/debugTool.js";
 const debug = debugFor("content");
 
 (() => {

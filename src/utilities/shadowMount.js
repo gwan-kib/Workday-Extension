@@ -1,5 +1,5 @@
-import { debugFor } from "../utilities/debugTool"; 
-const debug = debugFor("shadowMount"); 
+import { debugFor } from "../utilities/debugTool.js";
+const debug = debugFor("shadowMount");
 
 // extension ID
 const EXT_ID = "Workday - Schedule Tool";
@@ -9,7 +9,7 @@ export function ensureMount() {
   let host = document.getElementById(EXT_ID);
 
   if (host) {
-    debug.log("Returning existing shadow root:", host); 
+    debug.log("Returning existing shadow root:", host);
     return host.shadowRoot;
   }
 
@@ -24,6 +24,6 @@ export function ensureMount() {
   host.attachShadow({ mode: "open" });
   document.documentElement.appendChild(host);
 
-  debug.log("Mounted new extension container:", host); 
+  debug.log("Mounted new extension container:", host);
   return host.shadowRoot;
 }

@@ -1,4 +1,4 @@
-import { debugFor } from "../utilities/debugTool";
+import { debugFor } from "../utilities/debugTool.js";
 const debug = debugFor("scheduleStorage");
 
 const STORAGE_KEY = "wdSavedSchedules";
