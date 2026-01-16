@@ -2,7 +2,6 @@ import { debugFor } from "../../utilities/debugTool";
 
 const debug = debugFor("sectionLinkInfo");
 
-/* Parse the Workday "promptOption" section link string. */
 export function parseSectionLinkString(input) {
   let str = String(input || "")
     .replace(/\u00A0/g, " ")
@@ -17,7 +16,6 @@ export function parseSectionLinkString(input) {
 
   debug.log({ id: "parseSectionLinkString.normalized" }, "Normalized string:", str);
 
-  // REQUIRED pattern:
   const m = str.match(/^\s*([A-Z][A-Z0-9_]*\s*\d{3}[A-Z]?)\s*-\s*(.+?)\s*$/);
   if (!m) {
     debug.log({ id: "parseSectionLinkString.noMatch" }, "String did not match expected pattern");
@@ -29,7 +27,6 @@ export function parseSectionLinkString(input) {
 
   debug.log({ id: "parseSectionLinkString.match" }, "Regex match:", { baseCode, rest });
 
-  // Split rest into section token + title
   const parts = rest
     .split(/\s*[-–—]\s*/)
     .map((p) => p.trim())
@@ -53,14 +50,4 @@ export function parseSectionLinkString(input) {
   debug.log({ id: "parseSectionLinkString.result" }, "Parsed section link result:", result);
 
   return result;
-}
-
-export function guessClassCode(text) {
-  const m = String(text || "").match(/[A-Z][A-Z0-9_]*\s*\d{2,3}[A-Z]?/);
-
-  const out = m ? m[0].replace(/\s+/g, " ").trim() : "";
-
-  debug.log({ id: "guessClassCode" }, "Guessed class code:", { input: text, out });
-
-  return out;
 }

@@ -1,4 +1,3 @@
-// src/mainPanel/scheduleView.js
 import { extractStartDate } from "../extraction/parsers/meetingPatternsInfo.js";
 import { debugFor } from "../utilities/debugTool.js";
 const debug = debugFor("scheduleView");

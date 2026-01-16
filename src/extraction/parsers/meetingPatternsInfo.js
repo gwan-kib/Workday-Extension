@@ -54,15 +54,6 @@ export function isOnlineDelivery(deliveryModeCellEl) {
   return matched;
 }
 
-// Back-compat exports (optional, but keeps other files working)
-export function extractMeetingLinesFromCell(meetingEl) {
-  return extractMeetingLines(meetingEl);
-}
-
-export function extractMeetingLinesFromRow(rowEl) {
-  return extractMeetingLines(rowEl);
-}
-
 export function formatMeetingLineForPanel(line) {
   const raw = String(line || "");
 
@@ -78,7 +69,6 @@ export function formatMeetingLineForPanel(line) {
 
   const buildingPart = parts.find((p) => /\([A-Z]{2,}\)/.test(p)) || "";
 
-  // ✅ find Floor/Room anywhere in the full string (handles "Floor 3", "Floor: 3", "Rm 210", etc.)
   const floorMatch = raw.match(/\bfloor\b\s*[:\-]?\s*(-?[A-Za-z0-9]+)/i);
   const roomMatch = raw.match(/\b(room|rm)\b\s*[:\-]?\s*([A-Za-z0-9]+)/i);
 
@@ -97,7 +87,6 @@ export function formatMeetingLineForPanel(line) {
 }
 
 export function normalizeMeetingPatternsText(text) {
-  // preserve line breaks, normalize each line
   const normalized = String(text || "")
     .split(/\r?\n(.*)/s)
     .slice(0, 2)

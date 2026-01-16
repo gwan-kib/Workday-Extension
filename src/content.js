@@ -1,4 +1,3 @@
-// src/content.js
 import { on, debounce } from "./utilities/dom.js";
 import { STATE } from "./core/state.js";
 import { ensureMount } from "./utilities/shadowMount.js";

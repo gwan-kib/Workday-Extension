@@ -1,12 +1,8 @@
-// src/extraction/grid.js
 import { $$ } from "../utilities/dom";
 import { debugFor } from "../utilities/debugTool.js";
 
 const debug = debugFor("grid");
 
-// -------------------------
-// Text helpers
-// -------------------------
 export const normalizeText = (s) =>
   String(s || "")
     .replace(/\u00A0/g, " ")
@@ -23,9 +19,6 @@ export function getHeaderText(headerEl) {
   return (headerEl.textContent || "").trim();
 }
 
-// -------------------------
-// Header maps
-// -------------------------
 function getHeaderKey(el) {
   const a = el?.getAttribute?.("data-automation-id") || "";
   const m = a.match(/^columnHeader(\d+\.\d+)$/);
@@ -87,9 +80,6 @@ export function buildHeaderMaps(gridRoot) {
   return { colMap, posMap };
 }
 
-// -------------------------
-// Grid/table finding
-// -------------------------
 export function findWorkdayGrid() {
   const roots = $$(
     document,
@@ -121,7 +111,6 @@ export function findWorkdayGrid() {
 
     const headerText = headerEls.map((h) => normalizeText(getHeaderText(h)));
 
-    // still require "section" + at least one other expected header
     const looksRight =
       headerText.some((t) => t.includes("section")) &&
       (headerText.some((t) => t.includes("instructor")) ||

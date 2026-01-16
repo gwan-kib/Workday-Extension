@@ -1,4 +1,3 @@
-// src/mainPanel/loadMainPanel.js
 import { debugFor } from "../utilities/debugTool.js";
 
 const debug = debugFor("loadMainPanel");
@@ -15,7 +14,7 @@ export async function loadMainPanel(shadowRoot) {
     "formatting/schedule-view.css",
     "formatting/schedule-view-events.css",
     "formatting/settings.css",
-    
+
     "colors/course-list-colors.css",
     "colors/general-colors.css",
     "colors/schedule-view-colors.css",
@@ -36,7 +35,6 @@ export async function loadMainPanel(shadowRoot) {
   style.textContent = css;
   shadowRoot.appendChild(style);
 
-  // Material Symbols font (only once on the page)
   if (!document.querySelector('link[href*="Material+Symbols"]')) {
     const link = document.createElement("link");
     link.rel = "stylesheet";
@@ -50,41 +48,32 @@ export async function loadMainPanel(shadowRoot) {
   shadowRoot.appendChild(wrap);
 
   const ui = {
-    // Whole extension UI (this used to be ctx.widget)
     mainPanel: shadowRoot.querySelector(".widget"),
 
-    // Core roots
     root: shadowRoot,
     floatingButton: shadowRoot.querySelector("#floating-button"),
 
-    // Course table
     tableBody: shadowRoot.querySelector("tbody"),
     tableHead: shadowRoot.querySelector("thead"),
 
-    // Search + controls
     searchInput: shadowRoot.querySelector("#widget-search"),
     refreshButton: shadowRoot.querySelector("#widget-refresh"),
     saveScheduleButton: shadowRoot.querySelector("#widget-save-schedule"),
 
-    // Export dropdown
     exportDropdown: shadowRoot.querySelector("#widget-export"),
     exportButton: shadowRoot.querySelector("#widget-export-button"),
     exportMenu: shadowRoot.querySelector("#widget-export-menu"),
 
-    // Tabs / views
     viewTabs: shadowRoot.querySelectorAll(".tab-button"),
     views: shadowRoot.querySelectorAll(".widget-panel"),
 
-    // Schedule view
     scheduleGrid: shadowRoot.querySelector("#schedule-grid"),
     semesterButtons: shadowRoot.querySelectorAll(".semester-button"),
     footerConflicts: shadowRoot.querySelector("#widget-conflicts"),
 
-    // Saved schedules dropdown
     savedDropdown: shadowRoot.querySelector("#schedule-saved-dropdown"),
     savedMenu: shadowRoot.querySelector("#schedule-saved-menu"),
 
-    // Modal
     saveModal: shadowRoot.querySelector("#schedule-save-modal"),
     saveModalTitle: shadowRoot.querySelector("#schedule-modal-title"),
     saveModalMessage: shadowRoot.querySelector("#schedule-modal-message"),
@@ -93,7 +82,6 @@ export async function loadMainPanel(shadowRoot) {
     saveModalCancel: shadowRoot.querySelector(".schedule-modal-cancel"),
     saveModalConfirm: shadowRoot.querySelector(".schedule-modal-confirm"),
 
-    // Shortcuts
     helpButton: shadowRoot.querySelector(".help"),
     settingsButton: shadowRoot.querySelector(".settings"),
   };

@@ -1,4 +1,3 @@
-// src/extraction/rowCellReader.js
 import { $$ } from "../utilities/dom";
 import { debugFor } from "../utilities/debugTool.js";
 
@@ -21,21 +20,18 @@ export function createRowCellReader(rowEl, headerMaps) {
     cellCount: cellsInRow.length,
   });
 
-  // store first cell for each Workday key
   const cellByCol = new Map();
   cellsInRow.forEach((cell) => {
     const key = getCellWorkdayKey(cell);
     if (key && !cellByCol.has(key)) cellByCol.set(key, cell);
   });
 
-  // returns the cell element for a given header name
   const getCellByHeader = (keyName) => {
     const colKey = colHeaderMap?.[keyName];
     if (colKey == null) return null;
     return cellByCol.get(colKey) || null;
   };
 
-  // returns the text of a cell element for a given header name
   const readCellTextByHeader = (keyName) => {
     const el = getCellByHeader(keyName);
     return (el?.innerText || "").trim();

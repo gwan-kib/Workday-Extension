@@ -1,4 +1,3 @@
-// src/mainPanel/mainPanelInteractions.js
 import { $$, on } from "../utilities/dom.js";
 import { STATE } from "../core/state.js";
 import { renderCourseRows } from "./renderCourseRows.js";

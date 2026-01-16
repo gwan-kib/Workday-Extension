@@ -1,4 +1,3 @@
-// src/mainPanel/renderCourseRows.js
 import { debugFor } from "../utilities/debugTool.js";
 
 const debug = debugFor("renderCourseRows");

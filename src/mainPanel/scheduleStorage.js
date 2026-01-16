@@ -1,9 +1,8 @@
-// src/mainPanel/scheduleStorage.js
 import { debugFor } from "../utilities/debugTool.js";
 const debug = debugFor("scheduleStorage");
 
 const STORAGE_KEY = "wdSavedSchedules";
-const MAX_SCHEDULES = 6;
+const MAX_SCHEDULES = 10;
 
 const cloneCourses = (courses) => {
   if (typeof structuredClone === "function") return structuredClone(courses);
