@@ -3,7 +3,7 @@ import { debugFor } from "../utilities/debugTool.js";
 import { buildHeaderMaps, findWorkdayGrid } from "./grid.js";
 import { parseSectionLinkString } from "./parsers/sectionLinkInfo.js";
 import {
-  extractMeetingLinesFromCell,
+  extractMeetingLines,
   formatMeetingLineForPanel,
   normalizeMeetingPatternsText,
   extractStartDate,
@@ -157,7 +157,7 @@ export function extractFromRow(row, headerMaps) {
     return null;
   }
 
-  const meetingLines = extractMeetingLinesFromCell(meetingEl) || [];
+  const meetingLines = extractMeetingLines(meetingEl) || [];
   if (!meetingLines.length) {
     debug.warn({ id: "extractFromRow.skip" }, "Skipping row: no meeting lines found in meeting cell", {
       code,
