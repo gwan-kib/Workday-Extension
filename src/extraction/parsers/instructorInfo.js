@@ -1,4 +1,4 @@
-import { debugFor } from "../utilities/debugTool.js";
+import { debugFor } from "../../utilities/debugTool.js";
 
 const debug = debugFor("instructorInfo");
 

@@ -1,4 +1,4 @@
-import { debugFor } from "../utilities/debugTool.js";
+import { debugFor } from "../../utilities/debugTool";
 
 const debug = debugFor("sectionLinkInfo");
 
