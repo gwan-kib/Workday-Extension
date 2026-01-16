@@ -99,14 +99,18 @@ export function formatMeetingLineForPanel(line) {
 export function normalizeMeetingPatternsText(text) {
   // preserve line breaks, normalize each line
   const normalized = String(text || "")
-    .split(/\r?\n/)
-    .map((line) => line.replace(/\s+/g, " ").trim())
+    .split(/\r?\n(.*)/s)
+    .slice(0, 2)
+    .map((line) => line.replace(/[ \t]+/g, " ").trim())
     .filter(Boolean)
     .join("\n");
 
   debug.log({ id: "normalizeMeetingPatternsText" }, "Normalized meeting patterns text:", {
     beforeLen: String(text || "").length,
     afterLen: normalized.length,
+    ogText: text,
+    ogString: String(text || ""),
+    normalized,
   });
 
   return normalized;

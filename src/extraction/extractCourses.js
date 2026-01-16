@@ -150,9 +150,9 @@ export function extractFromRow(row, headerMaps) {
   let instructor = "N/A";
 
   if (!isLab && !isSeminar) {
-    const instructorText = readCellTextByHeader("instructor");
+    instructor = readCellTextByHeader("instructor");
 
-    if (!instructorText) {
+    if (!instructor) {
       debug.warn({ id: "extractFromRow.skip" }, "Skipping row: missing instructor cell", {
         code,
         section_number,
@@ -192,7 +192,7 @@ export function extractFromRow(row, headerMaps) {
   if (isOnline) meetingObj.location = "Online";
 
   let meeting = [meetingObj.days, meetingObj.time].filter(Boolean).join(" | ");
-  meeting += `\n${meetingObj.location || (isOnline ? "Online" : "")}`.trim();
+  meeting += `\n${meetingObj.location || (isOnline ? "Online" : "")}`;
 
   const startDate = extractStartDate(meetingLines[0]) || extractStartDate(startDateText);
 
