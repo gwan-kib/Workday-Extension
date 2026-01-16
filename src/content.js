@@ -10,7 +10,7 @@ import { filterCourses, sortCourses, wireTableSorting } from "./mainPanel/mainPa
 import { renderCourseRows } from "./mainPanel/renderCourseRows.js";
 import { renderSchedule } from "./mainPanel/scheduleView.js";
 
-import { exportICS } from "./export-logic/export-ics.js";
+import { exportICS } from "./exportLogic/exportIcs.js";
 
 import {
   canSaveMoreSchedules,

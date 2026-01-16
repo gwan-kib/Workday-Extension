@@ -1,4 +1,4 @@
-import { STATE } from "../core/state";
+import { STATE } from "../core/state.js";
 import { debugFor } from "../utilities/debugTool.js";
 
 const debug = debugFor("export-ics");
@@ -9,11 +9,11 @@ const TZID = "America/Vancouver";
 // converts a Date object into this format: YYYYMMDDTHHMMSSZ
 const formatDateTimeUTC = (date) => {
   const y = date.getUTCFullYear();
-  const m = pad(date.getUTCMonth() + 1);
-  const d = pad(date.getUTCDate());
-  const hh = pad(date.getUTCHours());
-  const mm = pad(date.getUTCMinutes());
-  const ss = pad(date.getUTCSeconds());
+  const m = padNumbers(date.getUTCMonth() + 1);
+  const d = padNumbers(date.getUTCDate());
+  const hh = padNumbers(date.getUTCHours());
+  const mm = padNumbers(date.getUTCMinutes());
+  const ss = padNumbers(date.getUTCSeconds());
   debug.log("Formatting UTC Date:", { y, m, d, hh, mm, ss });
   return `${y}${m}${d}T${hh}${mm}${ss}Z`;
 };
